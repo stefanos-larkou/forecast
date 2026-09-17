@@ -24,8 +24,18 @@ jobs:
 
             - run: pip install -r requirements.txt
 
-            - run: python backfill.py
+            - run: python -u backfill.py
 
             - name: Commit backfill
               if: always()
               run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add data/backfill
+                  if git diff --staged --quiet; then
+                      echo "Nothing to commit."
+                      exit 0
+                  fi
+                  git commit -m "backfill previous runs"
+                  git pull --rebase
+                  git push
