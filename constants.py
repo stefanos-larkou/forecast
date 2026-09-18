@@ -44,3 +44,5 @@ ERA5_LAG_DAYS = 6
 SERIES_KEY = ["location", "model", "variable", "lead_hours"]
 BIAS_WINDOW_DAYS = 30
 BIAS_MIN_DAYS = 7
+
+MAE_VARIABLES = ["temperature_2m", "relative_humidity_2m", "wind_speed_10m", "cloud_cover"]
