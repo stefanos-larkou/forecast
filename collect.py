@@ -4,14 +4,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from constants import LOCATION, MODELS, VARIABLES, Location
+from constants import FORECAST_API_URL, FORECASTS_DIR, LIVE_FORECAST_DAYS, LOCATION, MODELS, VARIABLES, Location
 from openmeteo import fetch_hourly
-from schema import finalise, write
-
-
-FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
-FORECAST_DAYS = 7
-OUT_DIR = Path("data/forecasts")
+from schema import FORECASTS
 
 
 def to_long(payload: dict, location: Location, run_time: datetime) -> pd.DataFrame:
@@ -43,11 +38,11 @@ def to_long(payload: dict, location: Location, run_time: datetime) -> pd.DataFra
     df = pd.concat(frames, ignore_index=True)
     df["lead_hours"] = (df["valid_time"] - df["run_time"]) // pd.Timedelta(hours=1)
 
-    return finalise(df[df["lead_hours"] > 0])
+    return FORECASTS.finalise(df[df["lead_hours"] > 0])
 
 
 def snapshot_path(run_time: datetime) -> Path:
-    return OUT_DIR / f"{run_time:%Y}" / f"{run_time:%m}" / f"run_{run_time:%Y%m%dT%H}.parquet"
+    return FORECASTS_DIR / f"{run_time:%Y}" / f"{run_time:%m}" / f"run_{run_time:%Y%m%dT%H}.parquet"
 
 
 def main() -> None:
@@ -57,11 +52,11 @@ def main() -> None:
         print(f"{path} already exists. Snapshot will not be overwritten.")
         return
 
-    payload = fetch_hourly(FORECAST_URL, LOCATION, VARIABLES, models=",".join(MODELS), forecast_days=FORECAST_DAYS)
+    payload = fetch_hourly(FORECAST_API_URL, LOCATION, VARIABLES, models=",".join(MODELS), forecast_days=LIVE_FORECAST_DAYS)
     print(f"{LOCATION.name}: model grid point ({payload['latitude']:.3f}, {payload['longitude']:.3f})")
 
     df = to_long(payload, LOCATION, run_time)
-    write(df, path)
+    FORECASTS.write(df, path)
     print(f"{len(df)} rows, lead hours {df['lead_hours'].min()} to {df['lead_hours'].max()} -> {path} ({path.stat().st_size / 1024:.1f} KB)")
 
 
