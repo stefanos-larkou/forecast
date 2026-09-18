@@ -6,8 +6,8 @@ from pathlib import Path
 import pandas as pd
 
 from constants import ARCHIVE_API_URL, ERA5_LAG_DAYS, HOURS_PER_DAY, LOCATION, OBSERVATIONS_DIR, OBSERVATIONS_FIRST_DAY, SECONDS_BETWEEN_REQUESTS, TRUTH_MODEL, VARIABLES, Location
-from openmeteo import fetch_hourly
 from schema import OBSERVATIONS
+from sources.openmeteo import fetch_hourly
 
 
 def to_long(payload: dict, location: Location) -> pd.DataFrame:

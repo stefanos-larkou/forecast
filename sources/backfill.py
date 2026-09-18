@@ -5,8 +5,8 @@ from pathlib import Path
 import pandas as pd
 
 from constants import BACKFILL_DIR, BACKFILL_FIRST_MONTH, BACKFILL_LEAD_DAYS, HOURS_PER_DAY, LOCATION, MODELS, PREVIOUS_RUNS_API_URL, PREVIOUS_RUNS_SOURCE, SECONDS_BETWEEN_REQUESTS, VARIABLES, Location
-from openmeteo import fetch_hourly
 from schema import FORECASTS
+from sources.openmeteo import fetch_hourly
 
 
 def previous_runs_name(variable: str, day: int) -> str:

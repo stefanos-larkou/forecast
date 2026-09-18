@@ -3,8 +3,8 @@ import json
 import lightgbm
 import numpy as np
 
-import gbm
 from constants import BOOSTING_ROUNDS, LEARNING_RATE, MIN_LEAF_ROWS, TREE_MAX_DEPTH
+from model import gbm
 
 
 def synthetic_rows() -> tuple[np.ndarray, np.ndarray]:

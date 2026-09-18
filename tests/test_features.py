@@ -1,7 +1,7 @@
 import pandas as pd
 
 from constants import ERA5_LAG_DAYS, MODEL_MAX_LEAD_HOURS, MODELS
-from features import build_features, trailing_bias, with_trailing_bias
+from model.features import build_features, trailing_bias, with_trailing_bias
 
 
 def hourly_errors(days: int) -> pd.DataFrame:

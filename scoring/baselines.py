@@ -1,6 +1,6 @@
 import pandas as pd
 
-from features import trailing_bias, with_trailing_bias
+from model.features import trailing_bias, with_trailing_bias
 
 
 def with_persistence(forecasts: pd.DataFrame, observations: pd.DataFrame) -> pd.DataFrame:

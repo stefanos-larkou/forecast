@@ -26,7 +26,7 @@ jobs:
 
             - run: pip install -r requirements.txt
 
-            - run: python -u observe.py
+            - run: python -u -m sources.observe
 
             - name: Commit observations
               if: always()

@@ -24,7 +24,7 @@ jobs:
 
             - run: pip install -r requirements.txt
 
-            - run: python -u backfill.py
+            - run: python -u -m sources.backfill
 
             - name: Commit backfill
               if: always()

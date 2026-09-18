@@ -1,8 +1,8 @@
 import pandas as pd
 
-from baselines import with_bias_correction, with_persistence
 from constants import BACKFILL_DIR, LEADERBOARD_DECIMALS, MAE_VARIABLES, OBSERVATIONS_DIR
-from grading import grade
+from scoring.baselines import with_bias_correction, with_persistence
+from scoring.grading import grade
 
 
 def score(graded: pd.DataFrame, observations: pd.DataFrame) -> pd.DataFrame:

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from baselines import with_bias_correction, with_persistence
+from scoring.baselines import with_bias_correction, with_persistence
 
 
 def test_persistence_is_the_observation_lead_hours_before_valid_time() -> None:

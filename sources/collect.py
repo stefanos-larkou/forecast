@@ -5,8 +5,8 @@ from pathlib import Path
 import pandas as pd
 
 from constants import FORECAST_API_URL, FORECASTS_DIR, LIVE_FORECAST_DAYS, LIVE_SOURCE, LOCATION, MODELS, VARIABLES, Location
-from openmeteo import fetch_hourly
 from schema import FORECASTS
+from sources.openmeteo import fetch_hourly
 
 
 def to_long(payload: dict, location: Location, run_time: datetime) -> pd.DataFrame:

@@ -26,7 +26,7 @@ jobs:
 
             - run: pip install -r requirements.txt
 
-            - run: python -u collect.py
+            - run: python -u -m sources.collect
 
             - name: Commit snapshot
               run: |
