@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from constants import PARQUET_COMPRESSION
+
 
 @dataclass(frozen=True)
 class Table:
@@ -16,7 +18,7 @@ class Table:
             raise ValueError(f"{path}: frame does not match the table schema.")
 
         path.parent.mkdir(parents=True, exist_ok=True)
-        df.to_parquet(path, compression="zstd", index=False)
+        df.to_parquet(path, compression=PARQUET_COMPRESSION, index=False)
 
 
 FORECASTS = Table({

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from constants import FORECAST_API_URL, FORECASTS_DIR, LIVE_FORECAST_DAYS, LOCATION, MODELS, VARIABLES, Location
+from constants import FORECAST_API_URL, FORECASTS_DIR, LIVE_FORECAST_DAYS, LIVE_SOURCE, LOCATION, MODELS, VARIABLES, Location
 from openmeteo import fetch_hourly
 from schema import FORECASTS
 
@@ -29,7 +29,7 @@ def to_long(payload: dict, location: Location, run_time: datetime) -> pd.DataFra
                 "model": model,
                 "variable": variable,
                 "value": hourly[column],
-                "source": "live"
+                "source": LIVE_SOURCE
             }))
 
     if not frames:

@@ -4,9 +4,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from constants import BACKFILL_DIR, BACKFILL_FIRST_MONTH, BACKFILL_LEAD_DAYS, LOCATION, MODELS, PREVIOUS_RUNS_API_URL, SECONDS_BETWEEN_REQUESTS, VARIABLES, Location
+from constants import BACKFILL_DIR, BACKFILL_FIRST_MONTH, BACKFILL_LEAD_DAYS, HOURS_PER_DAY, LOCATION, MODELS, PREVIOUS_RUNS_API_URL, PREVIOUS_RUNS_SOURCE, SECONDS_BETWEEN_REQUESTS, VARIABLES, Location
 from openmeteo import fetch_hourly
 from schema import FORECASTS
+
+
+def previous_runs_name(variable: str, day: int) -> str:
+    return f"{variable}_previous_day{day}"
 
 
 def to_long(payload: dict, location: Location) -> pd.DataFrame:
@@ -17,7 +21,7 @@ def to_long(payload: dict, location: Location) -> pd.DataFrame:
     for model in MODELS:
         for variable in VARIABLES:
             for day in BACKFILL_LEAD_DAYS:
-                column = f"{variable}_previous_day{day}_{model}"
+                column = f"{previous_runs_name(variable, day)}_{model}"
 
                 if column not in hourly:
                     print(f"Missing: {column}")
@@ -27,11 +31,11 @@ def to_long(payload: dict, location: Location) -> pd.DataFrame:
                     "location": location.slug,
                     "run_time": valid_time - pd.Timedelta(days=day),
                     "valid_time": valid_time,
-                    "lead_hours": day * 24,
+                    "lead_hours": day * HOURS_PER_DAY,
                     "model": model,
                     "variable": variable,
                     "value": hourly[column],
-                    "source": "previous_runs"
+                    "source": PREVIOUS_RUNS_SOURCE
                 }))
 
     if not frames:
@@ -45,7 +49,7 @@ def month_path(month: pd.Period) -> Path:
 
 
 def main() -> None:
-    hourly = [f"{variable}_previous_day{day}" for variable in VARIABLES for day in BACKFILL_LEAD_DAYS]
+    hourly = [previous_runs_name(variable, day) for variable in VARIABLES for day in BACKFILL_LEAD_DAYS]
     last_complete_month = pd.Period(pd.Timestamp.now(tz="UTC").date(), freq="M") - 1
 
     for month in pd.period_range(BACKFILL_FIRST_MONTH, last_complete_month, freq="M"):

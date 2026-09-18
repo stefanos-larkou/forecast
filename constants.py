@@ -28,9 +28,12 @@ SECONDS_BETWEEN_REQUESTS = 1
 FORECASTS_DIR = Path("data/forecasts")
 BACKFILL_DIR = Path("data/backfill")
 OBSERVATIONS_DIR = Path("data/observations")
+PARQUET_COMPRESSION = "zstd"
 
+LIVE_SOURCE = "live"
 LIVE_FORECAST_DAYS = 7
 
+PREVIOUS_RUNS_SOURCE = "previous_runs"
 BACKFILL_FIRST_MONTH = "2024-03"
 BACKFILL_LEAD_DAYS = range(1, 8)
 
