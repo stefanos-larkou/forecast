@@ -61,3 +61,8 @@ FEATURE_COLUMNS = [
     "day_sin",
     "day_cos"
 ]
+
+TREE_MAX_DEPTH = 3
+MIN_LEAF_ROWS = 100
+BOOSTING_ROUNDS = 200
+LEARNING_RATE = 0.1
