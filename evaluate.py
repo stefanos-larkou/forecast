@@ -1,7 +1,7 @@
 import pandas as pd
 
 from baselines import with_bias_correction, with_persistence
-from constants import BACKFILL_DIR, MAE_VARIABLES, OBSERVATIONS_DIR
+from constants import BACKFILL_DIR, LEADERBOARD_DECIMALS, MAE_VARIABLES, OBSERVATIONS_DIR
 from grading import grade
 
 
@@ -23,7 +23,7 @@ def main() -> None:
 
     for variable in MAE_VARIABLES:
         print(f"\n{variable}: mean absolute error, backfill")
-        print(table.loc[variable].astype("float64").round(2).unstack("model").to_string())
+        print(table.loc[variable].astype("float64").round(LEADERBOARD_DECIMALS).unstack("model").to_string())
 
 
 if __name__ == "__main__":

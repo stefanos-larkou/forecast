@@ -14,6 +14,7 @@ LOCATION = Location("larnaca", "Larnaca, Cyprus", 34.9221, 33.62794)
 MODELS = ["gfs_seamless", "ecmwf_ifs025", "icon_seamless"]
 VARIABLES = ["temperature_2m", "relative_humidity_2m", "precipitation", "wind_speed_10m", "cloud_cover"]
 HOURS_PER_DAY = 24
+DAYS_PER_YEAR = 365.25
 
 FORECAST_API_URL = "https://api.open-meteo.com/v1/forecast"
 PREVIOUS_RUNS_API_URL = "https://previous-runs-api.open-meteo.com/v1/forecast"
@@ -46,3 +47,17 @@ BIAS_WINDOW_DAYS = 30
 BIAS_MIN_DAYS = 7
 
 MAE_VARIABLES = ["temperature_2m", "relative_humidity_2m", "wind_speed_10m", "cloud_cover"]
+LEADERBOARD_DECIMALS = 2
+
+REFERENCE_MODEL = "ecmwf_ifs025"
+MODEL_MAX_LEAD_HOURS = 144
+FEATURE_COLUMNS = [
+    *MODELS,
+    *[f"{model}_trailing_bias" for model in MODELS],
+    "spread",
+    "lead_hours",
+    "hour_sin",
+    "hour_cos",
+    "day_sin",
+    "day_cos"
+]

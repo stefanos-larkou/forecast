@@ -1,6 +1,7 @@
+import numpy as np
 import pandas as pd
 
-from constants import BIAS_MIN_DAYS, BIAS_WINDOW_DAYS, ERA5_LAG_DAYS, HOURS_PER_DAY, SERIES_KEY
+from constants import BIAS_MIN_DAYS, BIAS_WINDOW_DAYS, DAYS_PER_YEAR, ERA5_LAG_DAYS, HOURS_PER_DAY, MODEL_MAX_LEAD_HOURS, MODELS, SERIES_KEY
 
 
 def trailing_bias(graded: pd.DataFrame) -> pd.DataFrame:
@@ -24,4 +25,31 @@ def with_trailing_bias(forecasts: pd.DataFrame, trailing: pd.DataFrame) -> pd.Da
         on="as_of",
         by=SERIES_KEY,
         direction="backward"
+    )
+
+
+def cyclic(values: pd.Series, period: float) -> tuple[pd.Series, pd.Series]:
+    angle = 2 * np.pi * values / period
+    return np.sin(angle), np.cos(angle)
+
+
+def build_features(forecasts: pd.DataFrame, graded: pd.DataFrame) -> pd.DataFrame:
+    forecasts = forecasts[forecasts["lead_hours"] <= MODEL_MAX_LEAD_HOURS]
+    long = with_trailing_bias(forecasts, trailing_bias(graded))
+    wide = long.pivot(
+        index=["location", "variable", "run_time", "valid_time", "lead_hours"],
+        columns="model",
+        values=["value", "trailing_bias"]
+    )
+    wide.columns = [model if field == "value" else f"{model}_{field}" for field, model in wide.columns]
+    wide = wide.reset_index()
+
+    hour_sin, hour_cos = cyclic(wide["valid_time"].dt.hour, HOURS_PER_DAY)
+    day_sin, day_cos = cyclic(wide["valid_time"].dt.dayofyear, DAYS_PER_YEAR)
+    return wide.assign(
+        spread=wide[MODELS].max(axis=1) - wide[MODELS].min(axis=1),
+        hour_sin=hour_sin,
+        hour_cos=hour_cos,
+        day_sin=day_sin,
+        day_cos=day_cos
     )
