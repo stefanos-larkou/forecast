@@ -6,7 +6,7 @@ from constants import REQUEST_ATTEMPTS, REQUEST_TIMEOUT_SECONDS, RETRYABLE_STATU
 
 
 def is_retryable(error: requests.RequestException) -> bool:
-    if isinstance(error, (requests.Timeout, requests.ConnectionError)):
+    if isinstance(error, (requests.Timeout, requests.ConnectionError, requests.JSONDecodeError)):
         return True
     return error.response is not None and error.response.status_code in RETRYABLE_STATUS_CODES
 
