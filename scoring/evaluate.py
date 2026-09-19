@@ -2,7 +2,7 @@ import time
 
 import pandas as pd
 
-from constants import CLIMATE_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MAE_VARIABLES, REFERENCE_MODEL, REFIT_EVERY_MONTHS, SCORING_KEY, TRAINING_WINDOW_MONTHS
+from constants import CLIMATE_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, LEADERBOARD_METRICS, MAE_VARIABLES, REFERENCE_MODEL, REFIT_EVERY_MONTHS, SCORING_KEY, TRAINING_WINDOW_MONTHS
 from model import gbm
 from model.training import load_training_data
 from scoring.baselines import climatology, with_bias_correction, with_climatology, with_persistence
@@ -17,8 +17,14 @@ def score(graded: pd.DataFrame, observations: pd.DataFrame, climate: pd.DataFram
 
     compared = by_model.join(shared).reset_index().merge(boosted, on=SCORING_KEY, how="inner").dropna()
     methods = [*by_model.columns, "persisted", "climatology", "boosted"]
-    errors = compared[methods].sub(compared["value_observed"], axis=0).abs()
-    return errors.assign(variable=compared["variable"], lead_hours=compared["lead_hours"]).groupby(["variable", "lead_hours"], observed=True).mean()
+    errors = compared[methods].sub(compared["value_observed"], axis=0)
+    keys = [compared["variable"], compared["lead_hours"]]
+
+    return pd.concat({
+        "mae": errors.abs().groupby(keys, observed=True).mean(),
+        "bias": errors.groupby(keys, observed=True).mean(),
+        "scatter": errors.groupby(keys, observed=True).std()
+    }, names=["metric"])
 
 
 def fold_starts(trained: pd.DataFrame) -> list[pd.Period]:
@@ -54,9 +60,11 @@ def boosted_forecasts(trained: pd.DataFrame) -> pd.DataFrame:
 
 
 def print_leaderboard(table: pd.DataFrame, first_fold: pd.Period) -> None:
+    print(f"\nForecasts from {first_fold} on, each scored by a model trained only on the {TRAINING_WINDOW_MONTHS} months before its fold")
     for variable in MAE_VARIABLES:
-        print(f"\n{variable}: mean absolute error, forecasts from {first_fold} on, each scored by a model trained only on the {TRAINING_WINDOW_MONTHS} months before its fold")
-        print(table.loc[variable].astype("float64").round(LEADERBOARD_DECIMALS).T.to_string())
+        for metric, description in LEADERBOARD_METRICS.items():
+            print(f"\n{variable}, {metric}: {description}")
+            print(table.loc[(metric, variable)].astype("float64").round(LEADERBOARD_DECIMALS).T.to_string())
 
 
 def main() -> None:

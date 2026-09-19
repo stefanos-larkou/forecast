@@ -57,6 +57,11 @@ BIAS_MIN_DAYS = 7
 
 MAE_VARIABLES = ["temperature_2m", "relative_humidity_2m", "wind_speed_10m", "cloud_cover"]
 LEADERBOARD_DECIMALS = 2
+LEADERBOARD_METRICS = {
+    "mae": "mean absolute error",
+    "bias": "mean error",
+    "scatter": "standard deviation of the error"
+}
 
 REFERENCE_MODEL = "ecmwf_ifs025"
 MODEL_MAX_LEAD_HOURS = 144
