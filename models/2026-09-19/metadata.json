@@ -1,0 +1,36 @@
+{
+    "version": "2026-09-19",
+    "trained_at": "2026-09-19T08:53:41.219446+00:00",
+    "commit": "c215df2cc3a89eb1eafa0f76f589522fe770eb00",
+    "training_window": {
+        "from": "2025-09-14T00:00:00+00:00",
+        "to": "2026-09-13T23:00:00+00:00"
+    },
+    "rows": {
+        "temperature_2m": 52371,
+        "relative_humidity_2m": 52431,
+        "wind_speed_10m": 52560,
+        "cloud_cover": 52126
+    },
+    "features": [
+        "gfs_seamless",
+        "ecmwf_ifs025",
+        "icon_seamless",
+        "gfs_seamless_trailing_bias",
+        "ecmwf_ifs025_trailing_bias",
+        "icon_seamless_trailing_bias",
+        "spread",
+        "lead_hours",
+        "hour_sin",
+        "hour_cos",
+        "day_sin",
+        "day_cos"
+    ],
+    "hyperparameters": {
+        "tree_max_depth": 3,
+        "min_leaf_rows": 100,
+        "boosting_rounds": 200,
+        "learning_rate": 0.1,
+        "training_window_months": 12
+    }
+}
