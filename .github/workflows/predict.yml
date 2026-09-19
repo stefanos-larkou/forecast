@@ -1,0 +1,44 @@
+name: Predict
+
+on:
+    workflow_run:
+        workflows: [Collect]
+        types: [completed]
+    workflow_dispatch:
+
+concurrency:
+    group: collect
+    queue: max
+
+permissions:
+    contents: write
+
+jobs:
+    predict:
+        if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: actions/setup-python@v7
+              with:
+                  python-version: "3.13"
+                  cache: pip
+
+            - run: pip install -r requirements.txt
+
+            - run: python -u -m model.predict
+
+            - name: Commit prediction
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add data/predictions
+                  if git diff --staged --quiet; then
+                      echo "Nothing to commit."
+                      exit 0
+                  fi
+                  git commit -m "prediction $(date -u +%Y-%m-%dT%H)"
+                  git pull --rebase
+                  git push

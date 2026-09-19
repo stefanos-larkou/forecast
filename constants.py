@@ -79,3 +79,12 @@ METADATA_FILE = "metadata.json"
 CURRENT_MODEL_FILE = MODELS_DIR / "current.json"
 MODEL_VERSION_FORMAT = "%Y-%m-%d"
 JSON_INDENT = 4
+
+PREDICTIONS_DIR = Path("data/predictions")
+BLEND_MODEL = "gbm_blend"
+PHYSICAL_LIMITS = {
+    "temperature_2m": (None, None),
+    "relative_humidity_2m": (0, 100),
+    "wind_speed_10m": (0, None),
+    "cloud_cover": (0, 100)
+}
