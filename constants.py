@@ -63,6 +63,11 @@ LEADERBOARD_METRICS = {
     "scatter": "standard deviation of the error"
 }
 
+RAIN_VARIABLE = "precipitation"
+WET_HOUR_MM = 0.1
+RAIN_METHODS = ["models", "climatology", "persisted", "boosted"]
+RELIABILITY_BIN_COUNT = 10
+
 REFERENCE_MODEL = "ecmwf_ifs025"
 MODEL_MAX_LEAD_HOURS = 144
 FEATURE_COLUMNS = [

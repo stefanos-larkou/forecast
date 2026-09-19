@@ -34,13 +34,18 @@ def fold_starts(trained: pd.DataFrame) -> list[pd.Period]:
     return list(months[::REFIT_EVERY_MONTHS])
 
 
-def forecast_fold(rows: pd.DataFrame, start: pd.Period) -> pd.DataFrame:
+def fold_rows(rows: pd.DataFrame, start: pd.Period) -> tuple[pd.DataFrame, pd.DataFrame]:
     train_from = (start - TRAINING_WINDOW_MONTHS).start_time.tz_localize("UTC")
     score_from = start.start_time.tz_localize("UTC")
     score_until = (start + REFIT_EVERY_MONTHS).start_time.tz_localize("UTC")
 
     training = rows[(rows["valid_time"] >= train_from) & (rows["valid_time"] < score_from)]
     scored = rows[(rows["run_time"] >= score_from) & (rows["run_time"] < score_until)]
+    return training, scored
+
+
+def forecast_fold(rows: pd.DataFrame, start: pd.Period) -> pd.DataFrame:
+    training, scored = fold_rows(rows, start)
 
     print(f"  {start} {rows['variable'].iloc[0]}: training on {len(training):,} rows, scoring {len(scored):,} forecasts...", end=" ", flush=True)
     began = time.perf_counter()
