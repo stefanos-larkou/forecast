@@ -1,6 +1,8 @@
 name: Backfill
 
 on:
+    schedule:
+        - cron: "20 9 * * *"
     workflow_dispatch:
 
 concurrency:
@@ -36,6 +38,6 @@ jobs:
                       echo "Nothing to commit."
                       exit 0
                   fi
-                  git commit -m "backfill previous runs"
+                  git commit -m "backfill $(date -u +%Y-%m-%d)"
                   git pull --rebase
                   git push
