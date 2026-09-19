@@ -79,6 +79,7 @@ METADATA_FILE = "metadata.json"
 CURRENT_MODEL_FILE = MODELS_DIR / "current.json"
 MODEL_VERSION_FORMAT = "%Y-%m-%d"
 JSON_INDENT = 4
+PROMOTION_TOLERANCE = 1e-9
 
 PREDICTIONS_DIR = Path("data/predictions")
 BLEND_MODEL = "gbm_blend"
