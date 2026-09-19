@@ -35,6 +35,9 @@ jobs:
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                   git add data/predictions
+                  if [ -d data/intervals ]; then
+                      git add data/intervals
+                  fi
                   if git diff --staged --quiet; then
                       echo "Nothing to commit."
                       exit 0

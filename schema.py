@@ -11,7 +11,7 @@ class Table:
     columns: dict[str, str]
 
     def finalise(self, df: pd.DataFrame) -> pd.DataFrame:
-        return df.dropna(subset=["value"]).astype(self.columns)[list(self.columns)]
+        return df.dropna(subset=list(self.columns)).astype(self.columns)[list(self.columns)]
 
     def write(self, df: pd.DataFrame, path: Path) -> None:
         if list(df.dtypes.astype(str).items()) != list(self.columns.items()):
@@ -38,4 +38,17 @@ OBSERVATIONS = Table({
     "valid_time": "datetime64[us, UTC]",
     "variable": "category",
     "value": "float32"
+})
+
+
+INTERVALS = Table({
+    "location": "category",
+    "run_time": "datetime64[us, UTC]",
+    "valid_time": "datetime64[us, UTC]",
+    "lead_hours": "int32",
+    "model": "category",
+    "variable": "category",
+    "lower": "float32",
+    "upper": "float32",
+    "source": "category"
 })

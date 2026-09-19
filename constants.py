@@ -31,6 +31,7 @@ FORECASTS_DIR = Path("data/forecasts")
 BACKFILL_DIR = Path("data/backfill")
 OBSERVATIONS_DIR = Path("data/observations")
 PREDICTIONS_DIR = Path("data/predictions")
+INTERVALS_DIR = Path("data/intervals")
 PARQUET_COMPRESSION = "zstd"
 
 LIVE_SOURCE = "live"
