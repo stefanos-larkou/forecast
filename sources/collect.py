@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from constants import FORECAST_API_URL, FORECASTS_DIR, LIVE_FORECAST_DAYS, LIVE_SOURCE, LOCATION, MODELS, VARIABLES, Location
+from constants import BYTES_PER_KB, FORECAST_API_URL, FORECASTS_DIR, LIVE_FORECAST_DAYS, LIVE_SOURCE, LOCATION, MODELS, VARIABLES, Location
 from schema import FORECASTS
 from sources.openmeteo import fetch_hourly
 
@@ -57,7 +57,7 @@ def main() -> None:
 
     df = to_long(payload, LOCATION, run_time)
     FORECASTS.write(df, path)
-    print(f"{len(df)} rows, lead hours {df['lead_hours'].min()} to {df['lead_hours'].max()} -> {path} ({path.stat().st_size / 1024:.1f} KB)")
+    print(f"{len(df)} rows, lead hours {df['lead_hours'].min()} to {df['lead_hours'].max()} -> {path} ({path.stat().st_size / BYTES_PER_KB:.1f} KB)")
 
 
 if __name__ == "__main__":

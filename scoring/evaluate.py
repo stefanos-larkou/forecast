@@ -2,11 +2,10 @@ import time
 
 import pandas as pd
 
-from constants import BACKFILL_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MAE_VARIABLES, OBSERVATIONS_DIR, REFERENCE_MODEL, REFIT_EVERY_MONTHS, SCORING_KEY, TRAINING_WINDOW_MONTHS
+from constants import FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MAE_VARIABLES, REFERENCE_MODEL, REFIT_EVERY_MONTHS, SCORING_KEY, TRAINING_WINDOW_MONTHS
 from model import gbm
-from model.features import build_features
+from model.training import load_training_data
 from scoring.baselines import with_bias_correction, with_persistence
-from scoring.grading import grade, with_target
 
 
 def score(graded: pd.DataFrame, observations: pd.DataFrame, boosted: pd.DataFrame) -> pd.DataFrame:
@@ -54,24 +53,15 @@ def boosted_forecasts(trained: pd.DataFrame) -> pd.DataFrame:
     ], ignore_index=True)
 
 
-def load() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    print("Loading forecasts and observations...", flush=True)
-    observations = pd.read_parquet(OBSERVATIONS_DIR)
-    forecasts = pd.read_parquet(BACKFILL_DIR)
-    graded = grade(forecasts, observations)
-
-    print("Building features...", flush=True)
-    trained = with_target(build_features(forecasts, graded), observations).dropna(subset=[*FEATURE_COLUMNS, "target"])
-    return observations, graded, trained
-
 def print_leaderboard(table: pd.DataFrame, first_fold: pd.Period) -> None:
     for variable in MAE_VARIABLES:
         print(f"\n{variable}: mean absolute error, forecasts from {first_fold} on, each scored by a model trained only on the {TRAINING_WINDOW_MONTHS} months before its fold")
         print(table.loc[variable].astype("float64").round(LEADERBOARD_DECIMALS).T.to_string())
 
+
 def main() -> None:
     began = time.perf_counter()
-    observations, graded, trained = load()
+    observations, graded, trained = load_training_data()
     starts = fold_starts(trained)
     print(f"{len(graded):,} graded forecasts, {len(trained):,} training rows, {len(starts)} folds from {starts[0]} to {starts[-1]}", flush=True)
 

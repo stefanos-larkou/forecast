@@ -15,6 +15,7 @@ MODELS = ["gfs_seamless", "ecmwf_ifs025", "icon_seamless"]
 VARIABLES = ["temperature_2m", "relative_humidity_2m", "precipitation", "wind_speed_10m", "cloud_cover"]
 HOURS_PER_DAY = 24
 DAYS_PER_YEAR = 365.25
+BYTES_PER_KB = 1024
 
 FORECAST_API_URL = "https://api.open-meteo.com/v1/forecast"
 PREVIOUS_RUNS_API_URL = "https://previous-runs-api.open-meteo.com/v1/forecast"
@@ -71,3 +72,10 @@ LEARNING_RATE = 0.1
 SCORING_KEY = ["location", "variable", "valid_time", "lead_hours"]
 TRAINING_WINDOW_MONTHS = 12
 REFIT_EVERY_MONTHS = 3
+
+MODELS_DIR = Path("models")
+MODEL_FILE = "model.json"
+METADATA_FILE = "metadata.json"
+CURRENT_MODEL_FILE = MODELS_DIR / "current.json"
+MODEL_VERSION_FORMAT = "%Y-%m-%d"
+JSON_INDENT = 4
