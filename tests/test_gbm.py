@@ -2,8 +2,9 @@ import json
 
 import lightgbm
 import numpy as np
+import pytest
 
-from constants import BOOSTING_ROUNDS, LEARNING_RATE, MIN_LEAF_ROWS, TREE_MAX_DEPTH
+from constants import BOOSTING_ROUNDS, LEARNING_RATE, LOWER_QUANTILE, MIN_LEAF_ROWS, TREE_MAX_DEPTH, UPPER_QUANTILE
 from model import gbm
 
 
@@ -14,9 +15,9 @@ def synthetic_rows() -> tuple[np.ndarray, np.ndarray]:
     return features, target
 
 
-def lightgbm_predictions(features: np.ndarray, target: np.ndarray, points: np.ndarray) -> np.ndarray:
+def lightgbm_predictions(features: np.ndarray, target: np.ndarray, points: np.ndarray, objective: dict) -> np.ndarray:
     settings = {
-        "objective": "regression",
+        **objective,
         "learning_rate": LEARNING_RATE,
         "max_depth": TREE_MAX_DEPTH,
         "num_leaves": 2 ** TREE_MAX_DEPTH,
@@ -41,7 +42,16 @@ def test_predictions_match_lightgbm_on_and_between_the_training_values() -> None
     points = np.vstack([features, features + 0.25])
     ours = gbm.predict(gbm.fit(features, target), points)
 
-    assert np.abs(ours - lightgbm_predictions(features, target, points)).max() < 1e-6
+    assert np.abs(ours - lightgbm_predictions(features, target, points, {"objective": "regression"})).max() < 1e-6
+
+
+@pytest.mark.parametrize("quantile", [LOWER_QUANTILE, UPPER_QUANTILE])
+def test_quantile_predictions_match_lightgbm_on_and_between_the_training_values(quantile: float) -> None:
+    features, target = synthetic_rows()
+    points = np.vstack([features, features + 0.25])
+    ours = gbm.predict(gbm.fit(features, target, quantile), points)
+
+    assert np.abs(ours - lightgbm_predictions(features, target, points, {"objective": "quantile", "alpha": quantile})).max() < 1e-6
 
 
 def test_a_model_survives_a_json_round_trip() -> None:

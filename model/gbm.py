@@ -31,10 +31,14 @@ def best_split(features: np.ndarray, target: np.ndarray) -> tuple[int, float, fl
     return best
 
 
-def grow(features: np.ndarray, target: np.ndarray, depth: int) -> dict:
-    split = best_split(features, target) if depth > 0 else None
+def leaf_value(residuals: np.ndarray, quantile: float | None) -> float:
+    return float(residuals.mean() if quantile is None else np.quantile(residuals, quantile))
+
+
+def grow(features: np.ndarray, gradients: np.ndarray, residuals: np.ndarray, depth: int, quantile: float | None) -> dict:
+    split = best_split(features, gradients) if depth > 0 else None
     if split is None:
-        return {"value": float(target.mean())}
+        return {"value": leaf_value(residuals, quantile)}
 
     column, threshold, _ = split
     goes_left = features[:, column] <= threshold
@@ -42,8 +46,8 @@ def grow(features: np.ndarray, target: np.ndarray, depth: int) -> dict:
     return {
         "feature": column,
         "threshold": threshold,
-        "left": grow(features[goes_left], target[goes_left], depth - 1),
-        "right": grow(features[~goes_left], target[~goes_left], depth - 1)
+        "left": grow(features[goes_left], gradients[goes_left], residuals[goes_left], depth - 1, quantile),
+        "right": grow(features[~goes_left], gradients[~goes_left], residuals[~goes_left], depth - 1, quantile)
     }
 
 
@@ -59,12 +63,17 @@ def predict_tree(tree: dict, features: np.ndarray) -> np.ndarray:
     return predictions
 
 
-def fit(features: np.ndarray, target: np.ndarray) -> list[dict]:
+def negative_gradients(residuals: np.ndarray, quantile: float | None) -> np.ndarray:
+    return residuals if quantile is None else np.where(residuals <= 0, quantile - 1, quantile)
+
+
+def fit(features: np.ndarray, target: np.ndarray, quantile: float | None = None) -> list[dict]:
     trees = []
     prediction = np.zeros(len(target))
 
     for _ in range(BOOSTING_ROUNDS):
-        tree = grow(features, target - prediction, TREE_MAX_DEPTH)
+        residuals = target - prediction
+        tree = grow(features, negative_gradients(residuals, quantile), residuals, TREE_MAX_DEPTH, quantile)
         prediction = prediction + LEARNING_RATE * predict_tree(tree, features)
         trees.append(tree)
 
