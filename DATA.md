@@ -1,6 +1,6 @@
 # Data
 
-Every file under `data/forecasts/` has these eight columns, in this order.
+Every file under `data/forecasts/`, `data/backfill/` and `data/predictions/` has these eight columns, in this order.
 
 Example row: `larnaca | 2026-09-17 15:00 | 2026-09-17 16:00 | 1 | gfs_seamless | temperature_2m | 29.0 | live`
 
@@ -15,7 +15,7 @@ Example row: `larnaca | 2026-09-17 15:00 | 2026-09-17 16:00 | 1 | gfs_seamless |
 | `model` | category | The weather model that made the prediction. | `gfs_seamless` |
 | `variable` | category | What is being predicted. | `temperature_2m` |
 | `value` | float32 | The predicted value, in the variable's unit. | `29.0` |
-| `source` | category | `live` for the collector's snapshots, `previous_runs` for the historical backfill | `live` |
+| `source` | category | `live` for the collector's snapshots and the predictions made from them, `previous_runs` for the historical backfill | `live` |
 
 ## Models
 
@@ -24,6 +24,19 @@ Example row: `larnaca | 2026-09-17 15:00 | 2026-09-17 16:00 | 1 | gfs_seamless |
 | `gfs_seamless` | NOAA, the United States' weather service (GFS) |
 | `ecmwf_ifs025` | The European Centre for Medium-Range Weather Forecasts (IFS) |
 | `icon_seamless` | DWD, Germany's weather service (ICON) |
+| `gbm_blend` | This project: a gradient-boosted model that corrects ECMWF using all three models above |
+
+## Predictions
+
+Files under `data/predictions/` hold `gbm_blend`'s forecasts. Each one is named after the snapshot
+in `data/forecasts/` it was made from, and has the same `run_time`.
+
+- **Four variables, not five.** Precipitation is not predicted.
+- **Lead hours 1 to 144.** Longer leads are not predicted.
+- **Values stay within what is physically possible**: cloud cover and humidity between 0 and 100,
+  wind speed 0 or above.
+- **Only the newest snapshot is predicted, as soon as it is saved**, so every prediction was made
+  before its outcome was known. A snapshot with no prediction file was never predicted.
 
 ## Variables
 
