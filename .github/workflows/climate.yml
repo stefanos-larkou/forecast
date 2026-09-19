@@ -1,8 +1,6 @@
-name: 4. Train
+name: 1. Climate
 
 on:
-    schedule:
-        - cron: "20 15 * * 1"
     workflow_dispatch:
 
 concurrency:
@@ -13,7 +11,7 @@ permissions:
     contents: write
 
 jobs:
-    train:
+    climate:
         runs-on: ubuntu-latest
         timeout-minutes: 30
         steps:
@@ -26,17 +24,18 @@ jobs:
 
             - run: pip install -r requirements.txt
 
-            - run: python -u -m model.train
+            - run: python -u -m sources.climate
 
-            - name: Commit model
+            - name: Commit climate history
+              if: always()
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                  git add models
+                  git add data/climate
                   if git diff --staged --quiet; then
                       echo "Nothing to commit."
                       exit 0
                   fi
-                  git commit -m "model $(date -u +%Y-%m-%d)"
+                  git commit -m "climate $(date -u +%Y-%m-%d)"
                   git pull --rebase
                   git push

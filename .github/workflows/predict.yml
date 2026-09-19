@@ -1,8 +1,8 @@
-name: Predict
+name: 6. Predict
 
 on:
     workflow_run:
-        workflows: [Collect]
+        workflows: ["5. Collect"]
         types: [completed]
     workflow_dispatch:
 

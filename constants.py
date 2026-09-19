@@ -46,6 +46,10 @@ TRUTH_MODEL = "era5"
 OBSERVATIONS_FIRST_DAY = "2024-03-01"
 ERA5_LAG_DAYS = 6
 
+CLIMATE_DIR = Path("data/climate")
+CLIMATE_FIRST_YEAR = 1994
+CLIMATE_LAST_YEAR = 2023
+
 SERIES_KEY = ["location", "model", "variable", "lead_hours"]
 BIAS_WINDOW_DAYS = 30
 BIAS_MIN_DAYS = 7
