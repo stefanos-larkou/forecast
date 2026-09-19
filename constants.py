@@ -75,9 +75,12 @@ UPPER_QUANTILE = 0.95
 SCORING_KEY = ["location", "variable", "valid_time", "lead_hours"]
 TRAINING_WINDOW_MONTHS = 12
 REFIT_EVERY_MONTHS = 3
+CALIBRATION_MONTHS = 3
 
 MODELS_DIR = Path("models")
 MODEL_FILE = "model.json"
+LOWER_MODEL_FILE = "lower.json"
+UPPER_MODEL_FILE = "upper.json"
 METADATA_FILE = "metadata.json"
 CURRENT_MODEL_FILE = MODELS_DIR / "current.json"
 MODEL_VERSION_FORMAT = "%Y-%m-%d"

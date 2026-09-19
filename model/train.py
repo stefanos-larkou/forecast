@@ -4,17 +4,18 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
-from constants import BOOSTING_ROUNDS, BYTES_PER_KB, CURRENT_MODEL_FILE, FEATURE_COLUMNS, JSON_INDENT, LEARNING_RATE, MAE_VARIABLES, METADATA_FILE, MIN_LEAF_ROWS, MODEL_FILE, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, SCORING_KEY, TRAINING_WINDOW_MONTHS, TREE_MAX_DEPTH
+from constants import BOOSTING_ROUNDS, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, JSON_INDENT, LEARNING_RATE, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MIN_LEAF_ROWS, MODEL_FILE, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, SCORING_KEY, TRAINING_WINDOW_MONTHS, TREE_MAX_DEPTH, UPPER_MODEL_FILE, UPPER_QUANTILE
 from model import gbm
 from model.training import load_training_data
 from scoring.evaluate import boosted_forecasts
 
 
-def training_window(trained: pd.DataFrame) -> pd.DataFrame:
-    end = trained["valid_time"].max()
-    return trained[trained["valid_time"] > end - pd.DateOffset(months=TRAINING_WINDOW_MONTHS)]
+def training_window(trained: pd.DataFrame, end: pd.Timestamp) -> pd.DataFrame:
+    start = end - pd.DateOffset(months=TRAINING_WINDOW_MONTHS)
+    return trained[(trained["valid_time"] > start) & (trained["valid_time"] <= end)]
 
 
 def commit_sha() -> str:
@@ -58,22 +59,47 @@ def should_promote(backtested: pd.DataFrame) -> bool:
     return passes_gate(backtest_scores(backtested, pd.Timestamp(incumbent["until"])), incumbent)
 
 
-def fit_models(window: pd.DataFrame) -> tuple[dict[str, list[dict]], dict[str, int]]:
-    print(f"Training window: {window['valid_time'].min()} to {window['valid_time'].max()}", flush=True)
+def fit_models(window: pd.DataFrame, quantile: float | None = None) -> tuple[dict[str, list[dict]], dict[str, int]]:
+    label = "point" if quantile is None else f"{quantile:.0%} quantile"
+    print(f"Training {label} models on {window['valid_time'].min()} to {window['valid_time'].max()}", flush=True)
+
     models = {}
     rows = {}
     for variable in MAE_VARIABLES:
         subset = window[window["variable"] == variable]
         print(f"  {variable}: training on {len(subset):,} rows...", end=" ", flush=True)
         began = time.perf_counter()
-        models[variable] = gbm.fit(subset[FEATURE_COLUMNS].to_numpy("float64"), subset["target"].to_numpy("float64"))
+        models[variable] = gbm.fit(subset[FEATURE_COLUMNS].to_numpy("float64"), subset["target"].to_numpy("float64"), quantile)
         rows[variable] = len(subset)
         print(f"done in {time.perf_counter() - began:.0f}s", flush=True)
 
     return models, rows
 
 
-def build_metadata(version: str, window: pd.DataFrame, rows: dict[str, int], backtested: pd.DataFrame, promoted: bool) -> dict:
+def conformal_margin(scores: pd.Series) -> float:
+    coverage = UPPER_QUANTILE - LOWER_QUANTILE
+    level = min(1.0, np.ceil((len(scores) + 1) * coverage) / len(scores))
+    return float(np.quantile(scores, level, method="higher"))
+
+
+def calibrate(calibration: pd.DataFrame, lower_models: dict[str, list[dict]], upper_models: dict[str, list[dict]]) -> dict[str, dict[str, float]]:
+    print(f"Calibrating on {calibration['valid_time'].min()} to {calibration['valid_time'].max()}:", flush=True)
+    margins = {}
+    for variable in MAE_VARIABLES:
+        rows = calibration[calibration["variable"] == variable]
+        features = rows[FEATURE_COLUMNS].to_numpy("float64")
+
+        lower = gbm.predict(lower_models[variable], features)
+        upper = gbm.predict(upper_models[variable], features)
+
+        scores = pd.Series(np.maximum(lower - rows["target"], rows["target"] - upper), index=rows.index)
+        margins[variable] = {str(lead): conformal_margin(group) for lead, group in scores.groupby(rows["lead_hours"])}
+        print(f"  {variable}: {(scores <= 0).mean():.1%} inside the uncalibrated band, margins {margins[variable]}", flush=True)
+
+    return margins
+
+
+def build_metadata(version: str, window: pd.DataFrame, rows: dict[str, int], quantile_window: pd.DataFrame, calibration: pd.DataFrame, margins: dict[str, dict[str, float]], backtested: pd.DataFrame, promoted: bool) -> dict:
     return {
         "version": version,
         "trained_at": datetime.now(timezone.utc).isoformat(),
@@ -86,18 +112,24 @@ def build_metadata(version: str, window: pd.DataFrame, rows: dict[str, int], bac
             "min_leaf_rows": MIN_LEAF_ROWS,
             "boosting_rounds": BOOSTING_ROUNDS,
             "learning_rate": LEARNING_RATE,
-            "training_window_months": TRAINING_WINDOW_MONTHS
+            "training_window_months": TRAINING_WINDOW_MONTHS,
+            "lower_quantile": LOWER_QUANTILE,
+            "upper_quantile": UPPER_QUANTILE,
+            "calibration_months": CALIBRATION_MONTHS
         },
+        "quantile_training_window": {"from": quantile_window["valid_time"].min().isoformat(), "to": quantile_window["valid_time"].max().isoformat()},
+        "calibration_window": {"from": calibration["valid_time"].min().isoformat(), "to": calibration["valid_time"].max().isoformat()},
+        "conformal_margins": margins,
         "backtest": backtest_scores(backtested, backtested["valid_time"].max()),
         "promoted": promoted
     }
 
 
-def save(directory: Path, models: dict[str, list[dict]], metadata: dict) -> None:
+def save(directory: Path, files: dict[str, dict]) -> None:
     directory.mkdir(parents=True)
-    (directory / MODEL_FILE).write_text(json.dumps(models))
-    (directory / METADATA_FILE).write_text(json.dumps(metadata, indent=JSON_INDENT))
-    print(f"Saved {directory} ({(directory / MODEL_FILE).stat().st_size / BYTES_PER_KB:.0f} KB)")
+    for name, content in files.items():
+        (directory / name).write_text(json.dumps(content, indent=JSON_INDENT if name == METADATA_FILE else None))
+    print(f"Saved {directory} ({sum((directory / name).stat().st_size for name in files) / BYTES_PER_KB:.0f} KB)")
 
 
 def promote(version: str) -> None:
@@ -116,9 +148,23 @@ def main() -> None:
     backtested = backtest(trained)
     promoted = should_promote(backtested)
 
-    window = training_window(trained)
+    end = trained["valid_time"].max()
+    window = training_window(trained, end)
     models, rows = fit_models(window)
-    save(directory, models, build_metadata(version, window, rows, backtested, promoted))
+
+    calibration_start = end - pd.DateOffset(months=CALIBRATION_MONTHS)
+    quantile_window = training_window(trained, calibration_start)
+    calibration = trained[trained["valid_time"] > calibration_start]
+    lower_models, _ = fit_models(quantile_window, LOWER_QUANTILE)
+    upper_models, _ = fit_models(quantile_window, UPPER_QUANTILE)
+    margins = calibrate(calibration, lower_models, upper_models)
+
+    save(directory, {
+        MODEL_FILE: models,
+        LOWER_MODEL_FILE: lower_models,
+        UPPER_MODEL_FILE: upper_models,
+        METADATA_FILE: build_metadata(version, window, rows, quantile_window, calibration, margins, backtested, promoted)
+    })
 
     if promoted:
         promote(version)
