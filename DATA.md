@@ -1,6 +1,6 @@
 # Data
 
-Every file under `data/forecasts/`, `data/backfill/` and `data/predictions/` has these eight columns, in this order.
+Every file under `data/forecasts/`, `data/backfill/` and `data/predictions/` has these eight columns, in this order. Files under `data/intervals/` differ in one column; see [Intervals](#intervals).
 
 Example row: `larnaca | 2026-09-17 15:00 | 2026-09-17 16:00 | 1 | gfs_seamless | temperature_2m | 29.0 | live`
 
@@ -37,6 +37,25 @@ in `data/forecasts/` it was made from, and has the same `run_time`.
   wind speed 0 or above.
 - **Only the newest snapshot is predicted, as soon as it is saved**, so every prediction was made
   before its outcome was known. A snapshot with no prediction file was never predicted.
+
+## Intervals
+
+Files under `data/intervals/` hold a 90% band around each of `gbm_blend`'s predictions: the truth is
+meant to fall between `lower` and `upper` nine times in ten. Each file is named after the snapshot
+it was made from, like its prediction file, and has the same columns except that `value` is replaced
+by two:
+
+| Column | Type | Description | Example |
+| --- | --- | --- | --- |
+| `lower` | float32 | The lower edge of the band, in the variable's unit. | `26.9` |
+| `upper` | float32 | The upper edge of the band, in the variable's unit. | `31.2` |
+
+A band pairs with its prediction on `location`, `run_time`, `valid_time`, `lead_hours`, `model`,
+`variable` and `source`.
+
+- **Written in the same run as the prediction, or not at all.** A prediction without an interval
+  file was made by a model that had no interval models yet, no band is ever added later.
+- **Edges stay within what is physically possible**, like the predictions.
 
 ## Variables
 
