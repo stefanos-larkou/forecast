@@ -2,21 +2,21 @@ import time
 
 import pandas as pd
 
-from constants import FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MAE_VARIABLES, REFERENCE_MODEL, REFIT_EVERY_MONTHS, SCORING_KEY, TRAINING_WINDOW_MONTHS
+from constants import CLIMATE_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MAE_VARIABLES, REFERENCE_MODEL, REFIT_EVERY_MONTHS, SCORING_KEY, TRAINING_WINDOW_MONTHS
 from model import gbm
 from model.training import load_training_data
-from scoring.baselines import with_bias_correction, with_persistence
+from scoring.baselines import climatology, with_bias_correction, with_climatology, with_persistence
 
 
-def score(graded: pd.DataFrame, observations: pd.DataFrame, boosted: pd.DataFrame) -> pd.DataFrame:
-    scored = with_persistence(with_bias_correction(graded, graded), observations)
+def score(graded: pd.DataFrame, observations: pd.DataFrame, climate: pd.DataFrame, boosted: pd.DataFrame) -> pd.DataFrame:
+    scored = with_climatology(with_persistence(with_bias_correction(graded, graded), observations), climate)
 
     by_model = scored.pivot(index=SCORING_KEY, columns="model", values=["value", "value_corrected"])
     by_model.columns = [f"{model} {'raw' if field == 'value' else 'corrected'}" for field, model in by_model.columns]
-    shared = scored.drop_duplicates(SCORING_KEY).set_index(SCORING_KEY)[["persisted", "value_observed"]]
+    shared = scored.drop_duplicates(SCORING_KEY).set_index(SCORING_KEY)[["persisted", "climatology", "value_observed"]]
 
     compared = by_model.join(shared).reset_index().merge(boosted, on=SCORING_KEY, how="inner").dropna()
-    methods = [*by_model.columns, "persisted", "boosted"]
+    methods = [*by_model.columns, "persisted", "climatology", "boosted"]
     errors = compared[methods].sub(compared["value_observed"], axis=0).abs()
     return errors.assign(variable=compared["variable"], lead_hours=compared["lead_hours"]).groupby(["variable", "lead_hours"], observed=True).mean()
 
@@ -69,7 +69,8 @@ def main() -> None:
     boosted = boosted_forecasts(trained)
 
     print("Scoring every method on the same forecasts...", flush=True)
-    print_leaderboard(score(graded, observations, boosted), starts[0])
+    climate = climatology(pd.read_parquet(CLIMATE_DIR))
+    print_leaderboard(score(graded, observations, climate, boosted), starts[0])
     print(f"\nFinished in {time.perf_counter() - began:.0f}s")
 
 

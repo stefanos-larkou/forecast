@@ -49,6 +49,7 @@ ERA5_LAG_DAYS = 6
 CLIMATE_DIR = Path("data/climate")
 CLIMATE_FIRST_YEAR = 1994
 CLIMATE_LAST_YEAR = 2023
+CLIMATOLOGY_WINDOW_DAYS = 31
 
 SERIES_KEY = ["location", "model", "variable", "lead_hours"]
 BIAS_WINDOW_DAYS = 30
