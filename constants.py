@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -119,6 +120,18 @@ SCORING_KEY = ["location", "variable", "valid_time", "lead_hours"]
 TRAINING_WINDOW_MONTHS = 12
 REFIT_EVERY_MONTHS = 3
 CALIBRATION_MONTHS = 3
+
+TUNING_GRID = {
+    "tree_max_depth": [2, 3, 4],
+    "min_leaf_rows": [100, 300],
+    "boosting_rounds": [100, 200, 400],
+    "learning_rate": [0.05, 0.1]
+}
+TUNING_MONTHS = 4
+TUNING_MONTH_GAP = 3
+TUNING_HOLDOUT_MONTHS = 9
+TUNING_THREAD_SHARE = 4
+TUNING_WORKERS = max(1, (os.cpu_count() or 1) // TUNING_THREAD_SHARE)
 
 MODELS_DIR = Path("models")
 MODEL_FILE = "model.json"
