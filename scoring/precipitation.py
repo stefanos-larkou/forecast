@@ -3,7 +3,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from constants import BACKFILL_DIR, BRIER_DECIMALS, CLIMATE_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MODELS, OBSERVATIONS_DIR, PHYSICAL_LIMITS, RAIN_METHODS, RAIN_PROBABILITY_VARIABLE, RAIN_VARIABLE, RELIABILITY_BIN_COUNT, SCORING_KEY, SKILL_DECIMALS, WET_HOUR_MM
+from constants import BACKFILL_DIR, BRIER_DECIMALS, CLIMATE_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MODELS, OBSERVATIONS_DIR, PHYSICAL_LIMITS, RAIN_METHODS, RAIN_PROBABILITY_VARIABLE, RAIN_VARIABLE, RELIABILITY_BIN_COUNT, RELIABILITY_METHODS, SCORING_KEY, SKILL_DECIMALS, WET_HOUR_MM
 from model import gbm
 from model.features import build_features
 from scoring.baselines import climatology, with_climatology, with_persistence
@@ -87,7 +87,7 @@ def main() -> None:
     print("\nprecipitation, Brier skill score against climatology: 1 means perfect, 0 no better than climatology, below 0 worse")
     print((1 - table.div(table["climatology"], axis=0)).round(SKILL_DECIMALS).T.to_string())
 
-    for method in ("models", "boosted"):
+    for method in RELIABILITY_METHODS:
         print(f"\nprecipitation, reliability of {method}: of the hours given each probability, how many were wet")
         print(reliability(scored, method).round(LEADERBOARD_DECIMALS).to_string())
 

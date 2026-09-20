@@ -28,7 +28,8 @@ class Variable:
 
 
 LOCATION = Location("larnaca", "Larnaca, Cyprus", 34.9221, 33.62794)
-MODELS = ["gfs_seamless", "ecmwf_ifs025", "icon_seamless"]
+REFERENCE_MODEL = "ecmwf_ifs025"
+MODELS = ["gfs_seamless", REFERENCE_MODEL, "icon_seamless"]
 
 RAIN_VARIABLE = "precipitation"
 RAIN_PROBABILITY_VARIABLE = "rain_probability"
@@ -58,12 +59,16 @@ SECONDS_BETWEEN_ATTEMPTS = 30
 RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 SECONDS_BETWEEN_REQUESTS = 1
 
-FORECASTS_DIR = Path("data/forecasts")
-BACKFILL_DIR = Path("data/backfill")
-OBSERVATIONS_DIR = Path("data/observations")
-PREDICTIONS_DIR = Path("data/predictions")
-INTERVALS_DIR = Path("data/intervals")
+DATA_DIR = Path("data")
+FORECASTS_DIR = DATA_DIR / "forecasts"
+BACKFILL_DIR = DATA_DIR / "backfill"
+OBSERVATIONS_DIR = DATA_DIR / "observations"
+PREDICTIONS_DIR = DATA_DIR / "predictions"
+INTERVALS_DIR = DATA_DIR / "intervals"
+CLIMATE_DIR = DATA_DIR / "climate"
+SUMMARY_FILE = DATA_DIR / "summary.json"
 PARQUET_COMPRESSION = "zstd"
+SUMMARY_DECIMALS = 4
 
 LIVE_SOURCE = "live"
 LIVE_FORECAST_DAYS = 7
@@ -74,10 +79,9 @@ BACKFILL_LAG_DAYS = 2
 BACKFILL_LEAD_DAYS = range(1, 8)
 
 TRUTH_MODEL = "era5"
-OBSERVATIONS_FIRST_DAY = "2024-03-01"
+OBSERVATIONS_FIRST_DAY = BACKFILL_FIRST_DAY
 ERA5_LAG_DAYS = 6
 
-CLIMATE_DIR = Path("data/climate")
 CLIMATE_FIRST_YEAR = 1994
 CLIMATE_LAST_YEAR = 2023
 CLIMATOLOGY_WINDOW_DAYS = 31
@@ -97,9 +101,9 @@ WET_HOUR_MM = 0.1
 BRIER_DECIMALS = 4
 SKILL_DECIMALS = 3
 RAIN_METHODS = ["models", "climatology", "persisted", "boosted"]
+RELIABILITY_METHODS = ["models", "boosted"]
 RELIABILITY_BIN_COUNT = 10
 
-REFERENCE_MODEL = "ecmwf_ifs025"
 MODEL_MAX_LEAD_HOURS = 144
 FEATURE_COLUMNS = [
     *MODELS,
