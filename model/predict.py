@@ -3,7 +3,7 @@ import json
 import numpy as np
 import pandas as pd
 
-from constants import BACKFILL_DIR, BLEND_MODEL, CURRENT_MODEL_FILE, FEATURE_COLUMNS, FORECASTS_DIR, HOURS_PER_DAY, INTERVALS_DIR, LIVE_SOURCE, LOWER_MODEL_FILE, METADATA_FILE, MODEL_FILE, MODELS_DIR, OBSERVATIONS_DIR, PHYSICAL_LIMITS, PREDICTIONS_DIR, REFERENCE_MODEL, UPPER_MODEL_FILE
+from constants import BACKFILL_DIR, BLEND_MODEL, CURRENT_MODEL_FILE, FEATURE_COLUMNS, FORECASTS_DIR, HOURS_PER_DAY, INTERVALS_DIR, LIVE_SOURCE, LOWER_MODEL_FILE, METADATA_FILE, MODEL_FILE, MODELS_DIR, OBSERVATIONS_DIR, PHYSICAL_LIMITS, PREDICTIONS_DIR, RAIN_MODEL_FILE, RAIN_PROBABILITY_VARIABLE, RAIN_VARIABLE, REFERENCE_MODEL, UPPER_MODEL_FILE
 from model import gbm
 from model.features import build_features
 from schema import FORECASTS, INTERVALS
@@ -13,6 +13,11 @@ from scoring.grading import grade
 def load_current_model() -> tuple[str, dict[str, list[dict]]]:
     version = json.loads(CURRENT_MODEL_FILE.read_text())["version"]
     return version, json.loads((MODELS_DIR / version / MODEL_FILE).read_text())
+
+
+def load_rain_model(version: str) -> list[dict] | None:
+    path = MODELS_DIR / version / RAIN_MODEL_FILE
+    return json.loads(path.read_text()) if path.exists() else None
 
 
 def load_interval_models(version: str) -> tuple[dict[str, list[dict]], dict[str, list[dict]], dict[str, dict[str, float]]] | None:
@@ -46,7 +51,13 @@ def as_live_rows(frame: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def predict(complete: pd.DataFrame, models: dict[str, list[dict]]) -> pd.DataFrame:
+def rain_probabilities(complete: pd.DataFrame, trees: list[dict]) -> pd.DataFrame:
+    rows = complete[complete["variable"] == RAIN_VARIABLE]
+    probability = gbm.predict(trees, rows[FEATURE_COLUMNS].to_numpy("float64")).clip(0, 1)
+    return rows[["location", "run_time", "valid_time"]].assign(variable=RAIN_PROBABILITY_VARIABLE, value=probability)
+
+
+def predict(complete: pd.DataFrame, models: dict[str, list[dict]], rain_model: list[dict] | None) -> pd.DataFrame:
     frames = []
     for variable, trees in models.items():
         rows = complete[complete["variable"] == variable]
@@ -54,6 +65,11 @@ def predict(complete: pd.DataFrame, models: dict[str, list[dict]]) -> pd.DataFra
         lower, upper = PHYSICAL_LIMITS[variable]
         value = (rows[REFERENCE_MODEL] + correction).clip(lower, upper)
         frames.append(rows[["location", "run_time", "valid_time", "variable"]].assign(value=value))
+
+    if rain_model is None:
+        print("The current model has no rain model, so no rain probabilities are written.")
+    else:
+        frames.append(rain_probabilities(complete, rain_model))
 
     return FORECASTS.finalise(as_live_rows(pd.concat(frames, ignore_index=True)))
 
@@ -88,7 +104,7 @@ def main() -> None:
     graded = grade(pd.read_parquet(BACKFILL_DIR), pd.read_parquet(OBSERVATIONS_DIR))
     complete = complete_features(snapshot, graded)
 
-    predictions = predict(complete, models)
+    predictions = predict(complete, models, load_rain_model(version))
     FORECASTS.write(predictions, path)
     print(f"{len(predictions):,} predictions, lead hours {predictions['lead_hours'].min()} to {predictions['lead_hours'].max()} -> {path}")
 

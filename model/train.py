@@ -7,10 +7,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from constants import BOOSTING_ROUNDS, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, JSON_INDENT, LEARNING_RATE, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MIN_LEAF_ROWS, MODEL_FILE, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, SCORING_KEY, TRAINING_WINDOW_MONTHS, TREE_MAX_DEPTH, UPPER_MODEL_FILE, UPPER_QUANTILE
+from constants import BOOSTING_ROUNDS, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, JSON_INDENT, LEARNING_RATE, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MIN_LEAF_ROWS, MODEL_FILE, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, TREE_MAX_DEPTH, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
 from model import gbm
 from model.training import load_training_data
 from scoring.evaluate import boosted_forecasts
+from scoring.precipitation import wet
 
 
 def training_window(trained: pd.DataFrame, end: pd.Timestamp) -> pd.DataFrame:
@@ -76,6 +77,18 @@ def fit_models(window: pd.DataFrame, quantile: float | None = None) -> tuple[dic
     return models, rows
 
 
+def fit_rain_model(window: pd.DataFrame) -> tuple[list[dict], int]:
+    rows = window[window["variable"] == RAIN_VARIABLE]
+    outcome = wet(rows["observed"])
+
+    print(f"Training the rain model on {len(rows):,} rows, {outcome.mean():.2%} of their hours wet...", end=" ", flush=True)
+    began = time.perf_counter()
+    trees = gbm.fit(rows[FEATURE_COLUMNS].to_numpy("float64"), outcome.to_numpy("float64"))
+    print(f"done in {time.perf_counter() - began:.0f}s", flush=True)
+
+    return trees, len(rows)
+
+
 def conformal_margin(scores: pd.Series) -> float:
     coverage = UPPER_QUANTILE - LOWER_QUANTILE
     level = min(1.0, np.ceil((len(scores) + 1) * coverage) / len(scores))
@@ -115,7 +128,8 @@ def build_metadata(version: str, window: pd.DataFrame, rows: dict[str, int], qua
             "training_window_months": TRAINING_WINDOW_MONTHS,
             "lower_quantile": LOWER_QUANTILE,
             "upper_quantile": UPPER_QUANTILE,
-            "calibration_months": CALIBRATION_MONTHS
+            "calibration_months": CALIBRATION_MONTHS,
+            "wet_hour_mm": WET_HOUR_MM
         },
         "quantile_training_window": {"from": quantile_window["valid_time"].min().isoformat(), "to": quantile_window["valid_time"].max().isoformat()},
         "calibration_window": {"from": calibration["valid_time"].min().isoformat(), "to": calibration["valid_time"].max().isoformat()},
@@ -151,6 +165,7 @@ def main() -> None:
     end = trained["valid_time"].max()
     window = training_window(trained, end)
     models, rows = fit_models(window)
+    rain_model, rows[RAIN_VARIABLE] = fit_rain_model(window)
 
     calibration_start = end - pd.DateOffset(months=CALIBRATION_MONTHS)
     quantile_window = training_window(trained, calibration_start)
@@ -161,6 +176,7 @@ def main() -> None:
 
     save(directory, {
         MODEL_FILE: models,
+        RAIN_MODEL_FILE: rain_model,
         LOWER_MODEL_FILE: lower_models,
         UPPER_MODEL_FILE: upper_models,
         METADATA_FILE: build_metadata(version, window, rows, quantile_window, calibration, margins, backtested, promoted)

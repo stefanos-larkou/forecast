@@ -31,7 +31,8 @@ Example row: `larnaca | 2026-09-17 15:00 | 2026-09-17 16:00 | 1 | gfs_seamless |
 Files under `data/predictions/` hold `gbm_blend`'s forecasts. Each one is named after the snapshot
 in `data/forecasts/` it was made from, and has the same `run_time`.
 
-- **Four variables, not five.** Precipitation is not predicted.
+- **Four variables, plus rain as a probability.** Precipitation is not predicted in millimetres:
+  instead there are `rain_probability` rows, the chance the hour reaches 0.1 mm.
 - **Lead hours 1 to 144.** Longer leads are not predicted.
 - **Values stay within what is physically possible**: cloud cover and humidity between 0 and 100,
   wind speed 0 or above.
@@ -66,3 +67,4 @@ A band pairs with its prediction on `location`, `run_time`, `valid_time`, `lead_
 | `precipitation` | Rain, showers and snow | mm | Total over the hour before `valid_time` |
 | `wind_speed_10m` | Wind speed 10 m above the ground | km/h | At `valid_time` |
 | `cloud_cover` | Share of the sky covered by cloud | % | At `valid_time` |
+| `rain_probability` | The chance that the hour before `valid_time` reaches 0.1 mm of precipitation. Only `gbm_blend` forecasts it, in `data/predictions/`, the weather models report `precipitation` in mm instead. | 0 to 1 | Over the hour before `valid_time` |

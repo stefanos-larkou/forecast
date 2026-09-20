@@ -64,6 +64,7 @@ LEADERBOARD_METRICS = {
 }
 
 RAIN_VARIABLE = "precipitation"
+RAIN_PROBABILITY_VARIABLE = "rain_probability"
 WET_HOUR_MM = 0.1
 RAIN_METHODS = ["models", "climatology", "persisted", "boosted"]
 RELIABILITY_BIN_COUNT = 10
@@ -95,6 +96,7 @@ CALIBRATION_MONTHS = 3
 
 MODELS_DIR = Path("models")
 MODEL_FILE = "model.json"
+RAIN_MODEL_FILE = "rain.json"
 LOWER_MODEL_FILE = "lower.json"
 UPPER_MODEL_FILE = "upper.json"
 METADATA_FILE = "metadata.json"
