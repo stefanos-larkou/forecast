@@ -3,7 +3,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from constants import BACKFILL_DIR, CLIMATE_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MODELS, OBSERVATIONS_DIR, RAIN_METHODS, RAIN_VARIABLE, RELIABILITY_BIN_COUNT, SCORING_KEY, WET_HOUR_MM
+from constants import BACKFILL_DIR, BRIER_DECIMALS, CLIMATE_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MODELS, OBSERVATIONS_DIR, PHYSICAL_LIMITS, RAIN_METHODS, RAIN_PROBABILITY_VARIABLE, RAIN_VARIABLE, RELIABILITY_BIN_COUNT, SCORING_KEY, SKILL_DECIMALS, WET_HOUR_MM
 from model import gbm
 from model.features import build_features
 from scoring.baselines import climatology, with_climatology, with_persistence
@@ -39,7 +39,7 @@ def probability_fold(rows: pd.DataFrame, start: pd.Period) -> pd.DataFrame:
     print(f"  {start}: training on {len(training):,} rows, scoring {len(scored):,} forecasts...", end=" ", flush=True)
     began = time.perf_counter()
     trees = gbm.fit(training[FEATURE_COLUMNS].to_numpy("float64"), training["wet"].to_numpy("float64"))
-    probability = gbm.predict(trees, scored[FEATURE_COLUMNS].to_numpy("float64")).clip(0, 1)
+    probability = gbm.predict(trees, scored[FEATURE_COLUMNS].to_numpy("float64")).clip(*PHYSICAL_LIMITS[RAIN_PROBABILITY_VARIABLE])
     print(f"done in {time.perf_counter() - began:.0f}s", flush=True)
 
     return scored[SCORING_KEY].assign(boosted=probability)
@@ -55,7 +55,8 @@ def brier(scored: pd.DataFrame) -> pd.DataFrame:
 
 
 def reliability(scored: pd.DataFrame, method: str) -> pd.DataFrame:
-    bins = pd.cut(scored[method], np.linspace(0, 1, RELIABILITY_BIN_COUNT + 1), include_lowest=True)
+    lowest, highest = PHYSICAL_LIMITS[RAIN_PROBABILITY_VARIABLE]
+    bins = pd.cut(scored[method], np.linspace(lowest, highest, RELIABILITY_BIN_COUNT + 1), include_lowest=True)
     grouped = scored.groupby(bins, observed=True)
     return pd.DataFrame({
         "forecasts": grouped.size(),
@@ -81,10 +82,10 @@ def main() -> None:
 
     table = brier(scored)
     print(f"\nprecipitation, Brier score: mean squared error of the probability that an hour reaches {WET_HOUR_MM} mm, forecasts from {starts[0]} on")
-    print(table.round(4).T.to_string())
+    print(table.round(BRIER_DECIMALS).T.to_string())
 
     print("\nprecipitation, Brier skill score against climatology: 1 means perfect, 0 no better than climatology, below 0 worse")
-    print((1 - table.div(table["climatology"], axis=0)).round(3).T.to_string())
+    print((1 - table.div(table["climatology"], axis=0)).round(SKILL_DECIMALS).T.to_string())
 
     for method in ("models", "boosted"):
         print(f"\nprecipitation, reliability of {method}: of the hours given each probability, how many were wet")

@@ -53,7 +53,8 @@ def as_live_rows(frame: pd.DataFrame) -> pd.DataFrame:
 
 def rain_probabilities(complete: pd.DataFrame, trees: list[dict]) -> pd.DataFrame:
     rows = complete[complete["variable"] == RAIN_VARIABLE]
-    probability = gbm.predict(trees, rows[FEATURE_COLUMNS].to_numpy("float64")).clip(0, 1)
+    lowest, highest = PHYSICAL_LIMITS[RAIN_PROBABILITY_VARIABLE]
+    probability = gbm.predict(trees, rows[FEATURE_COLUMNS].to_numpy("float64")).clip(lowest, highest)
     return rows[["location", "run_time", "valid_time"]].assign(variable=RAIN_PROBABILITY_VARIABLE, value=probability)
 
 

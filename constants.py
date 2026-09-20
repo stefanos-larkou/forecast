@@ -10,9 +10,31 @@ class Location:
     longitude: float
 
 
+@dataclass(frozen=True)
+class Variable:
+    name: str
+    fetched: bool = True
+    scored: bool = True
+    limits: tuple[float | None, float | None] = (None, None)
+
+
 LOCATION = Location("larnaca", "Larnaca, Cyprus", 34.9221, 33.62794)
 MODELS = ["gfs_seamless", "ecmwf_ifs025", "icon_seamless"]
-VARIABLES = ["temperature_2m", "relative_humidity_2m", "precipitation", "wind_speed_10m", "cloud_cover"]
+
+RAIN_VARIABLE = "precipitation"
+RAIN_PROBABILITY_VARIABLE = "rain_probability"
+VARIABLES = [
+    Variable("temperature_2m"),
+    Variable("relative_humidity_2m", limits=(0, 100)),
+    Variable(RAIN_VARIABLE, scored=False),
+    Variable("wind_speed_10m", limits=(0, None)),
+    Variable("cloud_cover", limits=(0, 100)),
+    Variable(RAIN_PROBABILITY_VARIABLE, fetched=False, scored=False, limits=(0, 1))
+]
+FETCHED_VARIABLES = [variable.name for variable in VARIABLES if variable.fetched]
+MAE_VARIABLES = [variable.name for variable in VARIABLES if variable.scored]
+PHYSICAL_LIMITS = {variable.name: variable.limits for variable in VARIABLES}
+
 HOURS_PER_DAY = 24
 DAYS_PER_YEAR = 365.25
 BYTES_PER_KB = 1024
@@ -55,7 +77,6 @@ SERIES_KEY = ["location", "model", "variable", "lead_hours"]
 BIAS_WINDOW_DAYS = 30
 BIAS_MIN_DAYS = 7
 
-MAE_VARIABLES = ["temperature_2m", "relative_humidity_2m", "wind_speed_10m", "cloud_cover"]
 LEADERBOARD_DECIMALS = 2
 LEADERBOARD_METRICS = {
     "mae": "mean absolute error",
@@ -63,9 +84,9 @@ LEADERBOARD_METRICS = {
     "scatter": "standard deviation of the error"
 }
 
-RAIN_VARIABLE = "precipitation"
-RAIN_PROBABILITY_VARIABLE = "rain_probability"
 WET_HOUR_MM = 0.1
+BRIER_DECIMALS = 4
+SKILL_DECIMALS = 3
 RAIN_METHODS = ["models", "climatology", "persisted", "boosted"]
 RELIABILITY_BIN_COUNT = 10
 
@@ -106,9 +127,3 @@ JSON_INDENT = 4
 PROMOTION_TOLERANCE = 1e-9
 
 BLEND_MODEL = "gbm_blend"
-PHYSICAL_LIMITS = {
-    "temperature_2m": (None, None),
-    "relative_humidity_2m": (0, 100),
-    "wind_speed_10m": (0, None),
-    "cloud_cover": (0, 100)
-}

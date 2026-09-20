@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from constants import BACKFILL_DIR, BACKFILL_FIRST_DAY, BACKFILL_LAG_DAYS, BACKFILL_LEAD_DAYS, HOURS_PER_DAY, LOCATION, MODELS, PREVIOUS_RUNS_API_URL, PREVIOUS_RUNS_SOURCE, SECONDS_BETWEEN_REQUESTS, VARIABLES, Location
+from constants import BACKFILL_DIR, BACKFILL_FIRST_DAY, BACKFILL_LAG_DAYS, BACKFILL_LEAD_DAYS, FETCHED_VARIABLES, HOURS_PER_DAY, LOCATION, MODELS, PREVIOUS_RUNS_API_URL, PREVIOUS_RUNS_SOURCE, SECONDS_BETWEEN_REQUESTS, Location
 from schema import FORECASTS
 from sources.openmeteo import fetch_hourly
 
@@ -20,7 +20,7 @@ def to_long(payload: dict, location: Location) -> pd.DataFrame:
     frames = []
 
     for model in MODELS:
-        for variable in VARIABLES:
+        for variable in FETCHED_VARIABLES:
             for day in BACKFILL_LEAD_DAYS:
                 column = f"{previous_runs_name(variable, day)}_{model}"
 
@@ -50,7 +50,7 @@ def day_path(day: date) -> Path:
 
 
 def main() -> None:
-    hourly = [previous_runs_name(variable, day) for variable in VARIABLES for day in BACKFILL_LEAD_DAYS]
+    hourly = [previous_runs_name(variable, day) for variable in FETCHED_VARIABLES for day in BACKFILL_LEAD_DAYS]
     last_day = (pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=BACKFILL_LAG_DAYS)).date()
     missing = [day.date() for day in pd.date_range(BACKFILL_FIRST_DAY, last_day, freq="D") if not day_path(day.date()).exists()]
     months = sorted({pd.Period(day, freq="M") for day in missing})

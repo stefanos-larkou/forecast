@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from constants import BYTES_PER_KB, FORECAST_API_URL, FORECASTS_DIR, LIVE_FORECAST_DAYS, LIVE_SOURCE, LOCATION, MODELS, VARIABLES, Location
+from constants import BYTES_PER_KB, FETCHED_VARIABLES, FORECAST_API_URL, FORECASTS_DIR, LIVE_FORECAST_DAYS, LIVE_SOURCE, LOCATION, MODELS, Location
 from schema import FORECASTS
 from sources.openmeteo import fetch_hourly
 
@@ -15,7 +15,7 @@ def to_long(payload: dict, location: Location, run_time: datetime) -> pd.DataFra
     frames = []
 
     for model in MODELS:
-        for variable in VARIABLES:
+        for variable in FETCHED_VARIABLES:
             column = f"{variable}_{model}"
 
             if column not in hourly:
@@ -52,7 +52,7 @@ def main() -> None:
         print(f"{path} already exists. Snapshot will not be overwritten.")
         return
 
-    payload = fetch_hourly(FORECAST_API_URL, LOCATION, VARIABLES, models=",".join(MODELS), forecast_days=LIVE_FORECAST_DAYS)
+    payload = fetch_hourly(FORECAST_API_URL, LOCATION, FETCHED_VARIABLES, models=",".join(MODELS), forecast_days=LIVE_FORECAST_DAYS)
     print(f"{LOCATION.name}: model grid point ({payload['latitude']:.3f}, {payload['longitude']:.3f})")
 
     df = to_long(payload, LOCATION, run_time)

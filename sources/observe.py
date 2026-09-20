@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from constants import ARCHIVE_API_URL, ERA5_LAG_DAYS, HOURS_PER_DAY, LOCATION, OBSERVATIONS_DIR, OBSERVATIONS_FIRST_DAY, SECONDS_BETWEEN_REQUESTS, TRUTH_MODEL, VARIABLES, Location
+from constants import ARCHIVE_API_URL, ERA5_LAG_DAYS, FETCHED_VARIABLES, HOURS_PER_DAY, LOCATION, OBSERVATIONS_DIR, OBSERVATIONS_FIRST_DAY, SECONDS_BETWEEN_REQUESTS, TRUTH_MODEL, Location
 from schema import OBSERVATIONS
 from sources.openmeteo import fetch_hourly
 
@@ -15,7 +15,7 @@ def to_long(payload: dict, location: Location) -> pd.DataFrame:
     valid_time = pd.to_datetime(hourly["time"], utc=True)
     frames = []
 
-    for variable in VARIABLES:
+    for variable in FETCHED_VARIABLES:
         if variable not in hourly:
             print(f"Missing: {variable}")
             continue
@@ -45,13 +45,13 @@ def main() -> None:
     for month in months:
         days = [day for day in missing if pd.Period(day, freq="M") == month]
         print(f"{month}: fetching {len(days)} day(s)...", flush=True)
-        payload = fetch_hourly(ARCHIVE_API_URL, LOCATION, VARIABLES, models=TRUTH_MODEL, start_date=str(days[0]), end_date=str(days[-1]))
+        payload = fetch_hourly(ARCHIVE_API_URL, LOCATION, FETCHED_VARIABLES, models=TRUTH_MODEL, start_date=str(days[0]), end_date=str(days[-1]))
         df = to_long(payload, LOCATION)
 
         for day in days:
             day_df = df[df["valid_time"].dt.date == day]
-            if len(day_df) < HOURS_PER_DAY * len(VARIABLES):
-                print(f"{day}: only {len(day_df)} of {HOURS_PER_DAY * len(VARIABLES)} values. Not written.")
+            if len(day_df) < HOURS_PER_DAY * len(FETCHED_VARIABLES):
+                print(f"{day}: only {len(day_df)} of {HOURS_PER_DAY * len(FETCHED_VARIABLES)} values. Not written.")
                 continue
             OBSERVATIONS.write(day_df, day_path(day))
 
