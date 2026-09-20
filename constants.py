@@ -11,6 +11,14 @@ class Location:
 
 
 @dataclass(frozen=True)
+class Hyperparameters:
+    tree_max_depth: int = 3
+    min_leaf_rows: int = 100
+    boosting_rounds: int = 200
+    learning_rate: float = 0.1
+
+
+@dataclass(frozen=True)
 class Variable:
     name: str
     fetched: bool = True
@@ -103,10 +111,7 @@ FEATURE_COLUMNS = [
     "day_cos"
 ]
 
-TREE_MAX_DEPTH = 3
-MIN_LEAF_ROWS = 100
-BOOSTING_ROUNDS = 200
-LEARNING_RATE = 0.1
+HYPERPARAMETERS = Hyperparameters()
 LOWER_QUANTILE = 0.05
 UPPER_QUANTILE = 0.95
 
@@ -123,6 +128,7 @@ UPPER_MODEL_FILE = "upper.json"
 METADATA_FILE = "metadata.json"
 CURRENT_MODEL_FILE = MODELS_DIR / "current.json"
 MODEL_VERSION_FORMAT = "%Y-%m-%d"
+MODEL_FORMAT = 2
 JSON_INDENT = 4
 PROMOTION_TOLERANCE = 1e-9
 

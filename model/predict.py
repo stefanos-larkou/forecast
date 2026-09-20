@@ -3,16 +3,21 @@ import json
 import numpy as np
 import pandas as pd
 
-from constants import BACKFILL_DIR, BLEND_MODEL, CURRENT_MODEL_FILE, FEATURE_COLUMNS, FORECASTS_DIR, HOURS_PER_DAY, INTERVALS_DIR, LIVE_SOURCE, LOWER_MODEL_FILE, METADATA_FILE, MODEL_FILE, MODELS_DIR, OBSERVATIONS_DIR, PHYSICAL_LIMITS, PREDICTIONS_DIR, RAIN_MODEL_FILE, RAIN_PROBABILITY_VARIABLE, RAIN_VARIABLE, REFERENCE_MODEL, UPPER_MODEL_FILE
+from constants import BACKFILL_DIR, BLEND_MODEL, CURRENT_MODEL_FILE, FEATURE_COLUMNS, FORECASTS_DIR, HOURS_PER_DAY, INTERVALS_DIR, LIVE_SOURCE, LOWER_MODEL_FILE, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODELS_DIR, OBSERVATIONS_DIR, PHYSICAL_LIMITS, PREDICTIONS_DIR, RAIN_MODEL_FILE, RAIN_PROBABILITY_VARIABLE, RAIN_VARIABLE, REFERENCE_MODEL, UPPER_MODEL_FILE
 from model import gbm
 from model.features import build_features
 from schema import FORECASTS, INTERVALS
 from scoring.grading import grade
 
 
-def load_current_model() -> tuple[str, dict[str, list[dict]]]:
+def load_current_model() -> tuple[str, dict[str, list[dict]]] | None:
     version = json.loads(CURRENT_MODEL_FILE.read_text())["version"]
-    return version, json.loads((MODELS_DIR / version / MODEL_FILE).read_text())
+    directory = MODELS_DIR / version
+    if json.loads((directory / METADATA_FILE).read_text()).get("format") != MODEL_FORMAT:
+        print(f"Model {version} was not saved in format {MODEL_FORMAT}. Nothing is written until a newer model is promoted.")
+        return None
+
+    return version, json.loads((directory / MODEL_FILE).read_text())
 
 
 def load_rain_model(version: str) -> list[dict] | None:
@@ -99,7 +104,11 @@ def main() -> None:
         print(f"{path} already exists. The prediction will not be overwritten.")
         return
 
-    version, models = load_current_model()
+    current = load_current_model()
+    if current is None:
+        return
+
+    version, models = current
     print(f"Predicting {snapshot_path} with model {version}", flush=True)
     snapshot = pd.read_parquet(snapshot_path)
     graded = grade(pd.read_parquet(BACKFILL_DIR), pd.read_parquet(OBSERVATIONS_DIR))

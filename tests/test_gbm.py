@@ -4,7 +4,7 @@ import lightgbm
 import numpy as np
 import pytest
 
-from constants import BOOSTING_ROUNDS, LEARNING_RATE, LOWER_QUANTILE, MIN_LEAF_ROWS, TREE_MAX_DEPTH, UPPER_QUANTILE
+from constants import HYPERPARAMETERS, LOWER_QUANTILE, UPPER_QUANTILE
 from model import gbm
 
 
@@ -18,10 +18,10 @@ def synthetic_rows() -> tuple[np.ndarray, np.ndarray]:
 def lightgbm_predictions(features: np.ndarray, target: np.ndarray, points: np.ndarray, objective: dict) -> np.ndarray:
     settings = {
         **objective,
-        "learning_rate": LEARNING_RATE,
-        "max_depth": TREE_MAX_DEPTH,
-        "num_leaves": 2 ** TREE_MAX_DEPTH,
-        "min_data_in_leaf": MIN_LEAF_ROWS,
+        "learning_rate": HYPERPARAMETERS.learning_rate,
+        "max_depth": HYPERPARAMETERS.tree_max_depth,
+        "num_leaves": 2 ** HYPERPARAMETERS.tree_max_depth,
+        "min_data_in_leaf": HYPERPARAMETERS.min_leaf_rows,
         "min_sum_hessian_in_leaf": 0,
         "lambda_l1": 0,
         "lambda_l2": 0,
@@ -33,7 +33,7 @@ def lightgbm_predictions(features: np.ndarray, target: np.ndarray, points: np.nd
         "force_row_wise": True,
         "verbose": -1
     }
-    booster = lightgbm.train(settings, lightgbm.Dataset(features, target), num_boost_round=BOOSTING_ROUNDS)
+    booster = lightgbm.train(settings, lightgbm.Dataset(features, target), num_boost_round=HYPERPARAMETERS.boosting_rounds)
     return booster.predict(points)
 
 

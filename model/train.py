@@ -1,13 +1,14 @@
 import json
 import subprocess
 import time
+from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from constants import BOOSTING_ROUNDS, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, JSON_INDENT, LEARNING_RATE, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MIN_LEAF_ROWS, MODEL_FILE, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, TREE_MAX_DEPTH, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
+from constants import BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, HYPERPARAMETERS, JSON_INDENT, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
 from model import gbm
 from model.training import load_training_data
 from scoring.evaluate import boosted_forecasts
@@ -115,16 +116,14 @@ def calibrate(calibration: pd.DataFrame, lower_models: dict[str, list[dict]], up
 def build_metadata(version: str, window: pd.DataFrame, rows: dict[str, int], quantile_window: pd.DataFrame, calibration: pd.DataFrame, margins: dict[str, dict[str, float]], backtested: pd.DataFrame, promoted: bool) -> dict:
     return {
         "version": version,
+        "format": MODEL_FORMAT,
         "trained_at": datetime.now(timezone.utc).isoformat(),
         "commit": commit_sha(),
         "training_window": {"from": window["valid_time"].min().isoformat(), "to": window["valid_time"].max().isoformat()},
         "rows": rows,
         "features": FEATURE_COLUMNS,
         "hyperparameters": {
-            "tree_max_depth": TREE_MAX_DEPTH,
-            "min_leaf_rows": MIN_LEAF_ROWS,
-            "boosting_rounds": BOOSTING_ROUNDS,
-            "learning_rate": LEARNING_RATE,
+            **asdict(HYPERPARAMETERS),
             "training_window_months": TRAINING_WINDOW_MONTHS,
             "lower_quantile": LOWER_QUANTILE,
             "upper_quantile": UPPER_QUANTILE,

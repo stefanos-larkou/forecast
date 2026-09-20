@@ -1,9 +1,9 @@
 import numpy as np
 
-from constants import BOOSTING_ROUNDS, LEARNING_RATE, MIN_LEAF_ROWS, TREE_MAX_DEPTH
+from constants import HYPERPARAMETERS, Hyperparameters
 
 
-def best_split(features: np.ndarray, target: np.ndarray) -> tuple[int, float, float] | None:
+def best_split(features: np.ndarray, target: np.ndarray, min_leaf_rows: int) -> tuple[int, float, float] | None:
     rows = len(target)
     left_count = np.arange(1, rows)
     right_count = rows - left_count
@@ -20,7 +20,7 @@ def best_split(features: np.ndarray, target: np.ndarray) -> tuple[int, float, fl
         right_squares = (ordered ** 2).sum() - left_squares
         error = (left_squares - left_sum ** 2 / left_count) + (right_squares - right_sum ** 2 / right_count)
 
-        allowed = (values[:-1] < values[1:]) & (left_count >= MIN_LEAF_ROWS) & (right_count >= MIN_LEAF_ROWS)
+        allowed = (values[:-1] < values[1:]) & (left_count >= min_leaf_rows) & (right_count >= min_leaf_rows)
         if not allowed.any():
             continue
 
@@ -31,14 +31,14 @@ def best_split(features: np.ndarray, target: np.ndarray) -> tuple[int, float, fl
     return best
 
 
-def leaf_value(residuals: np.ndarray, quantile: float | None) -> float:
-    return float(residuals.mean() if quantile is None else np.quantile(residuals, quantile))
+def leaf_value(residuals: np.ndarray, quantile: float | None, learning_rate: float) -> float:
+    return float(learning_rate * (residuals.mean() if quantile is None else np.quantile(residuals, quantile)))
 
 
-def grow(features: np.ndarray, gradients: np.ndarray, residuals: np.ndarray, depth: int, quantile: float | None) -> dict:
-    split = best_split(features, gradients) if depth > 0 else None
+def grow(features: np.ndarray, gradients: np.ndarray, residuals: np.ndarray, depth: int, quantile: float | None, settings: Hyperparameters) -> dict:
+    split = best_split(features, gradients, settings.min_leaf_rows) if depth > 0 else None
     if split is None:
-        return {"value": leaf_value(residuals, quantile)}
+        return {"value": leaf_value(residuals, quantile, settings.learning_rate)}
 
     column, threshold, _ = split
     goes_left = features[:, column] <= threshold
@@ -46,8 +46,8 @@ def grow(features: np.ndarray, gradients: np.ndarray, residuals: np.ndarray, dep
     return {
         "feature": column,
         "threshold": threshold,
-        "left": grow(features[goes_left], gradients[goes_left], residuals[goes_left], depth - 1, quantile),
-        "right": grow(features[~goes_left], gradients[~goes_left], residuals[~goes_left], depth - 1, quantile)
+        "left": grow(features[goes_left], gradients[goes_left], residuals[goes_left], depth - 1, quantile, settings),
+        "right": grow(features[~goes_left], gradients[~goes_left], residuals[~goes_left], depth - 1, quantile, settings)
     }
 
 
@@ -67,18 +67,18 @@ def negative_gradients(residuals: np.ndarray, quantile: float | None) -> np.ndar
     return residuals if quantile is None else np.where(residuals <= 0, quantile - 1, quantile)
 
 
-def fit(features: np.ndarray, target: np.ndarray, quantile: float | None = None) -> list[dict]:
+def fit(features: np.ndarray, target: np.ndarray, quantile: float | None = None, settings: Hyperparameters = HYPERPARAMETERS) -> list[dict]:
     trees = []
     prediction = np.zeros(len(target))
 
-    for _ in range(BOOSTING_ROUNDS):
+    for _ in range(settings.boosting_rounds):
         residuals = target - prediction
-        tree = grow(features, negative_gradients(residuals, quantile), residuals, TREE_MAX_DEPTH, quantile)
-        prediction = prediction + LEARNING_RATE * predict_tree(tree, features)
+        tree = grow(features, negative_gradients(residuals, quantile), residuals, settings.tree_max_depth, quantile, settings)
+        prediction = prediction + predict_tree(tree, features)
         trees.append(tree)
 
     return trees
 
 
 def predict(trees: list[dict], features: np.ndarray) -> np.ndarray:
-    return LEARNING_RATE * sum(predict_tree(tree, features) for tree in trees)
+    return sum(predict_tree(tree, features) for tree in trees)
