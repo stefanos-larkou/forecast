@@ -1,4 +1,5 @@
-import type { LiveRecord, ModelVersion, Summary } from "../models/summary";
+import { BACKTEST_SERIES, VARIABLES } from "../constants";
+import type { Backtest, LiveRecord, ModelVersion, SeriesErrors, Summary, VariableKey } from "../models/summary";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -22,9 +23,35 @@ function isLiveRecord(value: unknown): value is LiveRecord {
         && hasCounts(value, ["snapshots", "forecasts", "predictions", "intervals", "graded"]);
 }
 
+function isLeads(value: unknown): value is number[] {
+    return Array.isArray(value) && value.length > 0 && value.every(lead => Number.isInteger(lead) && lead > 0);
+}
+
+function isNumbers(value: unknown, length: number): value is number[] {
+    return Array.isArray(value) && value.length === length && value.every(item => Number.isFinite(item));
+}
+
+function isSeriesErrors(value: unknown, length: number): value is SeriesErrors {
+    return isRecord(value) && BACKTEST_SERIES.every(({ key }) => isNumbers(value[key], length));
+}
+
+function isErrors(value: unknown, length: number): value is Record<VariableKey, SeriesErrors> {
+    return isRecord(value) && VARIABLES.every(({ key }) => isSeriesErrors(value[key], length));
+}
+
+function isBacktest(value: unknown): value is Backtest {
+    return isRecord(value)
+        && hasStrings(value, ["from", "to"])
+        && hasCounts(value, ["forecasts"])
+        && isLeads(value.leads)
+        && isRecord(value.metrics)
+        && isErrors(value.metrics.mae, value.leads.length);
+}
+
 export function isSummary(value: unknown): value is Summary {
     return isRecord(value)
         && hasStrings(value, ["generated_at", "location"])
         && isModelVersion(value.model)
-        && isLiveRecord(value.live);
+        && isLiveRecord(value.live)
+        && isBacktest(value.backtest);
 }
