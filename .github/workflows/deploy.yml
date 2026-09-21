@@ -1,0 +1,63 @@
+name: 7. Deploy
+
+on:
+    push:
+        branches: [master]
+        paths:
+            - "SPA/**"
+            - ".github/workflows/deploy.yml"
+    workflow_run:
+        workflows: ["3. Observe", "4. Train"]
+        types: [completed]
+    workflow_dispatch:
+
+concurrency:
+    group: pages
+    cancel-in-progress: false
+
+permissions:
+    contents: read
+
+jobs:
+    build:
+        if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        defaults:
+            run:
+                working-directory: SPA
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+                  cache: npm
+                  cache-dependency-path: SPA/package-lock.json
+
+            - run: npm ci
+
+            - run: npm run check
+
+            - name: Add the data the page reads
+              run: |
+                  mkdir -p dist/data
+                  cp ../data/summary.json dist/data/
+
+            - uses: actions/upload-pages-artifact@v5
+              with:
+                  path: SPA/dist
+
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        permissions:
+            pages: write
+            id-token: write
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+            - id: deployment
+              uses: actions/deploy-pages@v5
