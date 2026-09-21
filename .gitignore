@@ -4,3 +4,4 @@ __pycache__/
 
 SPA/node_modules/
 SPA/dist/
+SPA/certs/
