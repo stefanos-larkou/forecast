@@ -11,3 +11,14 @@ export interface ChartStyle {
     grid: string;
     font: ChartFont;
 }
+
+export interface TableRow {
+    header: string;
+    values: string[];
+}
+
+export interface ChartTable {
+    rowHeader: string;
+    columns: string[];
+    rows: TableRow[];
+}

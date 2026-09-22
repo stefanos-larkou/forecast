@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { SUMMARY } from "../test-fixtures";
 import { renderWithProviders } from "../test-utils";
-import { BacktestSection } from "./BacktestSection";
+import BacktestSection from "./BacktestSection";
 
 describe("BacktestSection", () => {
     it("gives every variable its own titled, labelled chart, in order", () => {

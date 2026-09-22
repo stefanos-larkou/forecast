@@ -4,7 +4,7 @@ import { CategoryScale, Chart, Legend, LinearScale, LineController, LineElement,
 
 Chart.register(CategoryScale, LinearScale, LineController, LineElement, PointElement, Legend, Tooltip);
 
-export function ChartCanvas({ config, label }: { config: ChartConfiguration<"line">, label: string; }) {
+export function ChartCanvas({ config, label }: { config: ChartConfiguration, label: string; }) {
     const ref = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {

@@ -1,9 +1,11 @@
+import { Suspense, lazy } from "react";
 import { Alert, Box, Skeleton, Typography } from "@mui/material";
 import { StatusStrip } from "./components/StatusStrip";
 import { PLACE } from "./core/constants";
 import { useSummary } from "./core/hooks/useSummary";
 import { isError, isLoading, isSuccess } from "./core/utils/query-state";
-import { BacktestSection } from "./components/BacktestSection";
+
+const BacktestSection = lazy(() => import("./components/BacktestSection"));
 
 export function App() {
     const summary = useSummary();
@@ -16,10 +18,11 @@ export function App() {
             {isSuccess(summary) && (
                 <>
                     <StatusStrip summary={summary.data} />
-                    <BacktestSection backtest={summary.data.backtest} />
+                    <Suspense fallback={<Skeleton variant="rounded" sx={{ mt: 4, height: theme => theme.spacing(40) }} />}>
+                        <BacktestSection backtest={summary.data.backtest} />
+                    </Suspense>
                 </>
             )}
-
         </Box>
     );
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { VARIABLES } from "../constants";
 import { SUMMARY } from "../../test-fixtures";
-import { errorByLeadConfig } from "./error-by-lead";
+import { errorByLeadConfig, errorByLeadTable } from "./error-by-lead";
 
 const [TEMPERATURE] = VARIABLES;
 const STYLE = {
@@ -32,5 +32,18 @@ describe("errorByLeadConfig", () => {
 
     it("labels the error axis with the variable's unit and starts it at zero", () => {
         expect(CONFIG.options?.scales?.y).toMatchObject({ beginAtZero: true, title: { text: "Mean absolute error (\u00b0C)" } });
+    });
+});
+
+describe("errorByLeadTable", () => {
+    it("gives a column per series and a row per lead, to two decimals", () => {
+        const table = errorByLeadTable(SUMMARY.backtest, TEMPERATURE);
+
+        expect(table.rowHeader).toBe("Hours ahead");
+        expect(table.columns).toEqual(["gbm_blend", "ECMWF", "GFS", "ICON", "climatology", "persistence"]);
+        expect(table.rows).toEqual([
+            { header: "24", values: ["0.72", "1.22", "0.90", "0.94", "1.49", "1.09"] },
+            { header: "48", values: ["0.75", "1.35", "0.94", "0.96", "1.49", "1.49"] }
+        ]);
     });
 });
