@@ -68,6 +68,7 @@ INTERVALS_DIR = DATA_DIR / "intervals"
 CLIMATE_DIR = DATA_DIR / "climate"
 SUMMARY_FILE = DATA_DIR / "summary.json"
 PARQUET_COMPRESSION = "zstd"
+BAND_VARIABLE = "temperature_2m"
 SUMMARY_DECIMALS = 4
 
 LIVE_SOURCE = "live"

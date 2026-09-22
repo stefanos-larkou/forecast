@@ -7,7 +7,7 @@ on:
             - "SPA/**"
             - ".github/workflows/deploy.yml"
     workflow_run:
-        workflows: ["3. Observe", "4. Train"]
+        workflows: ["3. Observe", "4. Train", "6. Predict"]
         types: [completed]
     workflow_dispatch:
 

@@ -1,11 +1,12 @@
 import json
+from pathlib import Path
 import sys
 import time
 from datetime import datetime, timezone
 
 import pandas as pd
 
-from constants import BACKFILL_DIR, BLEND_MODEL, BYTES_PER_KB, CLIMATE_DIR, CURRENT_MODEL_FILE, FORECASTS_DIR, INTERVALS_DIR, JSON_INDENT, LOCATION, METADATA_FILE, MODELS_DIR, OBSERVATIONS_DIR, PREDICTIONS_DIR, RELIABILITY_METHODS, SCORING_KEY, SUMMARY_DECIMALS, SUMMARY_FILE
+from constants import BACKFILL_DIR, BAND_VARIABLE, BLEND_MODEL, BYTES_PER_KB, CLIMATE_DIR, CURRENT_MODEL_FILE, FORECASTS_DIR, INTERVALS_DIR, JSON_INDENT, LOCATION, METADATA_FILE, MODELS_DIR, OBSERVATIONS_DIR, PREDICTIONS_DIR, RELIABILITY_METHODS, SCORING_KEY, SUMMARY_DECIMALS, SUMMARY_FILE
 from model.training import load_training_data
 from model.tune import validation_months
 from scoring import precipitation
@@ -83,11 +84,25 @@ def build_backtest() -> dict:
     }
 
 
-def build_live() -> dict:
+def build_forecast(predictions: pd.DataFrame, intervals: pd.DataFrame) -> dict | None:
+    if predictions.empty:
+        return None
+
+    run_time = predictions["run_time"].max()
+    hours = predictions[predictions["run_time"] == run_time].pivot(index="valid_time", columns="variable", values="value").sort_index()
+    band = intervals[(intervals["run_time"] == run_time) & (intervals["variable"] == BAND_VARIABLE)].set_index("valid_time").sort_index()
+
+    return {
+        "run_time": run_time.isoformat(),
+        "hours": [hour.isoformat() for hour in hours.index],
+        "variables": {variable: rounded(hours[variable]) for variable in hours.columns if hours[variable].notna().all()},
+        "band": {"variable": BAND_VARIABLE, "lower": rounded(band["lower"]), "upper": rounded(band["upper"])}
+    }
+
+
+def build_live(predictions: pd.DataFrame, intervals: pd.DataFrame) -> dict:
     forecasts = pd.read_parquet(FORECASTS_DIR)
     observations = pd.read_parquet(OBSERVATIONS_DIR)
-    predictions = pd.read_parquet(PREDICTIONS_DIR) if any(PREDICTIONS_DIR.rglob("*.parquet")) else forecasts.iloc[:0]
-    intervals = pd.read_parquet(INTERVALS_DIR) if any(INTERVALS_DIR.rglob("*.parquet")) else forecasts.iloc[:0]
     truth_until = observations["valid_time"].max()
 
     return {
@@ -106,6 +121,10 @@ def build_live() -> dict:
     }
 
 
+def read_table(directory: Path) -> pd.DataFrame:
+    return pd.read_parquet(directory) if any(directory.rglob("*.parquet")) else pd.DataFrame()
+
+
 def main() -> None:
     rebuild = "backtest" in sys.argv[1:]
     previous = json.loads(SUMMARY_FILE.read_text()) if SUMMARY_FILE.exists() else {}
@@ -116,11 +135,15 @@ def main() -> None:
         print("Carrying the backtest over unchanged. Pass 'backtest' to rebuild it.")
         backtest = previous["backtest"]
 
+    predictions = read_table(PREDICTIONS_DIR)
+    intervals = read_table(INTERVALS_DIR)
+
     summary = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "location": LOCATION.slug,
         "model": current_model(),
-        "live": build_live(),
+        "live": build_live(predictions, intervals),
+        "forecast": build_forecast(predictions, intervals),
         "backtest": backtest
     }
 
