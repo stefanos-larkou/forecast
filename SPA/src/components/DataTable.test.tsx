@@ -4,7 +4,7 @@ import { renderWithProviders } from "../test-utils";
 import { DataTable } from "./DataTable";
 
 const TABLE = {
-    rowHeader: "Hours ahead",
+    rowHeader: "Hours Ahead",
     columns: ["gbm_blend", "ECMWF"],
     rows: [
         { header: "24", values: ["0.72", "1.22"] },
@@ -22,7 +22,7 @@ describe("DataTable", () => {
     it("heads the first column with the row header and the rest with the columns", () => {
         renderWithProviders(<DataTable table={TABLE} label="Errors" />);
 
-        expect(row(0)).toEqual(["Hours ahead", "gbm_blend", "ECMWF"]);
+        expect(row(0)).toEqual(["Hours Ahead", "gbm_blend", "ECMWF"]);
     });
 
     it("gives each row its header and its values in order", () => {

@@ -1,11 +1,11 @@
-import { screen } from "@testing-library/react";
+import { screen, waitForElementToBeRemoved } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { renderWithProviders } from "../test-utils";
 import { ChartPanel } from "./ChartPanel";
 
 const CONFIG = { type: "line" as const, data: { labels: [24, 48], datasets: [{ data: [1, 2] }] } };
-const TABLE = { rowHeader: "Hours ahead", columns: ["gbm_blend"], rows: [{ header: "24", values: ["0.72"] }] };
+const TABLE = { rowHeader: "Hours Ahead", columns: ["gbm_blend"], rows: [{ header: "24", values: ["0.72"] }] };
 const LABEL = "Temperature: mean absolute error";
 
 function panel() {
@@ -25,10 +25,10 @@ describe("ChartPanel", () => {
 
         await userEvent.click(screen.getByRole("button", { name: "Show as table" }));
         expect(screen.getByRole("table")).toBeInTheDocument();
-        expect(screen.queryByRole("img", { name: LABEL })).not.toBeInTheDocument();
+        await waitForElementToBeRemoved(() => screen.queryByRole("img", { name: LABEL }));
 
         await userEvent.click(screen.getByRole("button", { name: "Show as chart" }));
         expect(screen.getByRole("img", { name: LABEL })).toBeInTheDocument();
-        expect(screen.queryByRole("table")).not.toBeInTheDocument();
+        await waitForElementToBeRemoved(() => screen.queryByRole("table"));
     });
 });

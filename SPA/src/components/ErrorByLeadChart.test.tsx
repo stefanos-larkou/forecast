@@ -12,7 +12,7 @@ describe("ErrorByLeadChart", () => {
     it("titles the panel with its variable and describes the chart with its unit", () => {
         renderWithProviders(<ErrorByLeadChart backtest={SUMMARY.backtest} variable={WIND} />);
 
-        expect(screen.getByRole("heading", { level: 3, name: "Wind speed" })).toBeInTheDocument();
+        expect(screen.getByRole("heading", { level: 3, name: "Wind Speed" })).toBeInTheDocument();
         expect(screen.getByRole("img", { name: /mean absolute error in km\/h/ })).toBeInTheDocument();
     });
 

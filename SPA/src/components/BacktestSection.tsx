@@ -1,15 +1,16 @@
 import { Box, Typography } from "@mui/material";
-import { VARIABLES } from "../core/constants";
+import { BACKTEST_HEADING, VARIABLES } from "../core/constants";
 import type { Backtest } from "../core/models/summary";
+import { ChartGrid } from "./ChartGrid";
 import { ErrorByLeadChart } from "./ErrorByLeadChart";
 
 export default function BacktestSection({ backtest }: { backtest: Backtest; }) {
     return (
         <Box component="section" sx={{ mt: 4 }}>
-            <Typography variant="h2" sx={{ mb: 2 }}>Error by how far ahead the forecast looks</Typography>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "repeat(2, minmax(0, 1fr))" }, gap: 2 }}>
+            <Typography variant="h2" sx={{ mb: 2 }}>{BACKTEST_HEADING}</Typography>
+            <ChartGrid>
                 {VARIABLES.map(variable => <ErrorByLeadChart key={variable.key} backtest={backtest} variable={variable} />)}
-            </Box>
+            </ChartGrid>
         </Box>
     );
 }

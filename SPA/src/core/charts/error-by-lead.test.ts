@@ -31,7 +31,7 @@ describe("errorByLeadConfig", () => {
     });
 
     it("labels the error axis with the variable's unit and starts it at zero", () => {
-        expect(CONFIG.options?.scales?.y).toMatchObject({ beginAtZero: true, title: { text: "Mean absolute error (\u00b0C)" } });
+        expect(CONFIG.options?.scales?.y).toMatchObject({ beginAtZero: true, title: { text: "Mean Absolute Error (\u00b0C)" } });
     });
 });
 
@@ -39,7 +39,7 @@ describe("errorByLeadTable", () => {
     it("gives a column per series and a row per lead, to two decimals", () => {
         const table = errorByLeadTable(SUMMARY.backtest, TEMPERATURE);
 
-        expect(table.rowHeader).toBe("Hours ahead");
+        expect(table.rowHeader).toBe("Hours Ahead");
         expect(table.columns).toEqual(["gbm_blend", "ECMWF", "GFS", "ICON", "climatology", "persistence"]);
         expect(table.rows).toEqual([
             { header: "24", values: ["0.72", "1.22", "0.90", "0.94", "1.49", "1.09"] },

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Paper, Stack, Typography } from "@mui/material";
+import { Button, Collapse, Paper, Stack, Typography } from "@mui/material";
 import type { ChartConfiguration } from "chart.js";
 import type { ChartTable } from "../core/models/charts";
 import { ChartCanvas } from "./ChartCanvas";
@@ -16,7 +16,12 @@ export function ChartPanel({ title, label, config, table }: { title: string, lab
                     {tableShown ? "Show as chart" : "Show as table"}
                 </Button>
             </Stack>
-            {tableShown ? <DataTable table={table} label={label} /> : <ChartCanvas config={config} label={label} />}
+            <Collapse in={!tableShown} unmountOnExit>
+                <ChartCanvas config={config} label={label} />
+            </Collapse>
+            <Collapse in={tableShown} unmountOnExit>
+                <DataTable table={table} label={label} />
+            </Collapse>
         </Paper>
     );
 }

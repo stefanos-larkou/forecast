@@ -4,7 +4,7 @@ import type { ChartStyle, ChartTable } from "../models/charts";
 import type { Backtest, Variable } from "../models/summary";
 import { formatError } from "../utils/format";
 
-const ROW_HEADER = "Hours ahead";
+const ROW_HEADER = "Hours Ahead";
 
 export function errorByLeadConfig(backtest: Backtest, variable: Variable, style: ChartStyle): ChartConfiguration<"line"> {
     const errors = backtest.metrics.mae[variable.key];
@@ -54,7 +54,7 @@ export function errorByLeadConfig(backtest: Backtest, variable: Variable, style:
                 y: {
                     beginAtZero: true,
                     ticks: { font },
-                    title: { display: true, text: `Mean absolute error (${variable.unit})`, font },
+                    title: { display: true, text: `Mean Absolute Error (${variable.unit})`, font },
                     grid: { color: style.grid }
                 }
             }

@@ -24,7 +24,7 @@ describe("App", () => {
 
         expect(screen.getByRole("heading", { level: 1, name: PLACE })).toBeInTheDocument();
         expect(await screen.findByText("Snapshots")).toBeInTheDocument();
-        expect(await screen.findByRole("heading", { level: 2 })).toBeInTheDocument();
+        expect(await screen.findByRole("heading", { level: 3, name: "Temperature" })).toBeInTheDocument();
     });
 
     it("tells the reader when the latest figures could not be loaded", async () => {
