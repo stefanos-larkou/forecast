@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-09-21T20:33:07.809810+00:00",
+    "generated_at": "2026-09-22T08:33:04.166544+00:00",
     "location": "larnaca",
     "model": {
         "version": "2026-09-21",
@@ -12,12 +12,12 @@
     },
     "live": {
         "from": "2026-09-17T21:00:00+00:00",
-        "to": "2026-09-21T12:00:00+00:00",
-        "truth_until": "2026-09-15T23:00:00+00:00",
-        "snapshots": 15,
-        "forecasts": 34710,
-        "predictions": 6480,
-        "intervals": 2880,
+        "to": "2026-09-22T05:00:00+00:00",
+        "truth_until": "2026-09-16T23:00:00+00:00",
+        "snapshots": 17,
+        "forecasts": 39315,
+        "predictions": 7920,
+        "intervals": 4032,
         "graded": 0,
         "model": "gbm_blend",
         "leaderboard": null,
