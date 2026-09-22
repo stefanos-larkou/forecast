@@ -112,6 +112,11 @@ export const theme = createTheme({
         }
     },
     components: {
+        MuiSkeleton: {
+            defaultProps: {
+                animation: "wave"
+            }
+        },
         MuiLink: {
             defaultProps: {
                 underline: "hover"

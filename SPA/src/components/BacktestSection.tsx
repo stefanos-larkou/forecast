@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { BACKTEST_HEADING, VARIABLES } from "../core/constants";
+import { BACKTEST_CAPTION, BACKTEST_HEADING, VARIABLES } from "../core/constants";
 import type { Backtest } from "../core/models/summary";
 import { formatCount, formatMonth } from "../core/utils/format";
 import { ChartGrid } from "./ChartGrid";
@@ -15,10 +15,7 @@ export default function BacktestSection({ backtest }: { backtest: Backtest; }) {
             <ChartGrid>
                 {VARIABLES.map(variable => <ErrorByLeadChart key={variable.key} backtest={backtest} variable={variable} />)}
             </ChartGrid>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                Mean absolute error against ERA5 (lower is better). These are
-                archived forecasts, not the live record.
-            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>{BACKTEST_CAPTION}</Typography>
         </Box>
     );
 }

@@ -7,11 +7,11 @@ describe("formatError", () => {
         expect(formatError(14.1893)).toBe("14.19");
         expect(formatError(4)).toBe("4.00");
     });
+});
 
-    describe("formatMonth", () => {
-        it("names the month and year a summary month stands for", () => {
-            expect(formatMonth("2025-03")).toBe("March 2025");
-            expect(formatMonth("2026-09")).toBe("September 2026");
-        });
+describe("formatMonth", () => {
+    it("names the month and year a summary month stands for", () => {
+        expect(formatMonth("2025-03")).toBe("March 2025");
+        expect(formatMonth("2026-09")).toBe("September 2026");
     });
 });
