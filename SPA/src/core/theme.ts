@@ -10,15 +10,25 @@ interface BrandPalette {
     soft: string;
 }
 
+export interface SeriesPalette {
+    ours: string;
+    ecmwf: string;
+    gfs: string;
+    icon: string;
+    reference: string;
+}
+
 declare module "@mui/material/styles" {
     interface Palette {
         themeIcon: ThemeIconPalette;
         brand: BrandPalette;
+        series: SeriesPalette;
     }
 
     interface PaletteOptions {
         themeIcon?: ThemeIconPalette;
         brand?: BrandPalette;
+        series?: SeriesPalette;
     }
 
     interface CssThemeVariables {
@@ -45,6 +55,13 @@ export const theme = createTheme({
                 brand: {
                     main: "#6a54b0",
                     soft: "rgba(106, 84, 176, 0.32)"
+                },
+                series: {
+                    ours: "#c2410c",
+                    ecmwf: "#1d4ed8",
+                    gfs: "#047857",
+                    icon: "#7c3aed",
+                    reference: "#64748b"
                 }
             }
         },
@@ -62,6 +79,13 @@ export const theme = createTheme({
                 brand: {
                     main: "#a794e8",
                     soft: "rgba(167, 148, 232, 0.32)"
+                },
+                series: {
+                    ours: "#e2690f",
+                    ecmwf: "#3b82f6",
+                    gfs: "#0fa574",
+                    icon: "#a855f7",
+                    reference: "#8296a8"
                 }
             }
         }

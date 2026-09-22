@@ -1,6 +1,7 @@
 import type { BACKTEST_SERIES, VARIABLES } from "../constants";
 
-export type VariableKey = (typeof VARIABLES)[number]["key"];
+export type Variable = (typeof VARIABLES)[number];
+export type VariableKey = Variable["key"];
 export type SeriesKey = (typeof BACKTEST_SERIES)[number]["key"];
 export type SeriesErrors = Record<SeriesKey, number[]>;
 
@@ -39,10 +40,4 @@ export interface Summary {
     model: ModelVersion;
     live: LiveRecord;
     backtest: Backtest;
-}
-
-export interface ErrorRow {
-    series: string;
-    lead: number;
-    error: number;
 }

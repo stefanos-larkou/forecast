@@ -3,6 +3,7 @@ import { StatusStrip } from "./components/StatusStrip";
 import { PLACE } from "./core/constants";
 import { useSummary } from "./core/hooks/useSummary";
 import { isError, isLoading, isSuccess } from "./core/utils/query-state";
+import { BacktestSection } from "./components/BacktestSection";
 
 export function App() {
     const summary = useSummary();
@@ -12,7 +13,13 @@ export function App() {
             <Typography variant="h1" sx={{ mb: 2 }}>{PLACE}</Typography>
             {isLoading(summary) && <Skeleton variant="rounded" sx={{ height: theme => theme.spacing(10) }} />}
             {isError(summary) && <Alert severity="error">The latest figures could not be loaded. Try again later.</Alert>}
-            {isSuccess(summary) && <StatusStrip summary={summary.data} />}
+            {isSuccess(summary) && (
+                <>
+                    <StatusStrip summary={summary.data} />
+                    <BacktestSection backtest={summary.data.backtest} />
+                </>
+            )}
+
         </Box>
     );
 }
