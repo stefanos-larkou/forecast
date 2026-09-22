@@ -22,6 +22,10 @@ export function formatMonth(month: string): string {
     return MONTH.format(new Date(`${month}-01T00:00:00Z`));
 }
 
+export function formatTime(timestamp: string): string {
+    return TIME.format(new Date(timestamp));
+}
+
 export function formatCount(count: number): string {
     return COUNT.format(count);
 }

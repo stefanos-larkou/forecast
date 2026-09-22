@@ -1,3 +1,4 @@
+import { HOURS_AHEAD_SHOWN } from "../constants";
 import type { Forecast, HourlyRow } from "../models/summary";
 
 export function hourlyRows(forecast: Forecast): HourlyRow[] {
@@ -17,6 +18,12 @@ export function hourlyRows(forecast: Forecast): HourlyRow[] {
 
         return [{ at, temperature, lower, upper, rain, cloud, wind, humidity }];
     });
+}
+
+export function upcomingRows(rows: HourlyRow[], now: Date): HourlyRow[] {
+    const current = currentRow(rows, now);
+    const from = current === undefined ? 0 : rows.indexOf(current);
+    return rows.slice(from, from + HOURS_AHEAD_SHOWN);
 }
 
 export function currentRow(rows: HourlyRow[], now: Date): HourlyRow | undefined {

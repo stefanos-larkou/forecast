@@ -2,6 +2,8 @@ export const PLACE = "Larnaca";
 export const LOCALE = "en-GB";
 export const BACKTEST_CAPTION = "Mean absolute error against ERA5 (lower is better). These are archived forecasts, not the live record.";
 export const BACKTEST_HEADING = "Error by how far ahead the forecast looks";
+export const HOURS_AHEAD_SHOWN = 24;
+export const RAIN_WORTH_SHOWING = 0.005;
 export const RAIN_VARIABLE = "rain_probability";
 export const SUMMARY_URL = `${import.meta.env.BASE_URL}data/summary.json`;
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FORECAST } from "../../test-fixtures";
-import { currentRow, hourlyRows } from "./forecast";
+import { currentRow, hourlyRows, upcomingRows } from "./forecast";
 
 const ROWS = hourlyRows(FORECAST);
 
@@ -33,5 +33,18 @@ describe("currentRow", () => {
 
     it("has nothing to give when there are no hours", () => {
         expect(currentRow([], new Date())).toBeUndefined();
+    });
+});
+
+describe("upcomingRows", () => {
+    it("starts at the hour under way, not at the first hour published", () => {
+        const upcoming = upcomingRows(ROWS, new Date("2026-09-22T19:30:00Z"));
+
+        expect(upcoming.map(row => row.at)).toEqual(["2026-09-22T19:00:00+00:00", "2026-09-22T20:00:00+00:00"]);
+    });
+
+    it("never runs past the hours it was given", () => {
+        expect(upcomingRows(ROWS, new Date("2026-09-22T17:00:00Z"))).toHaveLength(3);
+        expect(upcomingRows([], new Date())).toEqual([]);
     });
 });

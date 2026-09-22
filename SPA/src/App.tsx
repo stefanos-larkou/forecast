@@ -6,6 +6,7 @@ import { StatusStrip } from "./components/StatusStrip";
 import { PLACE } from "./core/constants";
 import { useSummary } from "./core/hooks/useSummary";
 import { isError, isLoading, isSuccess } from "./core/utils/query-state";
+import { HourlyStrip } from "./components/HourlyStrip";
 
 const backtestSection = import("./components/BacktestSection");
 const BacktestSection = lazy(() => backtestSection);
@@ -20,7 +21,12 @@ export function App() {
             {isError(summary) && <Alert severity="error">The latest figures could not be loaded. Try again later.</Alert>}
             {isSuccess(summary) && (
                 <>
-                    {summary.data.forecast && <CurrentConditions forecast={summary.data.forecast} />}
+                    {summary.data.forecast && (
+                        <>
+                            <CurrentConditions forecast={summary.data.forecast} />
+                            <HourlyStrip forecast={summary.data.forecast} />
+                        </>
+                    )}
                     <StatusStrip summary={summary.data} />
                     <Suspense fallback={<BacktestLoading />}>
                         <BacktestSection backtest={summary.data.backtest} />
