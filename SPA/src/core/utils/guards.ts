@@ -1,5 +1,5 @@
-import { BACKTEST_SERIES, VARIABLES } from "../constants";
-import type { Backtest, LiveRecord, ModelVersion, SeriesErrors, Summary, VariableKey } from "../models/summary";
+import { BACKTEST_SERIES, RAIN_VARIABLE, VARIABLES } from "../constants";
+import type { Backtest, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, SeriesErrors, Summary, VariableKey } from "../models/summary";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -39,6 +39,31 @@ function isErrors(value: unknown, length: number): value is Record<VariableKey, 
     return isRecord(value) && VARIABLES.every(({ key }) => isSeriesErrors(value[key], length));
 }
 
+function isHours(value: unknown): value is string[] {
+    return Array.isArray(value) && value.length > 0 && value.every(hour => typeof hour === "string");
+}
+
+const FORECAST_KEYS: ForecastVariableKey[] = [...VARIABLES.map(variable => variable.key), RAIN_VARIABLE];
+
+function isForecast(value: unknown): value is Forecast {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    const hours = value.hours;
+    const variables = value.variables;
+    const band = value.band;
+
+    return hasStrings(value, ["run_time"])
+        && isHours(hours)
+        && isRecord(variables)
+        && FORECAST_KEYS.every(key => isNumbers(variables[key], hours.length))
+        && isRecord(band)
+        && hasStrings(band, ["variable"])
+        && isNumbers(band.lower, hours.length)
+        && isNumbers(band.upper, hours.length);
+}
+
 function isBacktest(value: unknown): value is Backtest {
     return isRecord(value)
         && hasStrings(value, ["from", "to"])
@@ -53,5 +78,6 @@ export function isSummary(value: unknown): value is Summary {
         && hasStrings(value, ["generated_at", "location"])
         && isModelVersion(value.model)
         && isLiveRecord(value.live)
+        && (value.forecast === null || isForecast(value.forecast))
         && isBacktest(value.backtest);
 }

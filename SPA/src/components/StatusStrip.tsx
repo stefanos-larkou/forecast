@@ -13,7 +13,7 @@ export function StatusStrip({ summary }: { summary: Summary; }) {
     ];
 
     return (
-        <Paper variant="outlined" sx={{ p: 2 }}>
+        <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
             <Stack component="dl" direction="row" spacing={3} useFlexGap sx={{ flexWrap: "wrap", m: 0 }}>
                 {items.map(({ label, value }) => (
                     <div key={label}>

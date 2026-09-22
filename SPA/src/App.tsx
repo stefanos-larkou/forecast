@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { Alert, Box, Skeleton, Typography } from "@mui/material";
 import { BacktestLoading } from "./components/BacktestLoading";
+import { CurrentConditions } from "./components/CurrentConditions";
 import { StatusStrip } from "./components/StatusStrip";
 import { PLACE } from "./core/constants";
 import { useSummary } from "./core/hooks/useSummary";
@@ -19,6 +20,7 @@ export function App() {
             {isError(summary) && <Alert severity="error">The latest figures could not be loaded. Try again later.</Alert>}
             {isSuccess(summary) && (
                 <>
+                    {summary.data.forecast && <CurrentConditions forecast={summary.data.forecast} />}
                     <StatusStrip summary={summary.data} />
                     <Suspense fallback={<BacktestLoading />}>
                         <BacktestSection backtest={summary.data.backtest} />

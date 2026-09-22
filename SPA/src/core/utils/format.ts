@@ -1,4 +1,5 @@
 import { LOCALE } from "../constants";
+import type { ForecastVariableKey } from "../models/summary";
 
 const ERROR_DECIMALS = 2;
 
@@ -23,6 +24,18 @@ export function formatMonth(month: string): string {
 
 export function formatCount(count: number): string {
     return COUNT.format(count);
+}
+
+const MEASUREMENTS: Record<ForecastVariableKey, Intl.NumberFormat> = {
+    temperature_2m: new Intl.NumberFormat(LOCALE, { style: "unit", unit: "celsius", minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+    relative_humidity_2m: new Intl.NumberFormat(LOCALE, { style: "unit", unit: "percent", maximumFractionDigits: 0 }),
+    wind_speed_10m: new Intl.NumberFormat(LOCALE, { style: "unit", unit: "kilometer-per-hour", maximumFractionDigits: 0 }),
+    cloud_cover: new Intl.NumberFormat(LOCALE, { style: "unit", unit: "percent", maximumFractionDigits: 0 }),
+    rain_probability: new Intl.NumberFormat(LOCALE, { style: "percent", maximumFractionDigits: 0 })
+};
+
+export function formatMeasurement(variable: ForecastVariableKey, value: number): string {
+    return MEASUREMENTS[variable].format(value);
 }
 
 export function formatError(error: number): string {

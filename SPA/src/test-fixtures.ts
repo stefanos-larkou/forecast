@@ -1,4 +1,21 @@
-import type { Summary } from "./core/models/summary";
+import type { Forecast, Summary } from "./core/models/summary";
+
+export const FORECAST: Forecast = {
+    run_time: "2026-09-22T17:00:00+00:00",
+    hours: ["2026-09-22T18:00:00+00:00", "2026-09-22T19:00:00+00:00", "2026-09-22T20:00:00+00:00"],
+    variables: {
+        temperature_2m: [26.28, 25.41, 23.9],
+        relative_humidity_2m: [68.17, 71.4, 74.02],
+        wind_speed_10m: [7.26, 6.81, 5.4],
+        cloud_cover: [9.77, 14.2, 21.06],
+        rain_probability: [0.02, 0.05, 0.11]
+    },
+    band: {
+        variable: "temperature_2m",
+        lower: [24.63, 23.8, 22.4],
+        upper: [27.27, 26.9, 25.6]
+    }
+};
 
 export const SUMMARY: Summary = {
     generated_at: "2026-09-21T12:00:00+00:00",
@@ -14,6 +31,7 @@ export const SUMMARY: Summary = {
         intervals: 1152,
         graded: 0
     },
+    forecast: FORECAST,
     backtest: {
         from: "2025-03",
         to: "2026-09",
