@@ -4,6 +4,7 @@ const ERROR_DECIMALS = 2;
 
 const DATE = new Intl.DateTimeFormat(LOCALE, { day: "2-digit", month: "2-digit", year: "numeric" });
 const TIME = new Intl.DateTimeFormat(LOCALE, { hour: "2-digit", minute: "2-digit" });
+const MONTH = new Intl.DateTimeFormat(LOCALE, { month: "long", year: "numeric", timeZone: "UTC" });
 const COUNT = new Intl.NumberFormat(LOCALE);
 const ERROR = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: ERROR_DECIMALS, maximumFractionDigits: ERROR_DECIMALS });
 
@@ -14,6 +15,10 @@ export function formatDate(timestamp: string): string {
 export function formatDateTime(timestamp: string): string {
     const date = new Date(timestamp);
     return `${DATE.format(date)} ${TIME.format(date)}`;
+}
+
+export function formatMonth(month: string): string {
+    return MONTH.format(new Date(`${month}-01T00:00:00Z`));
 }
 
 export function formatCount(count: number): string {
