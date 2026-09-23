@@ -1,5 +1,5 @@
 import { HOURS_AHEAD_SHOWN } from "../constants";
-import type { Forecast, HourlyRow } from "../models/summary";
+import type { DailyRow, Forecast, HourlyRow } from "../models/summary";
 
 export function hourlyRows(forecast: Forecast): HourlyRow[] {
     return forecast.hours.flatMap((at, index) => {
@@ -24,6 +24,23 @@ export function upcomingRows(rows: HourlyRow[], now: Date): HourlyRow[] {
     const current = currentRow(rows, now);
     const from = current === undefined ? 0 : rows.indexOf(current);
     return rows.slice(from, from + HOURS_AHEAD_SHOWN);
+}
+
+function dayOf(row: HourlyRow): string {
+    return new Date(row.at).toDateString();
+}
+
+export function dailyRows(rows: HourlyRow[]): DailyRow[] {
+    return [...new Set(rows.map(dayOf))].map(day => {
+        const hours = rows.filter(row => dayOf(row) === day);
+        const temperatures = hours.map(hour => hour.temperature);
+        return {
+            at: hours[0]?.at ?? "",
+            high: Math.max(...temperatures),
+            low: Math.min(...temperatures),
+            rain: Math.max(...hours.map(hour => hour.rain))
+        };
+    });
 }
 
 export function currentRow(rows: HourlyRow[], now: Date): HourlyRow | undefined {

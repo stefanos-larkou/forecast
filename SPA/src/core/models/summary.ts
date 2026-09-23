@@ -59,6 +59,13 @@ export interface HourlyRow {
     humidity: number;
 }
 
+export interface DailyRow {
+    at: string;
+    high: number;
+    low: number;
+    rain: number;
+}
+
 export interface Summary {
     generated_at: string;
     location: string;

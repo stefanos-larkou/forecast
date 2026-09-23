@@ -7,6 +7,7 @@ import { PLACE } from "./core/constants";
 import { useSummary } from "./core/hooks/useSummary";
 import { isError, isLoading, isSuccess } from "./core/utils/query-state";
 import { HourlyStrip } from "./components/HourlyStrip";
+import { DailyOutlook } from "./components/DailyOutlook";
 
 const backtestSection = import("./components/BacktestSection");
 const BacktestSection = lazy(() => backtestSection);
@@ -25,6 +26,7 @@ export function App() {
                         <>
                             <CurrentConditions forecast={summary.data.forecast} />
                             <HourlyStrip forecast={summary.data.forecast} />
+                            <DailyOutlook forecast={summary.data.forecast} />
                         </>
                     )}
                     <StatusStrip summary={summary.data} />

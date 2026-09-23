@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FORECAST } from "../../test-fixtures";
-import { currentRow, hourlyRows, upcomingRows } from "./forecast";
+import { currentRow, dailyRows, hourlyRows, upcomingRows } from "./forecast";
 
 const ROWS = hourlyRows(FORECAST);
 
@@ -46,5 +46,18 @@ describe("upcomingRows", () => {
     it("never runs past the hours it was given", () => {
         expect(upcomingRows(ROWS, new Date("2026-09-22T17:00:00Z"))).toHaveLength(3);
         expect(upcomingRows([], new Date())).toEqual([]);
+    });
+});
+
+describe("dailyRows", () => {
+    it("keeps the hours of one day together, with its coldest and warmest hour", () => {
+        const days = dailyRows(ROWS);
+
+        expect(days).toHaveLength(1);
+        expect(days[0]).toEqual({ at: "2026-09-22T18:00:00+00:00", high: 26.28, low: 23.9, rain: 0.11 });
+    });
+
+    it("has nothing to summarise when there are no hours", () => {
+        expect(dailyRows([])).toEqual([]);
     });
 });

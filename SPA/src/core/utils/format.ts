@@ -7,6 +7,7 @@ const DATE = new Intl.DateTimeFormat(LOCALE, { day: "2-digit", month: "2-digit",
 const TIME = new Intl.DateTimeFormat(LOCALE, { hour: "2-digit", minute: "2-digit" });
 const MONTH = new Intl.DateTimeFormat(LOCALE, { month: "long", year: "numeric", timeZone: "UTC" });
 const COUNT = new Intl.NumberFormat(LOCALE);
+const WEEKDAY = new Intl.DateTimeFormat(LOCALE, { weekday: "long" });
 const ERROR = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: ERROR_DECIMALS, maximumFractionDigits: ERROR_DECIMALS });
 
 export function formatDate(timestamp: string): string {
@@ -24,6 +25,10 @@ export function formatMonth(month: string): string {
 
 export function formatTime(timestamp: string): string {
     return TIME.format(new Date(timestamp));
+}
+
+export function formatWeekday(timestamp: string): string {
+    return WEEKDAY.format(new Date(timestamp));
 }
 
 export function formatCount(count: number): string {
