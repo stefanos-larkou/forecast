@@ -1,22 +1,52 @@
 import { describe, expect, it } from "vitest";
-import { isNight, weatherState } from "./weather";
+import { chanceLabel, isNight, weatherState } from "./weather";
 import { SUMMARY } from "../../test-fixtures";
 
+const WARM = 20;
+
+function state(rain: number, amount: number, cloud = 90, temperature = WARM): string {
+    return weatherState({ rain, amount, cloud, temperature });
+}
+
 describe("weatherState", () => {
-    it("calls it rain when rain is more likely than not, whatever the cloud says", () => {
-        expect(weatherState({ rain: 0.7, cloud: 90 })).toBe("rain");
-        expect(weatherState({ rain: 0.55, cloud: 10 })).toBe("rain");
-    });
-
-    it("calls a lesser chance showers", () => {
-        expect(weatherState({ rain: 0.2, cloud: 10 })).toBe("showers");
-        expect(weatherState({ rain: 0.54, cloud: 95 })).toBe("showers");
-    });
-
     it("falls back to how much cloud there is when rain is unlikely", () => {
-        expect(weatherState({ rain: 0.19, cloud: 70 })).toBe("overcast");
-        expect(weatherState({ rain: 0, cloud: 40 })).toBe("partly");
-        expect(weatherState({ rain: 0, cloud: 24 })).toBe("clear");
+        expect(state(0.29, 8, 70)).toBe("overcast");
+        expect(state(0, 0, 40)).toBe("partly");
+        expect(state(0, 0, 24)).toBe("clear");
+    });
+
+    it("names the intensity from the millimetres once rain is more likely than not", () => {
+        expect(state(0.55, 0.49)).toBe("drizzle");
+        expect(state(0.55, 0.5)).toBe("rain");
+        expect(state(0.9, 3.99)).toBe("rain");
+        expect(state(0.9, 4)).toBe("downpour");
+    });
+
+    it("promises no more than showers while rain is merely possible", () => {
+        expect(state(0.3, 0.5)).toBe("showers");
+        expect(state(0.54, 9)).toBe("showers");
+    });
+
+    it("calls the same millimetres drizzle at every chance of rain", () => {
+        expect(state(0.3, 0.2)).toBe("drizzle");
+        expect(state(0.54, 0.2)).toBe("drizzle");
+        expect(state(0.99, 0.2)).toBe("drizzle");
+    });
+
+    it("turns to snow at freezing, and calls it heavy only where rain would have been a downpour", () => {
+        expect(state(0.3, 0.2, 90, 1)).toBe("snow");
+        expect(state(0.9, 3.9, 90, 0)).toBe("snow");
+        expect(state(0.54, 9, 90, 0)).toBe("snow");
+        expect(state(0.9, 4, 90, 0)).toBe("heavySnow");
+    });
+});
+
+describe("chanceLabel", () => {
+    it("names what would fall, not always rain", () => {
+        expect(chanceLabel("snow")).toBe("Chance of snow");
+        expect(chanceLabel("heavySnow")).toBe("Chance of snow");
+        expect(chanceLabel("drizzle")).toBe("Chance of rain");
+        expect(chanceLabel("clear")).toBe("Chance of rain");
     });
 });
 

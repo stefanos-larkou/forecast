@@ -8,7 +8,8 @@ export const FORECAST: Forecast = {
         relative_humidity_2m: [68.17, 71.4, 74.02],
         wind_speed_10m: [7.26, 6.81, 5.4],
         cloud_cover: [9.77, 14.2, 21.06],
-        rain_probability: [0.02, 0.05, 0.11]
+        rain_probability: [0.02, 0.05, 0.11],
+        rain_amount: [0.0, 0.14, 0.62]
     },
     band: {
         variable: "temperature_2m",

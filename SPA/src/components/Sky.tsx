@@ -2,40 +2,53 @@ import type { ReactNode } from "react";
 import { Box } from "@mui/material";
 import { keyframes } from "@mui/system";
 import type { SkyPalette } from "../core/theme";
-import type { WeatherState } from "../core/utils/weather";
+import { WET_STATES } from "../core/constants";
+import type { WeatherState } from "../core/models/weather";
+import { FallingWeather } from "./FallingWeather";
 
-// Each cloud starts off the left edge and drifts across. A negative delay starts
-// it part-way through, so the sky already has clouds in it when the page loads.
+const CLOUD_PATH = "M26 48a17 17 0 0 1 .4-33.6A23 23 0 0 1 68 12a15 15 0 0 1 22 12 13 13 0 0 1-3 24z";
+const CLOUD_BOX = "0 0 120 56";
+
 const CLOUDS = [
-    { top: "14%", width: 11, height: 4, duration: 90, started: 24, opacity: 0.9 },
-    { top: "42%", width: 7, height: 2.6, duration: 130, started: 74, opacity: 0.7 },
-    { top: "6%", width: 5, height: 2, duration: 170, started: 132, opacity: 0.55 }
+    { top: "8%", width: 19, duration: 46, started: 6, opacity: 0.92 },
+    { top: "44%", width: 13, duration: 46, started: 29, opacity: 0.74 },
+    { top: "24%", width: 10, duration: 58, started: 19, opacity: 0.62 },
+    { top: "60%", width: 16, duration: 52, started: 40, opacity: 0.84 },
+    { top: "2%", width: 11, duration: 64, started: 52, opacity: 0.55 },
+    { top: "34%", width: 17, duration: 50, started: 12, opacity: 0.8 },
+    { top: "70%", width: 12, duration: 56, started: 34, opacity: 0.66 },
+    { top: "16%", width: 14, duration: 42, started: 25, opacity: 0.7 }
 ];
+const CLOUDS_SHOWN: Partial<Record<WeatherState, number>> = { partly: 4, overcast: 8 };
+const CLOUDS_WHEN_WET = 4;
+const CLOUD_NIGHT_FADE = 0.4;
 
-const DROPS = [8, 21, 34, 47, 60, 73, 86, 95];
+const SUN = { top: "12%", right: "12%", size: 10 };
+const MOON = { top: "18%", right: "12%", size: 7 };
+const CLOUD_FROM = "-20%";
+const CLOUD_TO = "110%";
 const SUNSHINE_SIZE = 50;
 const SUNSHINE_THROUGH_CLOUD = 0.3;
 
 const drift = keyframes({
-    from: { transform: "translateX(0)" },
-    to: { transform: "translateX(140vw)" }
-});
-
-const fall = keyframes({
-    from: { transform: "translateY(-20%)", opacity: 0 },
-    "10%": { opacity: 0.55 },
-    to: { transform: "translateY(120%)", opacity: 0 }
+    from: { left: CLOUD_FROM },
+    to: { left: CLOUD_TO }
 });
 
 function skyKey(state: WeatherState, night: boolean): keyof SkyPalette {
     if (!night) return state;
-    const dull = state === "overcast" || state === "showers" || state === "rain";
+    const dull = state === "overcast" || WET_STATES.includes(state);
     return dull ? "dullNight" : "night";
 }
 
+function cloudCount(state: WeatherState): number {
+    if (state === "clear") return 0;
+    return CLOUDS_SHOWN[state] ?? CLOUDS_WHEN_WET;
+}
+
 export function Sky({ state, night, children }: { state: WeatherState, night: boolean, children: ReactNode; }) {
-    const clouds = state === "clear" ? [] : CLOUDS.slice(0, state === "partly" ? 2 : 3);
-    const raining = state === "rain" || state === "showers";
+    const clouds = CLOUDS.slice(0, cloudCount(state));
+    const wet = WET_STATES.includes(state);
     const tone = skyKey(state, night);
 
     return (
@@ -48,14 +61,14 @@ export function Sky({ state, night, children }: { state: WeatherState, night: bo
                 color: theme => theme.vars.palette.sky[tone].ink
             }}
         >
-            {state !== "overcast" && !raining && (
+            {state !== "overcast" && !wet && (
                 <Box
                     sx={{
                         position: "absolute",
-                        top: night ? "18%" : "12%",
-                        right: "12%",
-                        width: theme => theme.spacing(night ? 7 : 10),
-                        height: theme => theme.spacing(night ? 7 : 10)
+                        top: night ? MOON.top : SUN.top,
+                        right: night ? MOON.right : SUN.right,
+                        width: theme => theme.spacing(night ? MOON.size : SUN.size),
+                        height: theme => theme.spacing(night ? MOON.size : SUN.size)
                     }}
                 >
                     {!night && (
@@ -77,7 +90,10 @@ export function Sky({ state, night, children }: { state: WeatherState, night: bo
                     <Box
                         sx={{
                             position: "absolute",
-                            inset: 0,
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 0,
                             borderRadius: "50%",
                             backgroundColor: theme => night ? theme.vars.palette.weather.moon : theme.vars.palette.weather.sun
                         }}
@@ -86,44 +102,25 @@ export function Sky({ state, night, children }: { state: WeatherState, night: bo
             )}
             {clouds.map(cloud => (
                 <Box
+                    component="svg"
                     key={cloud.top}
+                    viewBox={CLOUD_BOX}
+                    aria-hidden="true"
                     sx={{
                         position: "absolute",
                         top: cloud.top,
-                        left: theme => `-${theme.spacing(cloud.width)}`,
                         width: theme => theme.spacing(cloud.width),
-                        height: theme => theme.spacing(cloud.height),
-                        borderRadius: 999,
-                        backgroundColor: "#ffffff",
-                        opacity: night ? cloud.opacity * 0.4 : cloud.opacity,
-                        filter: "blur(0.5px)",
-                        animation: `${drift} ${cloud.duration}s linear -${cloud.started}s infinite`,
-                        "&::before, &::after": {
-                            content: '""',
-                            position: "absolute",
-                            backgroundColor: "inherit",
-                            borderRadius: "50%"
-                        },
-                        "&::before": { width: "45%", height: "190%", left: "12%", bottom: "35%" },
-                        "&::after": { width: "32%", height: "150%", right: "16%", bottom: "30%" }
+                        height: "auto",
+                        display: "block",
+                        fill: theme => theme.vars.palette.sky[tone].cloud,
+                        opacity: night ? cloud.opacity * CLOUD_NIGHT_FADE : cloud.opacity,
+                        animation: `${drift} ${cloud.duration}s linear -${cloud.started}s infinite`
                     }}
-                />
+                >
+                    <path d={CLOUD_PATH} />
+                </Box>
             ))}
-            {raining && DROPS.map(left => (
-                <Box
-                    key={left}
-                    sx={{
-                        position: "absolute",
-                        top: 0,
-                        left: `${left}%`,
-                        width: "1.5px",
-                        height: theme => theme.spacing(2.5),
-                        borderRadius: 999,
-                        backgroundColor: "#e0f2fe",
-                        animation: `${fall} ${state === "rain" ? 0.9 : 1.6}s linear ${left / 100}s infinite`
-                    }}
-                />
-            ))}
+            <FallingWeather state={state} />
             <Box sx={{ position: "relative" }}>{children}</Box>
         </Box>
     );

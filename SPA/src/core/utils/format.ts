@@ -40,7 +40,8 @@ const MEASUREMENTS: Record<ForecastVariableKey, Intl.NumberFormat> = {
     relative_humidity_2m: new Intl.NumberFormat(LOCALE, { style: "unit", unit: "percent", maximumFractionDigits: 0 }),
     wind_speed_10m: new Intl.NumberFormat(LOCALE, { style: "unit", unit: "kilometer-per-hour", maximumFractionDigits: 0 }),
     cloud_cover: new Intl.NumberFormat(LOCALE, { style: "unit", unit: "percent", maximumFractionDigits: 0 }),
-    rain_probability: new Intl.NumberFormat(LOCALE, { style: "percent", maximumFractionDigits: 0 })
+    rain_probability: new Intl.NumberFormat(LOCALE, { style: "percent", maximumFractionDigits: 0 }),
+    rain_amount: new Intl.NumberFormat(LOCALE, { style: "unit", unit: "millimeter", minimumFractionDigits: 1, maximumFractionDigits: 1 })
 };
 
 export function formatMeasurement(variable: ForecastVariableKey, value: number): string {

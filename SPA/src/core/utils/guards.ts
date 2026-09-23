@@ -1,4 +1,4 @@
-import { BACKTEST_SERIES, RAIN_VARIABLE, VARIABLES } from "../constants";
+import { BACKTEST_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
 import type { Backtest, Coordinates, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, SeriesErrors, Summary, VariableKey } from "../models/summary";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -49,7 +49,7 @@ function isHours(value: unknown): value is string[] {
     return Array.isArray(value) && value.length > 0 && value.every(hour => typeof hour === "string");
 }
 
-const FORECAST_KEYS: ForecastVariableKey[] = [...VARIABLES.map(variable => variable.key), RAIN_VARIABLE];
+const FORECAST_KEYS: ForecastVariableKey[] = [...VARIABLES.map(variable => variable.key), RAIN_VARIABLE, RAIN_AMOUNT_VARIABLE];
 
 function isForecast(value: unknown): value is Forecast {
     if (!isRecord(value)) {

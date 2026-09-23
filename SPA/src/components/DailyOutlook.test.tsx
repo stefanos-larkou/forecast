@@ -13,7 +13,8 @@ const TWO_DAYS: Forecast = {
         relative_humidity_2m: [70, 55, 72, 58],
         wind_speed_10m: [8, 12, 7, 11],
         cloud_cover: [10, 40, 15, 35],
-        rain_probability: [0, 0.31, 0, 0.002]
+        rain_probability: [0, 0.31, 0, 0.002],
+        rain_amount: [0, 0.8, 0, 0.1]
     },
     band: {
         variable: "temperature_2m",

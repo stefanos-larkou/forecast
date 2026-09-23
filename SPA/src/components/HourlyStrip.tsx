@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
-import { RAIN_WORTH_SHOWING } from "../core/constants";
+import { MUTED_ON_SKY, RAIN_WORTH_SHOWING } from "../core/constants";
 import type { Forecast, HourlyRow } from "../core/models/summary";
 import { hourlyRows, upcomingRows } from "../core/utils/forecast";
 import { formatMeasurement, formatTime } from "../core/utils/format";
@@ -17,7 +17,6 @@ const CHEVRON_SIZE = 18;
 const CHEVRON_STROKE = 2;
 const BUTTON_SIZE = 34;
 const BUTTON_BLUR = "blur(6px)";
-const MUTED = 0.8;
 const EDGE_BUTTON = {
     position: "absolute",
     top: "50%",
@@ -166,11 +165,11 @@ export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
                             "&:hover": { backgroundColor: "glass.fill" }
                         }}
                     >
-                        <Typography variant="caption" sx={{ opacity: MUTED }}>{formatTime(hour.at)}</Typography>
+                        <Typography variant="caption" sx={{ opacity: MUTED_ON_SKY }}>{formatTime(hour.at)}</Typography>
                         <WeatherIcon state={weatherState(hour)} />
                         <Typography variant="body2" sx={{ fontWeight: "medium" }}>{formatMeasurement("temperature_2m", hour.temperature)}</Typography>
                         {anyRain && (
-                            <Typography variant="caption" sx={{ opacity: MUTED }}>
+                            <Typography variant="caption" sx={{ opacity: MUTED_ON_SKY }}>
                                 {wet(hour) ? formatMeasurement("rain_probability", hour.rain) : ""}
                             </Typography>
                         )}

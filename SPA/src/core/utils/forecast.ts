@@ -7,16 +7,17 @@ export function hourlyRows(forecast: Forecast): HourlyRow[] {
         const lower = forecast.band.lower[index];
         const upper = forecast.band.upper[index];
         const rain = forecast.variables.rain_probability[index];
+        const amount = forecast.variables.rain_amount[index];
         const cloud = forecast.variables.cloud_cover[index];
         const wind = forecast.variables.wind_speed_10m[index];
         const humidity = forecast.variables.relative_humidity_2m[index];
 
-        if (temperature === undefined || lower === undefined || upper === undefined
-            || rain === undefined || cloud === undefined || wind === undefined || humidity === undefined) {
+        if (temperature === undefined || lower === undefined || upper === undefined || rain === undefined
+            || amount === undefined || cloud === undefined || wind === undefined || humidity === undefined) {
             return [];
         }
 
-        return [{ at, temperature, lower, upper, rain, cloud, wind, humidity }];
+        return [{ at, temperature, lower, upper, rain, amount, cloud, wind, humidity }];
     });
 }
 
@@ -39,6 +40,7 @@ export function dailyRows(rows: HourlyRow[]): DailyRow[] {
             high: Math.max(...temperatures),
             low: Math.min(...temperatures),
             rain: Math.max(...hours.map(hour => hour.rain)),
+            amount: Math.max(...hours.map(hour => hour.amount)),
             cloud: hours.reduce((total, hour) => total + hour.cloud, 0) / hours.length
         };
     });

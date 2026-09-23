@@ -1,8 +1,8 @@
-import type { BACKTEST_SERIES, RAIN_VARIABLE, VARIABLES } from "../constants";
+import type { BACKTEST_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
 
 export type Variable = (typeof VARIABLES)[number];
 export type VariableKey = Variable["key"];
-export type ForecastVariableKey = VariableKey | typeof RAIN_VARIABLE;
+export type ForecastVariableKey = VariableKey | typeof RAIN_VARIABLE | typeof RAIN_AMOUNT_VARIABLE;
 export type SeriesKey = (typeof BACKTEST_SERIES)[number]["key"];
 export type SeriesErrors = Record<SeriesKey, number[]>;
 
@@ -59,6 +59,7 @@ export interface HourlyRow {
     lower: number;
     upper: number;
     rain: number;
+    amount: number;
     cloud: number;
     wind: number;
     humidity: number;
@@ -69,6 +70,7 @@ export interface DailyRow {
     high: number;
     low: number;
     rain: number;
+    amount: number;
     cloud: number;
 }
 

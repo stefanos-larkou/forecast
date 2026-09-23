@@ -13,6 +13,7 @@ describe("hourlyRows", () => {
             lower: 24.63,
             upper: 27.27,
             rain: 0.02,
+            amount: 0,
             cloud: 9.77,
             wind: 7.26,
             humidity: 68.17
@@ -54,7 +55,7 @@ describe("dailyRows", () => {
         const days = dailyRows(ROWS);
 
         expect(days).toHaveLength(1);
-        expect(days[0]).toEqual({ at: "2026-09-22T18:00:00+00:00", high: 26.28, low: 23.9, rain: 0.11, cloud: 15.01 });
+        expect(days[0]).toEqual({ at: "2026-09-22T18:00:00+00:00", high: 26.28, low: 23.9, rain: 0.11, amount: 0.62, cloud: 15.01 });
     });
 
     it("has nothing to summarise when there are no hours", () => {

@@ -31,7 +31,7 @@ export function DailyOutlook({ forecast }: { forecast: Forecast; }) {
                             onClick={() => setOpened(day.at)}
                             sx={{ alignItems: "baseline", justifyContent: "space-between", width: "100%", px: 1, py: 0.5, borderRadius: 1, textAlign: "left" }}
                         >
-                            <WeatherIcon state={weatherState(day)} size={24} />
+                            <WeatherIcon state={weatherState({ ...day, temperature: day.high })} size={24} />
                             <Typography variant="body1" sx={{ flex: 1 }}>{formatWeekday(day.at)}</Typography>
                             <Typography variant="body2" color="text.secondary" sx={{ width: theme => theme.spacing(8), textAlign: "right" }}>
                                 {day.rain >= RAIN_WORTH_SHOWING ? formatMeasurement("rain_probability", day.rain) : ""}
