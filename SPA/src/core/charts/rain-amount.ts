@@ -1,15 +1,16 @@
 import { Chart, type ChartConfiguration } from "chart.js";
-import { BACKTEST_SERIES, LEAD_HEADER, LOCALE, SERIES_LINE_WIDTHS } from "../constants";
+import { AMOUNT_SERIES, LEAD_HEADER, LOCALE, SERIES_LINE_WIDTHS } from "../constants";
 import type { ChartStyle, ChartTable } from "../models/charts";
-import type { Backtest, Variable } from "../models/summary";
+import type { RainAmount } from "../models/summary";
 import { formatError } from "../utils/format";
 
-export function errorByLeadConfig(backtest: Backtest, variable: Variable, style: ChartStyle): ChartConfiguration<"line"> {
-    const errors = backtest.metrics.mae[variable.key];
+const AXIS_TITLE = "Mean Absolute Error (mm)";
+
+export function rainAmountConfig(amount: RainAmount, style: ChartStyle): ChartConfiguration<"line"> {
     const font = style.font;
-    const datasets = BACKTEST_SERIES.map(series => ({
+    const datasets = AMOUNT_SERIES.map(series => ({
         label: series.label,
-        data: errors[series.key],
+        data: amount.mae[series.key],
         borderColor: style.series[series.colour],
         backgroundColor: style.series[series.colour],
         borderWidth: SERIES_LINE_WIDTHS[series.role],
@@ -18,7 +19,7 @@ export function errorByLeadConfig(backtest: Backtest, variable: Variable, style:
 
     return {
         type: "line",
-        data: { labels: backtest.leads, datasets },
+        data: { labels: amount.leads, datasets },
         options: {
             maintainAspectRatio: false,
             locale: LOCALE,
@@ -52,7 +53,7 @@ export function errorByLeadConfig(backtest: Backtest, variable: Variable, style:
                 y: {
                     beginAtZero: true,
                     ticks: { font },
-                    title: { display: true, text: `Mean Absolute Error (${variable.unit})`, font },
+                    title: { display: true, text: AXIS_TITLE, font },
                     grid: { color: style.grid }
                 }
             }
@@ -60,15 +61,14 @@ export function errorByLeadConfig(backtest: Backtest, variable: Variable, style:
     };
 }
 
-export function errorByLeadTable(backtest: Backtest, variable: Variable): ChartTable {
-    const errors = backtest.metrics.mae[variable.key];
+export function rainAmountTable(amount: RainAmount): ChartTable {
     return {
         rowHeader: LEAD_HEADER,
-        columns: BACKTEST_SERIES.map(series => series.label),
-        rows: backtest.leads.map((lead, index) => ({
+        columns: AMOUNT_SERIES.map(series => series.label),
+        rows: amount.leads.map((lead, index) => ({
             header: String(lead),
-            values: BACKTEST_SERIES.map(series => {
-                const error = errors[series.key][index];
+            values: AMOUNT_SERIES.map(series => {
+                const error = amount.mae[series.key][index];
                 return error === undefined ? "" : formatError(error);
             })
         }))

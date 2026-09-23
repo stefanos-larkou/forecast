@@ -1,4 +1,4 @@
-import type { BACKTEST_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
+import type { AMOUNT_SERIES, BACKTEST_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
 import type { WeatherState } from "./weather";
 
 export type Variable = (typeof VARIABLES)[number];
@@ -6,6 +6,8 @@ export type VariableKey = Variable["key"];
 export type ForecastVariableKey = VariableKey | typeof RAIN_VARIABLE | typeof RAIN_AMOUNT_VARIABLE;
 export type SeriesKey = (typeof BACKTEST_SERIES)[number]["key"];
 export type SeriesErrors = Record<SeriesKey, number[]>;
+export type AmountKey = (typeof AMOUNT_SERIES)[number]["key"];
+export type AmountErrors = Record<AmountKey, number[]>;
 
 export interface Coordinates {
     latitude: number;
@@ -33,12 +35,21 @@ export interface BacktestMetrics {
     mae: Record<VariableKey, SeriesErrors>;
 }
 
+export interface RainAmount {
+    leads: number[];
+    wet_hours: number;
+    typical_mm: number;
+    mae: AmountErrors;
+    skill: AmountErrors;
+}
+
 export interface Backtest {
     from: string;
     to: string;
     forecasts: number;
     leads: number[];
     metrics: BacktestMetrics;
+    rain: { amount: RainAmount; };
 }
 
 export interface ForecastBand {

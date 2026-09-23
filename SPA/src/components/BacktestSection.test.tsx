@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { SUMMARY } from "../test-fixtures";
 import { renderWithProviders } from "../test-utils";
 import BacktestSection from "./BacktestSection";
-import { BACKTEST_HEADING } from "../core/constants";
+import { AMOUNT_CAPTION, AMOUNT_HEADING, BACKTEST_CAPTION, BACKTEST_HEADING } from "../core/constants";
 
 describe("BacktestSection", () => {
     it("gives every variable its own titled, labelled chart, in order", () => {
@@ -11,8 +11,8 @@ describe("BacktestSection", () => {
 
         const titles = screen.getAllByRole("heading", { level: 3 }).map(heading => heading.textContent);
         expect(screen.getByRole("heading", { level: 2, name: BACKTEST_HEADING })).toBeInTheDocument();
-        expect(titles).toEqual(["Temperature", "Humidity", "Wind Speed", "Cloud Cover"]);
-        expect(screen.getAllByRole("img")).toHaveLength(4);
+        expect(titles).toEqual(["Temperature", "Humidity", "Wind Speed", "Cloud Cover", AMOUNT_HEADING]);
+        expect(screen.getAllByRole("img")).toHaveLength(5);
     });
 
     it("states the window and the number of forecasts the backtest covers", () => {
@@ -24,7 +24,13 @@ describe("BacktestSection", () => {
     it("says what the error is measured against, and that it is not the live record", () => {
         renderWithProviders(<BacktestSection backtest={SUMMARY.backtest} />);
 
-        expect(screen.getByText(/against ERA5/)).toBeInTheDocument();
-        expect(screen.getByText(/not the live record/)).toBeInTheDocument();
+        expect(screen.getByText(BACKTEST_CAPTION)).toBeInTheDocument();
+    });
+
+    it("scores how much rain falls over wet hours alone, beside the four variables", () => {
+        renderWithProviders(<BacktestSection backtest={SUMMARY.backtest} />);
+
+        expect(screen.getByRole("heading", { level: 3, name: AMOUNT_HEADING })).toBeInTheDocument();
+        expect(screen.getByText(AMOUNT_CAPTION)).toBeInTheDocument();
     });
 });

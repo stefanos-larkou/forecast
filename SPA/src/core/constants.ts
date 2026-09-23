@@ -5,6 +5,9 @@ export const PLACE = "Larnaca";
 export const LOCALE = "en-GB";
 export const BACKTEST_CAPTION = "Mean absolute error against ERA5 (lower is better). These are archived forecasts, not the live record.";
 export const BACKTEST_HEADING = "Error by how far ahead the forecast looks";
+export const AMOUNT_HEADING = "How much falls in a wet hour";
+export const AMOUNT_CAPTION = "Mean absolute error in millimetres over wet hours only, against ERA5. The amount model answers how much falls given that it does.";
+export const LEAD_HEADER = "Hours Ahead";
 export const PAGE_MAX_WIDTH = 1100;
 export const CHART_HEIGHT = 40;
 export const HOURS_AHEAD_SHOWN = 24;
@@ -53,6 +56,12 @@ export const BACKTEST_SERIES = [
     { key: "icon_seamless raw", label: "ICON", colour: "icon", role: "model", dash: [] },
     { key: "climatology", label: "climatology", colour: "reference", role: "baseline", dash: [6, 4] },
     { key: "persisted", label: "persistence", colour: "reference", role: "baseline", dash: [2, 3] }
+] as const;
+
+export const AMOUNT_SERIES = [
+    { key: "boosted", label: "gbm_blend", colour: "ours", role: "ours", dash: [] },
+    { key: "typical", label: "a typical wet hour", colour: "reference", role: "baseline", dash: [6, 4] },
+    { key: "models", label: "the three models", colour: "ecmwf", role: "model", dash: [] }
 ] as const;
 
 export const SERIES_LINE_WIDTHS = { ours: 3, model: 1.5, baseline: 1.5 } as const;

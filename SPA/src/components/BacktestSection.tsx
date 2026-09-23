@@ -1,9 +1,10 @@
 import { Box, Typography } from "@mui/material";
-import { BACKTEST_CAPTION, BACKTEST_HEADING, VARIABLES } from "../core/constants";
+import { AMOUNT_CAPTION, BACKTEST_CAPTION, BACKTEST_HEADING, VARIABLES } from "../core/constants";
 import type { Backtest } from "../core/models/summary";
 import { formatCount, formatMonth } from "../core/utils/format";
 import { ChartGrid } from "./ChartGrid";
 import { ErrorByLeadChart } from "./ErrorByLeadChart";
+import { RainAmountChart } from "./RainAmountChart";
 
 export default function BacktestSection({ backtest }: { backtest: Backtest; }) {
     return (
@@ -16,6 +17,10 @@ export default function BacktestSection({ backtest }: { backtest: Backtest; }) {
                 {VARIABLES.map(variable => <ErrorByLeadChart key={variable.key} backtest={backtest} variable={variable} />)}
             </ChartGrid>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>{BACKTEST_CAPTION}</Typography>
+            <Box sx={{ mt: 4 }}>
+                <RainAmountChart amount={backtest.rain.amount} />
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>{AMOUNT_CAPTION}</Typography>
+            </Box>
         </Box>
     );
 }

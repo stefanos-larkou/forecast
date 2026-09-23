@@ -39,6 +39,15 @@ export const SUMMARY: Summary = {
         to: "2026-09",
         forecasts: 322096,
         leads: [24, 48],
+        rain: {
+            amount: {
+                leads: [24, 48],
+                wet_hours: 4443,
+                typical_mm: 0.1,
+                mae: { boosted: [0.3475, 0.35], typical: [0.3731, 0.3746], models: [0.4011, 0.3983] },
+                skill: { boosted: [0.0686, 0.0656], typical: [0, 0], models: [-0.075, -0.0632] }
+            }
+        },
         metrics: {
             mae: {
                 temperature_2m: {

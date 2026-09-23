@@ -1,5 +1,5 @@
-import { BACKTEST_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
-import type { Backtest, Coordinates, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, SeriesErrors, Summary, VariableKey } from "../models/summary";
+import { AMOUNT_SERIES, BACKTEST_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
+import type { AmountErrors, Backtest, Coordinates, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, RainAmount, SeriesErrors, Summary, VariableKey } from "../models/summary";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -45,6 +45,21 @@ function isErrors(value: unknown, length: number): value is Record<VariableKey, 
     return isRecord(value) && VARIABLES.every(({ key }) => isSeriesErrors(value[key], length));
 }
 
+function isAmountErrors(value: unknown, length: number): value is AmountErrors {
+    return isRecord(value) && AMOUNT_SERIES.every(({ key }) => isNumbers(value[key], length));
+}
+
+function isRainAmount(value: unknown): value is RainAmount {
+    if (!isRecord(value) || !isLeads(value.leads)) {
+        return false;
+    }
+
+    return hasCounts(value, ["wet_hours"])
+        && Number.isFinite(value.typical_mm)
+        && isAmountErrors(value.mae, value.leads.length)
+        && isAmountErrors(value.skill, value.leads.length);
+}
+
 function isHours(value: unknown): value is string[] {
     return Array.isArray(value) && value.length > 0 && value.every(hour => typeof hour === "string");
 }
@@ -76,7 +91,9 @@ function isBacktest(value: unknown): value is Backtest {
         && hasCounts(value, ["forecasts"])
         && isLeads(value.leads)
         && isRecord(value.metrics)
-        && isErrors(value.metrics.mae, value.leads.length);
+        && isErrors(value.metrics.mae, value.leads.length)
+        && isRecord(value.rain)
+        && isRainAmount(value.rain.amount);
 }
 
 export function isSummary(value: unknown): value is Summary {
