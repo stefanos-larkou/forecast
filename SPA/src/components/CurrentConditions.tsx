@@ -1,10 +1,12 @@
 import { useMemo } from "react";
-import { Paper, Stack, Typography } from "@mui/material";
-import type { Forecast } from "../core/models/summary";
+import { Stack, Typography } from "@mui/material";
+import type { Coordinates, Forecast } from "../core/models/summary";
 import { currentRow, hourlyRows } from "../core/utils/forecast";
 import { formatDateTime, formatMeasurement } from "../core/utils/format";
+import { isNight, weatherState, WEATHER_LABELS } from "../core/utils/weather";
+import { Sky } from "./Sky";
 
-export function CurrentConditions({ forecast }: { forecast: Forecast; }) {
+export function CurrentConditions({ forecast, where }: { forecast: Forecast, where: Coordinates; }) {
     const rows = useMemo(() => hourlyRows(forecast), [forecast]);
     const now = currentRow(rows, new Date());
 
@@ -12,6 +14,7 @@ export function CurrentConditions({ forecast }: { forecast: Forecast; }) {
         return null;
     }
 
+    const state = weatherState(now);
     const alongside = [
         { label: "Chance of rain", value: formatMeasurement("rain_probability", now.rain) },
         { label: "Cloud Cover", value: formatMeasurement("cloud_cover", now.cloud) },
@@ -20,24 +23,26 @@ export function CurrentConditions({ forecast }: { forecast: Forecast; }) {
     ];
 
     return (
-        <Paper variant="outlined" sx={{ p: 3 }}>
-            <Typography variant="overline" component="p" color="text.secondary">
-                {`Forecast issued ${formatDateTime(forecast.run_time)}`}
-            </Typography>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 4 }} sx={{ alignItems: { sm: "baseline" }, mt: 1 }}>
-                <Typography variant="h2" component="p">{formatMeasurement("temperature_2m", now.temperature)}</Typography>
-                <Typography variant="body1" color="text.secondary">
-                    {`${formatMeasurement("temperature_2m", now.lower)} to ${formatMeasurement("temperature_2m", now.upper)}, nine times in ten`}
+        <Sky state={state} night={isNight(now.at, where)}>
+            <Stack sx={{ p: 3 }}>
+                <Typography variant="overline" component="p" sx={{ opacity: 0.85 }}>
+                    {`${WEATHER_LABELS[state]} \u00b7 forecast issued ${formatDateTime(forecast.run_time)}`}
                 </Typography>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 4 }} sx={{ alignItems: { sm: "baseline" }, mt: 1 }}>
+                    <Typography variant="h2" component="p">{formatMeasurement("temperature_2m", now.temperature)}</Typography>
+                    <Typography variant="body1" sx={{ opacity: 0.85 }}>
+                        {`${formatMeasurement("temperature_2m", now.lower)} - ${formatMeasurement("temperature_2m", now.upper)}, 90% of the time`}
+                    </Typography>
+                </Stack>
+                <Stack component="dl" direction="row" spacing={4} useFlexGap sx={{ flexWrap: "wrap", mt: 2, mb: 0 }}>
+                    {alongside.map(({ label, value }) => (
+                        <div key={label}>
+                            <Typography variant="overline" component="dt" sx={{ opacity: 0.85 }}>{label}</Typography>
+                            <Typography component="dd" sx={{ m: 0 }}>{value}</Typography>
+                        </div>
+                    ))}
+                </Stack>
             </Stack>
-            <Stack component="dl" direction="row" spacing={4} useFlexGap sx={{ flexWrap: "wrap", mt: 2, mb: 0 }}>
-                {alongside.map(({ label, value }) => (
-                    <div key={label}>
-                        <Typography variant="overline" component="dt" color="text.secondary">{label}</Typography>
-                        <Typography component="dd" sx={{ m: 0 }}>{value}</Typography>
-                    </div>
-                ))}
-            </Stack>
-        </Paper>
+        </Sky>
     );
 }

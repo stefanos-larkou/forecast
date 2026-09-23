@@ -20,6 +20,7 @@ export const FORECAST: Forecast = {
 export const SUMMARY: Summary = {
     generated_at: "2026-09-21T12:00:00+00:00",
     location: "larnaca",
+    coordinates: { latitude: 34.9221, longitude: 33.62794 },
     model: { version: "2026-09-20", trained_at: "2026-09-20T09:12:33+00:00", commit: "90f5ea2" },
     live: {
         from: "2026-09-17T12:00:00+00:00",

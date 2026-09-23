@@ -10,6 +10,13 @@ interface BrandPalette {
     soft: string;
 }
 
+export interface SkyPalette {
+    day: string;
+    night: string;
+    dull: string;
+    dullNight: string;
+}
+
 export interface WeatherPalette {
     sun: string;
     cloud: string;
@@ -31,6 +38,7 @@ declare module "@mui/material/styles" {
         brand: BrandPalette;
         series: SeriesPalette;
         weather: WeatherPalette;
+        sky: SkyPalette;
     }
 
     interface PaletteOptions {
@@ -38,6 +46,7 @@ declare module "@mui/material/styles" {
         brand?: BrandPalette;
         series?: SeriesPalette;
         weather?: WeatherPalette;
+        sky?: SkyPalette;
     }
 
     interface CssThemeVariables {
@@ -64,6 +73,12 @@ export const theme = createTheme({
                 brand: {
                     main: "#6a54b0",
                     soft: "rgba(106, 84, 176, 0.32)"
+                },
+                sky: {
+                    day: "linear-gradient(170deg, #38bdf8 0%, #7dd3fc 45%, #e0f2fe 100%)",
+                    night: "linear-gradient(170deg, #0b1220 0%, #1e293b 55%, #334155 100%)",
+                    dull: "linear-gradient(170deg, #64748b 0%, #94a3b8 55%, #cbd5e1 100%)",
+                    dullNight: "linear-gradient(170deg, #0f172a 0%, #1f2937 55%, #475569 100%)"
                 },
                 weather: {
                     sun: "#eab308",
@@ -94,6 +109,12 @@ export const theme = createTheme({
                 brand: {
                     main: "#a794e8",
                     soft: "rgba(167, 148, 232, 0.32)"
+                },
+                sky: {
+                    day: "linear-gradient(170deg, #0284c7 0%, #0ea5e9 45%, #7dd3fc 100%)",
+                    night: "linear-gradient(170deg, #060b16 0%, #131c2e 55%, #26334a 100%)",
+                    dull: "linear-gradient(170deg, #475569 0%, #64748b 55%, #94a3b8 100%)",
+                    dullNight: "linear-gradient(170deg, #080d17 0%, #161e2b 55%, #303c4f 100%)"
                 },
                 weather: {
                     sun: "#facc15",

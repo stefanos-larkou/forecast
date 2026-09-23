@@ -6,6 +6,11 @@ export type ForecastVariableKey = VariableKey | typeof RAIN_VARIABLE;
 export type SeriesKey = (typeof BACKTEST_SERIES)[number]["key"];
 export type SeriesErrors = Record<SeriesKey, number[]>;
 
+export interface Coordinates {
+    latitude: number;
+    longitude: number;
+}
+
 export interface ModelVersion {
     version: string;
     trained_at: string;
@@ -70,6 +75,7 @@ export interface DailyRow {
 export interface Summary {
     generated_at: string;
     location: string;
+    coordinates: Coordinates;
     model: ModelVersion;
     live: LiveRecord;
     forecast: Forecast | null;

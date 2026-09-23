@@ -24,7 +24,7 @@ export function App() {
                 <>
                     {summary.data.forecast && (
                         <>
-                            <CurrentConditions forecast={summary.data.forecast} />
+                            <CurrentConditions forecast={summary.data.forecast} where={summary.data.coordinates} />
                             <HourlyStrip forecast={summary.data.forecast} />
                             <DailyOutlook forecast={summary.data.forecast} />
                         </>

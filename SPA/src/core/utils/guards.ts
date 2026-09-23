@@ -1,5 +1,5 @@
 import { BACKTEST_SERIES, RAIN_VARIABLE, VARIABLES } from "../constants";
-import type { Backtest, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, SeriesErrors, Summary, VariableKey } from "../models/summary";
+import type { Backtest, Coordinates, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, SeriesErrors, Summary, VariableKey } from "../models/summary";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -11,6 +11,12 @@ function hasStrings(record: Record<string, unknown>, keys: string[]): boolean {
 
 function hasCounts(record: Record<string, unknown>, keys: string[]): boolean {
     return keys.every(key => Number.isInteger(record[key]) && Number(record[key]) >= 0);
+}
+
+function isCoordinates(value: unknown): value is Coordinates {
+    return isRecord(value)
+        && Number.isFinite(value.latitude) && Math.abs(Number(value.latitude)) <= 90
+        && Number.isFinite(value.longitude) && Math.abs(Number(value.longitude)) <= 180;
 }
 
 function isModelVersion(value: unknown): value is ModelVersion {
@@ -76,6 +82,7 @@ function isBacktest(value: unknown): value is Backtest {
 export function isSummary(value: unknown): value is Summary {
     return isRecord(value)
         && hasStrings(value, ["generated_at", "location"])
+        && isCoordinates(value.coordinates)
         && isModelVersion(value.model)
         && isLiveRecord(value.live)
         && (value.forecast === null || isForecast(value.forecast))
