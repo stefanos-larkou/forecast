@@ -1,9 +1,7 @@
 import { Box } from "@mui/material";
 
-// Craters laid out in a moon of radius MOON_UNIT, then scaled to whatever
-// radius the caller draws at, so the hero and the hourly icons wear the same
-// face. Each is kept clear of the rim, so none is clipped.
-const MOON_UNIT = 50;
+export const MOON_BOX = "0 0 100 100";
+export const MOON_RADIUS = 50;
 const CRATERS = [
     { cx: 35, cy: 32, r: 9 },
     { cx: 63, cy: 44, r: 13 },
@@ -14,7 +12,7 @@ const CRATERS = [
 ];
 
 export function Moon({ cx, cy, r }: { cx: number, cy: number, r: number; }) {
-    const scale = r / MOON_UNIT;
+    const scale = r / MOON_RADIUS;
 
     return (
         <>
@@ -23,8 +21,8 @@ export function Moon({ cx, cy, r }: { cx: number, cy: number, r: number; }) {
                 <Box
                     component="circle"
                     key={`${crater.cx} ${crater.cy}`}
-                    cx={cx + (crater.cx - MOON_UNIT) * scale}
-                    cy={cy + (crater.cy - MOON_UNIT) * scale}
+                    cx={cx + (crater.cx - MOON_RADIUS) * scale}
+                    cy={cy + (crater.cy - MOON_RADIUS) * scale}
                     r={crater.r * scale}
                     sx={{ fill: theme => theme.vars.palette.weather.crater }}
                 />

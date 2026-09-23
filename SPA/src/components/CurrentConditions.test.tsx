@@ -29,9 +29,12 @@ describe("CurrentConditions", () => {
         expect(screen.getAllByRole("definition").map(value => value.textContent)).toEqual(["5%", "14%", "7 km/h", "71%"]);
     });
 
-    it("names the weather and says when the forecast was issued", () => {
+    it("names the place, the weather and when the forecast was issued", () => {
         renderWithProviders(<CurrentConditions forecast={FORECAST} where={SUMMARY.coordinates} />);
 
-        expect(hero().getByText(/^Clear . forecast issued 22\/09\/2026/)).toBeInTheDocument();
+        expect(hero().getByRole("heading", { level: 1 })).toHaveTextContent("Larnaca");
+        expect(hero().getByText("Clear")).toBeInTheDocument();
+
+        expect(hero().getByText(/^Forecast issued 22\/09\/2026/)).toBeInTheDocument();
     });
 });

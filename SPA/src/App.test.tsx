@@ -22,7 +22,7 @@ describe("App", () => {
         serve(() => HttpResponse.json(SUMMARY));
         renderWithProviders(<App />);
 
-        expect(screen.getByRole("heading", { level: 1, name: PLACE })).toBeInTheDocument();
+        expect(await screen.findByRole("heading", { level: 1, name: PLACE })).toBeInTheDocument();
         expect(await screen.findByText("Snapshots")).toBeInTheDocument();
         expect(await screen.findByRole("heading", { level: 3, name: "Temperature" })).toBeInTheDocument();
     });

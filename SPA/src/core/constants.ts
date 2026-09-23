@@ -6,6 +6,7 @@ export const LOCALE = "en-GB";
 export const BACKTEST_CAPTION = "Mean absolute error against ERA5 (lower is better). These are archived forecasts, not the live record.";
 export const BACKTEST_HEADING = "Error by how far ahead the forecast looks";
 export const PAGE_MAX_WIDTH = 1100;
+export const CHART_HEIGHT = 40;
 export const HOURS_AHEAD_SHOWN = 24;
 export const CLOUD_CLEAR_UNDER = 25;
 export const CLOUD_OVERCAST_FROM = 70;
@@ -16,6 +17,7 @@ export const RAIN_DOWNPOUR_FROM = 4;
 export const SNOW_MAX_C = 1;
 export const RAIN_WORTH_SHOWING = 0.005;
 export const MUTED_ON_SKY = 0.85;
+export const TWO_COLUMNS_FROM = 360;
 export const CHANCE_OF_RAIN = "Chance of rain";
 export const CHANCE_OF_SNOW = "Chance of snow";
 

@@ -1,12 +1,18 @@
 import { useMemo } from "react";
 import { Box, Stack, Typography } from "@mui/material";
-import { MUTED_ON_SKY, variableLabel, WEATHER_LABELS } from "../core/constants";
+import type { Theme } from "@mui/material";
+import { MUTED_ON_SKY, PAGE_MAX_WIDTH, PLACE, TWO_COLUMNS_FROM, variableLabel, WEATHER_LABELS } from "../core/constants";
 import type { Coordinates, Forecast } from "../core/models/summary";
 import { currentRow, hourlyRows } from "../core/utils/forecast";
 import { formatDateTime, formatMeasurement } from "../core/utils/format";
 import { chanceLabel, isNight, weatherState } from "../core/utils/weather";
 import { HourlyStrip } from "./HourlyStrip";
 import { Sky } from "./Sky";
+
+const ISSUED_PREFIX = "Forecast issued";
+const INTERVAL_LABEL = "90% interval";
+const LABEL_TYPE = { opacity: MUTED_ON_SKY, fontSize: (theme: Theme) => theme.typography.body2.fontSize };
+const FOUR_COLUMNS_FROM = 600;
 
 export function CurrentConditions({ forecast, where }: { forecast: Forecast, where: Coordinates; }) {
     const rows = useMemo(() => hourlyRows(forecast), [forecast]);
@@ -26,25 +32,43 @@ export function CurrentConditions({ forecast, where }: { forecast: Forecast, whe
 
     return (
         <Sky state={state} night={isNight(now.at, where)}>
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ maxWidth: PAGE_MAX_WIDTH, mx: "auto", px: 2, py: 3 }}>
                 <Stack component="section" aria-label="Current conditions">
-                    <Typography variant="overline" component="p" sx={{ opacity: MUTED_ON_SKY }}>
-                        {`${WEATHER_LABELS[state]} \u00b7 forecast issued ${formatDateTime(forecast.run_time)}`}
-                    </Typography>
-                    <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 4 }} sx={{ alignItems: { sm: "baseline" }, mt: 1 }}>
-                        <Typography variant="h2" component="p">{formatMeasurement("temperature_2m", now.temperature)}</Typography>
-                        <Typography variant="body1" sx={{ opacity: MUTED_ON_SKY }}>
-                            {`${formatMeasurement("temperature_2m", now.lower)} - ${formatMeasurement("temperature_2m", now.upper)}, 90% of the time`}
+                    <Stack direction="row" spacing={1.5} useFlexGap sx={{ alignItems: "baseline", flexWrap: "wrap" }}>
+                        <Typography variant="h4" component="h1">{PLACE}</Typography>
+                        <Typography variant="body2" sx={{ opacity: MUTED_ON_SKY }}>
+                            {`${ISSUED_PREFIX} ${formatDateTime(forecast.run_time)}`}
                         </Typography>
                     </Stack>
-                    <Stack component="dl" direction="row" spacing={4} useFlexGap sx={{ flexWrap: "wrap", mt: 2, mb: 0 }}>
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 1, sm: 4 }} sx={{ alignItems: { sm: "flex-end" }, mt: 2 }}>
+                        <Typography variant="h1" component="p">{formatMeasurement("temperature_2m", now.temperature)}</Typography>
+                        <Stack sx={{ pb: 1 }}>
+                            <Typography variant="overline" component="p" sx={LABEL_TYPE}>{INTERVAL_LABEL}</Typography>
+                            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                                {`${formatMeasurement("temperature_2m", now.lower)} - ${formatMeasurement("temperature_2m", now.upper)}`}
+                            </Typography>
+                            <Typography variant="body1" sx={{ opacity: MUTED_ON_SKY }}>{WEATHER_LABELS[state]}</Typography>
+                        </Stack>
+                    </Stack>
+                    <Box
+                        component="dl"
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr",
+                            [`@media (min-width: ${TWO_COLUMNS_FROM}px)`]: { gridTemplateColumns: "repeat(2, 1fr)" },
+                            [`@media (min-width: ${FOUR_COLUMNS_FROM}px)`]: { gridTemplateColumns: "repeat(4, 1fr)" },
+                            gap: 2,
+                            mt: 2,
+                            mb: 0
+                        }}
+                    >
                         {alongside.map(({ label, value }) => (
                             <div key={label}>
-                                <Typography variant="overline" component="dt" sx={{ opacity: MUTED_ON_SKY }}>{label}</Typography>
-                                <Typography component="dd" sx={{ m: 0 }}>{value}</Typography>
+                                <Typography variant="overline" component="dt" sx={LABEL_TYPE}>{label}</Typography>
+                                <Typography variant="h6" component="dd" sx={{ m: 0 }}>{value}</Typography>
                             </div>
                         ))}
-                    </Stack>
+                    </Box>
                 </Stack>
                 <HourlyStrip forecast={forecast} where={where} />
             </Box>

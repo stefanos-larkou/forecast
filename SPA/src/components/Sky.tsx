@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { keyframes } from "@mui/system";
 import type { SkyPalette } from "../core/theme";
 import { WET_STATES } from "../core/constants";
-import { Moon } from "./Moon";
+import { Moon, MOON_BOX, MOON_RADIUS } from "./Moon";
 import type { WeatherState } from "../core/models/weather";
 import { FallingWeather } from "./FallingWeather";
 
@@ -24,10 +24,8 @@ const CLOUDS_SHOWN: Partial<Record<WeatherState, number>> = { partly: 4, overcas
 const CLOUDS_WHEN_WET = 4;
 const CLOUD_NIGHT_FADE = 0.4;
 
-const MOON_BOX = "0 0 100 100";
-const MOON_CENTRE = 50;
-const SUN = { top: "12%", right: "12%", size: 10 };
-const MOON = { top: "18%", right: "12%", size: 7 };
+const SUN_POSITION = { top: "12%", right: "12%", size: 10 };
+const MOON_POSITION = { top: "18%", right: "12%", size: 7 };
 const CLOUD_FROM = "-20%";
 const CLOUD_TO = "110%";
 const SUNSHINE_SIZE = 50;
@@ -61,7 +59,6 @@ export function Sky({ state, night, children }: { state: WeatherState, night: bo
             sx={{
                 position: "relative",
                 overflow: "hidden",
-                borderRadius: 1,
                 background: theme => theme.vars.palette.sky[tone].background,
                 color: theme => theme.vars.palette.sky[tone].ink
             }}
@@ -70,10 +67,10 @@ export function Sky({ state, night, children }: { state: WeatherState, night: bo
                 <Box
                     sx={{
                         position: "absolute",
-                        top: night ? MOON.top : SUN.top,
-                        right: night ? MOON.right : SUN.right,
-                        width: theme => theme.spacing(night ? MOON.size : SUN.size),
-                        height: theme => theme.spacing(night ? MOON.size : SUN.size)
+                        top: night ? MOON_POSITION.top : SUN_POSITION.top,
+                        right: night ? MOON_POSITION.right : SUN_POSITION.right,
+                        width: theme => theme.spacing(night ? MOON_POSITION.size : SUN_POSITION.size),
+                        height: theme => theme.spacing(night ? MOON_POSITION.size : SUN_POSITION.size)
                     }}
                 >
                     <Box
@@ -97,7 +94,7 @@ export function Sky({ state, night, children }: { state: WeatherState, night: bo
                             aria-hidden="true"
                             sx={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, width: "100%", height: "100%", display: "block" }}
                         >
-                            <Moon cx={MOON_CENTRE} cy={MOON_CENTRE} r={MOON_CENTRE} />
+                            <Moon cx={MOON_RADIUS} cy={MOON_RADIUS} r={MOON_RADIUS} />
                         </Box>
                     ) : (
                         <Box
