@@ -1,9 +1,11 @@
 import { useMemo } from "react";
-import { Box, Paper, Stack, Typography } from "@mui/material";
+import { Paper, Stack, Typography } from "@mui/material";
 import { RAIN_WORTH_SHOWING } from "../core/constants";
 import type { Forecast, HourlyRow } from "../core/models/summary";
 import { hourlyRows, upcomingRows } from "../core/utils/forecast";
 import { formatMeasurement, formatTime } from "../core/utils/format";
+import { weatherState } from "../core/utils/weather";
+import { WeatherIcon } from "./WeatherIcon";
 
 export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
     const rows = useMemo(() => hourlyRows(forecast), [forecast]);
@@ -32,19 +34,8 @@ export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
                         sx={{ alignItems: "center", flex: "0 0 auto", width: theme => theme.spacing(8), py: 1, scrollSnapAlign: "start" }}
                     >
                         <Typography variant="caption" color="text.secondary">{formatTime(hour.at)}</Typography>
+                        <WeatherIcon state={weatherState(hour)} />
                         <Typography variant="body2">{formatMeasurement("temperature_2m", hour.temperature)}</Typography>
-                        {anyRain && (
-                            <Box sx={{ width: "100%", height: theme => theme.spacing(5), display: "flex", alignItems: "flex-end" }}>
-                                <Box
-                                    sx={{
-                                        width: "100%",
-                                        height: `${Math.max(hour.rain * 100, 2)}%`,
-                                        borderRadius: 1,
-                                        backgroundColor: theme => wet(hour) ? theme.vars.palette.series.ecmwf : theme.vars.palette.divider
-                                    }}
-                                />
-                            </Box>
-                        )}
                         {anyRain && (
                             <Typography variant="caption" color="text.secondary">
                                 {wet(hour) ? formatMeasurement("rain_probability", hour.rain) : ""}

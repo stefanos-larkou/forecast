@@ -38,7 +38,8 @@ export function dailyRows(rows: HourlyRow[]): DailyRow[] {
             at: hours[0]?.at ?? "",
             high: Math.max(...temperatures),
             low: Math.min(...temperatures),
-            rain: Math.max(...hours.map(hour => hour.rain))
+            rain: Math.max(...hours.map(hour => hour.rain)),
+            cloud: hours.reduce((total, hour) => total + hour.cloud, 0) / hours.length
         };
     });
 }

@@ -4,6 +4,8 @@ import { RAIN_WORTH_SHOWING } from "../core/constants";
 import type { Forecast } from "../core/models/summary";
 import { dailyRows, hourlyRows } from "../core/utils/forecast";
 import { formatMeasurement, formatWeekday } from "../core/utils/format";
+import { WeatherIcon } from "./WeatherIcon";
+import { weatherState } from "../core/utils/weather";
 
 export function DailyOutlook({ forecast }: { forecast: Forecast; }) {
     const days = useMemo(() => dailyRows(hourlyRows(forecast)), [forecast]);
@@ -24,6 +26,8 @@ export function DailyOutlook({ forecast }: { forecast: Forecast; }) {
                         spacing={2}
                         sx={{ alignItems: "baseline", justifyContent: "space-between" }}
                     >
+                        <WeatherIcon state={weatherState(day)} size={24} />
+                        <Typography variant="body1" sx={{ flex: 1 }}>{formatWeekday(day.at)}</Typography>
                         <Typography variant="body1" sx={{ flex: 1 }}>{formatWeekday(day.at)}</Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ width: theme => theme.spacing(8), textAlign: "right" }}>
                             {day.rain >= RAIN_WORTH_SHOWING ? formatMeasurement("rain_probability", day.rain) : ""}

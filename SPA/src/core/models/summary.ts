@@ -64,6 +64,7 @@ export interface DailyRow {
     high: number;
     low: number;
     rain: number;
+    cloud: number;
 }
 
 export interface Summary {

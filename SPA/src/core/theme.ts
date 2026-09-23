@@ -10,6 +10,13 @@ interface BrandPalette {
     soft: string;
 }
 
+export interface WeatherPalette {
+    sun: string;
+    cloud: string;
+    rainCloud: string;
+    rain: string;
+}
+
 export interface SeriesPalette {
     ours: string;
     ecmwf: string;
@@ -23,12 +30,14 @@ declare module "@mui/material/styles" {
         themeIcon: ThemeIconPalette;
         brand: BrandPalette;
         series: SeriesPalette;
+        weather: WeatherPalette;
     }
 
     interface PaletteOptions {
         themeIcon?: ThemeIconPalette;
         brand?: BrandPalette;
         series?: SeriesPalette;
+        weather?: WeatherPalette;
     }
 
     interface CssThemeVariables {
@@ -56,6 +65,12 @@ export const theme = createTheme({
                     main: "#6a54b0",
                     soft: "rgba(106, 84, 176, 0.32)"
                 },
+                weather: {
+                    sun: "#eab308",
+                    cloud: "#cbd5e1",
+                    rainCloud: "#7d8ea3",
+                    rain: "#2563eb"
+                },
                 series: {
                     ours: "#c2410c",
                     ecmwf: "#1d4ed8",
@@ -79,6 +94,12 @@ export const theme = createTheme({
                 brand: {
                     main: "#a794e8",
                     soft: "rgba(167, 148, 232, 0.32)"
+                },
+                weather: {
+                    sun: "#facc15",
+                    cloud: "#dbe3ec",
+                    rainCloud: "#8fa1b5",
+                    rain: "#60a5fa"
                 },
                 series: {
                     ours: "#e2690f",
