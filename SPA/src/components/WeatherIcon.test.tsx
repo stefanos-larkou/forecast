@@ -26,6 +26,19 @@ describe("WeatherIcon", () => {
         expect(drops("overcast")).toBe(0);
     });
 
+    it("draws a moon in place of the sun at night", () => {
+        const shapes = (night: boolean) => {
+            const { unmount } = renderWithProviders(<WeatherIcon state="clear" night={night} />);
+            const found = screen.getByRole("img");
+            const count = { circles: found.querySelectorAll("circle").length, rays: found.querySelectorAll("line").length };
+            unmount();
+            return count;
+        };
+
+        expect(shapes(false)).toEqual({ circles: 1, rays: 8 });
+        expect(shapes(true)).toEqual({ circles: 7, rays: 0 });
+    });
+
     it("draws flakes instead of drops below freezing", () => {
         const flakes = (state: WeatherState) => {
             const { unmount } = renderWithProviders(<WeatherIcon state={state} />);

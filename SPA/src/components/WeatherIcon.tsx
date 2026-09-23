@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import { WEATHER_LABELS, WET_STATES } from "../core/constants";
+import { Moon } from "./Moon";
 import type { WeatherState } from "../core/models/weather";
 
 const RAYS = [0, 45, 90, 135, 180, 225, 270, 315];
@@ -8,6 +9,10 @@ const RAY_LENGTH = 3.5;
 const RAY_WIDTH = 1.6;
 const SUN = { cx: 12, cy: 12, r: 5 };
 const SUN_BEHIND_CLOUD = { cx: 15, cy: 8, r: 3.6 };
+// Wider than the sun's disc, because the sun also has rays reaching past it and
+// the moon has to hold the same weight with an outline alone.
+const MOON = { cx: 12, cy: 12, r: 7 };
+const MOON_BEHIND_CLOUD = { cx: 16.5, cy: 6.5, r: 4.6 };
 const ICON_SIZE = 28;
 const ICON_BOX = "0 0 24 24";
 const DROP_TOP = 19;
@@ -95,11 +100,12 @@ function Flakes({ at }: { at: number[][]; }) {
     );
 }
 
-export function WeatherIcon({ state, size = ICON_SIZE }: { state: WeatherState, size?: number; }) {
+export function WeatherIcon({ state, size = ICON_SIZE, night = false }: { state: WeatherState, size?: number, night?: boolean; }) {
+
     return (
         <Box component="svg" viewBox={ICON_BOX} width={size} height={size} role="img" aria-label={WEATHER_LABELS[state]} sx={{ display: "block" }}>
-            {state === "clear" && <Sun {...SUN} />}
-            {state === "partly" && <Sun {...SUN_BEHIND_CLOUD} />}
+            {state === "clear" && (night ? <Moon {...MOON} /> : <Sun {...SUN} />)}
+            {state === "partly" && (night ? <Moon {...MOON_BEHIND_CLOUD} /> : <Sun {...SUN_BEHIND_CLOUD} />)}
             {state !== "clear" && <Cloud raining={WET_STATES.includes(state)} />}
             {state === "drizzle" && <Drops at={DRIZZLE_DROPS} length={DRIZZLE_LENGTH} />}
             {state === "showers" && <Drops at={SHOWER_DROPS} />}

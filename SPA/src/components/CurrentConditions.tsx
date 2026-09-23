@@ -46,7 +46,7 @@ export function CurrentConditions({ forecast, where }: { forecast: Forecast, whe
                         ))}
                     </Stack>
                 </Stack>
-                <HourlyStrip forecast={forecast} />
+                <HourlyStrip forecast={forecast} where={where} />
             </Box>
         </Sky>
     );

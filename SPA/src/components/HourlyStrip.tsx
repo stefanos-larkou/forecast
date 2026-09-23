@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import { MUTED_ON_SKY, RAIN_WORTH_SHOWING } from "../core/constants";
-import type { Forecast, HourlyRow } from "../core/models/summary";
+import type { Coordinates, Forecast, HourlyRow } from "../core/models/summary";
 import { hourlyRows, upcomingRows } from "../core/utils/forecast";
 import { formatMeasurement, formatTime } from "../core/utils/format";
-import { weatherState } from "../core/utils/weather";
+import { isNight, weatherState } from "../core/utils/weather";
 import { WeatherIcon } from "./WeatherIcon";
 
 const PAGE_SHARE = 0.8;
@@ -53,13 +53,12 @@ function reachOf(strip: HTMLOListElement): { start: boolean, end: boolean; } {
     return { start: strip.scrollLeft <= EDGE_TOLERANCE, end: strip.scrollLeft >= room - EDGE_TOLERANCE };
 }
 
-export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
+export function HourlyStrip({ forecast, where }: { forecast: Forecast, where: Coordinates; }) {
     const rows = useMemo(() => hourlyRows(forecast), [forecast]);
     const hours = upcomingRows(rows, new Date());
     const strip = useRef<HTMLOListElement>(null);
     const [reach, setReach] = useState({ start: true, end: true });
     const wet = (hour: HourlyRow) => hour.rain >= RAIN_WORTH_SHOWING;
-    const anyRain = hours.some(wet);
 
     const drag = useRef<{ x: number, from: number, to: number, frame: number | null; } | null>(null);
 
@@ -166,13 +165,11 @@ export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
                         }}
                     >
                         <Typography variant="caption" sx={{ opacity: MUTED_ON_SKY }}>{formatTime(hour.at)}</Typography>
-                        <WeatherIcon state={weatherState(hour)} />
+                        <WeatherIcon state={weatherState(hour)} night={isNight(hour.at, where)} />
                         <Typography variant="body2" sx={{ fontWeight: "medium" }}>{formatMeasurement("temperature_2m", hour.temperature)}</Typography>
-                        {anyRain && (
-                            <Typography variant="caption" sx={{ opacity: MUTED_ON_SKY }}>
-                                {wet(hour) ? formatMeasurement("rain_probability", hour.rain) : ""}
-                            </Typography>
-                        )}
+                        <Typography variant="caption" sx={{ opacity: MUTED_ON_SKY, visibility: wet(hour) ? "visible" : "hidden" }}>
+                            {formatMeasurement("rain_probability", hour.rain)}
+                        </Typography>
                     </Stack>
                 ))}
             </Stack>

@@ -40,6 +40,8 @@ export interface WeatherPalette {
     sun: string;
     sunshine: string;
     moon: string;
+    moonshine: string;
+    crater: string;
     snow: string;
     cloud: string;
     rainCloud: string;
@@ -120,6 +122,8 @@ export const theme = createTheme({
                 weather: {
                     sun: "#eab308",
                     moon: "#e2e8f0",
+                    moonshine: "radial-gradient(circle, rgba(226, 232, 240, 0.34), rgba(203, 213, 225, 0.13) 36%, rgba(203, 213, 225, 0.04) 54%, transparent 70%)",
+                    crater: "#c3cedb",
                     snow: "#64748b",
                     sunshine: "radial-gradient(circle, rgba(255, 226, 168, 0.55), rgba(255, 214, 130, 0.22) 32%, rgba(255, 200, 110, 0.06) 52%, transparent 70%)",
                     cloud: "#cbd5e1",
@@ -172,6 +176,8 @@ export const theme = createTheme({
                 weather: {
                     sun: "#facc15",
                     moon: "#e2e8f0",
+                    moonshine: "radial-gradient(circle, rgba(226, 232, 240, 0.34), rgba(203, 213, 225, 0.13) 36%, rgba(203, 213, 225, 0.04) 54%, transparent 70%)",
+                    crater: "#c3cedb",
                     snow: "#e2e8f0",
                     sunshine: "radial-gradient(circle, rgba(255, 226, 168, 0.55), rgba(255, 214, 130, 0.22) 32%, rgba(255, 200, 110, 0.06) 52%, transparent 70%)",
                     cloud: "#dbe3ec",
