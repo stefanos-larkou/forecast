@@ -3,7 +3,7 @@ import time
 import numpy as np
 import pandas as pd
 
-from constants import BACKFILL_DIR, BRIER_DECIMALS, CLIMATE_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MODELS, OBSERVATIONS_DIR, PHYSICAL_LIMITS, RAIN_METHODS, RAIN_PROBABILITY_VARIABLE, RAIN_VARIABLE, RELIABILITY_BIN_COUNT, RELIABILITY_METHODS, SCORING_KEY, SKILL_DECIMALS, WET_HOUR_MM
+from constants import AMOUNT_DECIMALS, AMOUNT_METHODS, AMOUNT_QUANTILE, BACKFILL_DIR, BRIER_DECIMALS, CLIMATE_DIR, FEATURE_COLUMNS, LEADERBOARD_DECIMALS, MODELS, OBSERVATIONS_DIR, PHYSICAL_LIMITS, RAIN_AMOUNT_VARIABLE, RAIN_METHODS, RAIN_PROBABILITY_VARIABLE, RAIN_VARIABLE, RELIABILITY_BIN_COUNT, RELIABILITY_METHODS, SCORING_KEY, SKILL_DECIMALS, WET_HOUR_MM
 from model import gbm
 from model.features import build_features
 from scoring.baselines import climatology, with_climatology, with_persistence
@@ -49,6 +49,34 @@ def boosted_probabilities(prepared: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([probability_fold(prepared, start) for start in fold_starts(prepared)], ignore_index=True)
 
 
+def amount_fold(rows: pd.DataFrame, start: pd.Period) -> pd.DataFrame:
+    training, scored = fold_rows(rows, start)
+    wet_training = training[training["wet"] == 1]
+    wet_scored = scored[scored["wet"] == 1]
+
+    print(f"  {start}: training on {len(wet_training):,} wet rows, scoring {len(wet_scored):,} wet forecasts...", end=" ", flush=True)
+    began = time.perf_counter()
+    trees = gbm.fit(wet_training[FEATURE_COLUMNS].to_numpy("float64"), wet_training["observed"].to_numpy("float64"), AMOUNT_QUANTILE)
+    amount = gbm.predict(trees, wet_scored[FEATURE_COLUMNS].to_numpy("float64")).clip(*PHYSICAL_LIMITS[RAIN_AMOUNT_VARIABLE])
+    print(f"done in {time.perf_counter() - began:.0f}s", flush=True)
+
+    return wet_scored[SCORING_KEY].assign(
+        observed=wet_scored["observed"],
+        models=wet_scored[MODELS].mean(axis=1),
+        typical=wet_training["observed"].median(),
+        boosted=amount
+    )
+
+
+def boosted_amounts(prepared: pd.DataFrame) -> pd.DataFrame:
+    return pd.concat([amount_fold(prepared, start) for start in fold_starts(prepared)], ignore_index=True)
+
+
+def amount_error(scored: pd.DataFrame) -> pd.DataFrame:
+    absolute = scored[AMOUNT_METHODS].sub(scored["observed"], axis=0).abs()
+    return absolute.groupby(scored["lead_hours"], observed=True).mean()
+
+
 def brier(scored: pd.DataFrame) -> pd.DataFrame:
     squared = scored[RAIN_METHODS].sub(scored["wet"], axis=0) ** 2
     return squared.groupby(scored["lead_hours"], observed=True).mean()
@@ -81,11 +109,21 @@ def main() -> None:
     scored = prepared.merge(boosted_probabilities(prepared), on=SCORING_KEY, how="inner", validate="one_to_one")
 
     table = brier(scored)
-    print(f"\nprecipitation, Brier score: mean squared error of the probability that an hour reaches {WET_HOUR_MM} mm, forecasts from {starts[0]} on")
+    print(f"\nPrecipitation, Brier score: mean squared error of the probability that an hour reaches {WET_HOUR_MM} mm, forecasts from {starts[0]} on")
     print(table.round(BRIER_DECIMALS).T.to_string())
 
-    print("\nprecipitation, Brier skill score against climatology: 1 means perfect, 0 no better than climatology, below 0 worse")
+    print("\nPrecipitation, Brier skill score against climatology: 1 means perfect, 0 no better than climatology, below 0 worse")
     print((1 - table.div(table["climatology"], axis=0)).round(SKILL_DECIMALS).T.to_string())
+
+    print(f"\nTraining {len(starts)} amount models on wet hours alone, one per fold:", flush=True)
+    amounts = boosted_amounts(prepared)
+    errors = amount_error(amounts)
+
+    print(f"\nPrecipitation, mean absolute error over the {len(amounts):,} wet hours only, in mm: how much fell, given that it did")
+    print(errors.round(AMOUNT_DECIMALS).T.to_string())
+
+    print(f"\nPrecipitation, skill against a typical wet hour: the amount model fits the {AMOUNT_QUANTILE:.0%} quantile")
+    print((1 - errors.div(errors["typical"], axis=0)).round(SKILL_DECIMALS).T.to_string())
 
     for method in RELIABILITY_METHODS:
         print(f"\nprecipitation, reliability of {method}: of the hours given each probability, how many were wet")

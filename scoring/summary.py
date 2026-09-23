@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from constants import BACKFILL_DIR, BAND_VARIABLE, BLEND_MODEL, BYTES_PER_KB, CLIMATE_DIR, CURRENT_MODEL_FILE, FORECASTS_DIR, INTERVALS_DIR, JSON_INDENT, LOCATION, METADATA_FILE, MODELS_DIR, OBSERVATIONS_DIR, PREDICTIONS_DIR, RELIABILITY_METHODS, SCORING_KEY, SUMMARY_DECIMALS, SUMMARY_FILE
+from constants import AMOUNT_DECIMALS, BACKFILL_DIR, BAND_VARIABLE, BLEND_MODEL, BYTES_PER_KB, CLIMATE_DIR, CURRENT_MODEL_FILE, FORECASTS_DIR, INTERVALS_DIR, JSON_INDENT, LOCATION, METADATA_FILE, MODELS_DIR, OBSERVATIONS_DIR, PREDICTIONS_DIR, RELIABILITY_METHODS, SCORING_KEY, SUMMARY_DECIMALS, SUMMARY_FILE
 from model.training import load_training_data
 from model.tune import validation_months
 from scoring import precipitation
@@ -32,6 +32,20 @@ def crossover(table: pd.DataFrame, variable: str) -> dict:
     }
 
 
+def build_amount(prepared: pd.DataFrame) -> dict:
+    scored = precipitation.boosted_amounts(prepared)
+    errors = precipitation.amount_error(scored)
+    skill = 1 - errors.div(errors["typical"], axis=0)
+
+    return {
+        "leads": [int(lead) for lead in errors.index],
+        "wet_hours": len(scored),
+        "typical_mm": round(float(scored["typical"].median()), AMOUNT_DECIMALS),
+        "mae": {method: rounded(errors[method]) for method in errors.columns},
+        "skill": {method: rounded(skill[method]) for method in skill.columns}
+    }
+
+
 def build_rain(forecasts: pd.DataFrame, observations: pd.DataFrame, history: pd.DataFrame) -> dict:
     prepared = precipitation.prepare(forecasts, observations, history)
     scored = prepared.merge(precipitation.boosted_probabilities(prepared), on=SCORING_KEY, how="inner", validate="one_to_one")
@@ -43,6 +57,7 @@ def build_rain(forecasts: pd.DataFrame, observations: pd.DataFrame, history: pd.
         "wet_share": round(float(scored["wet"].mean()), SUMMARY_DECIMALS),
         "brier": {method: rounded(brier[method]) for method in brier.columns},
         "skill": {method: rounded(skill[method]) for method in skill.columns},
+        "amount": build_amount(prepared),
         "reliability": {
             method: [[round(float(row["mean forecast"]), SUMMARY_DECIMALS), round(float(row["observed wet"]), SUMMARY_DECIMALS), int(row["forecasts"])]
                      for _, row in precipitation.reliability(scored, method).iterrows()]

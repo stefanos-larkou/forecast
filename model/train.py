@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from constants import AMOUNT_MODEL_FILE, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, HYPERPARAMETERS, JSON_INDENT, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, RAIN_AMOUNT_VARIABLE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
+from constants import AMOUNT_MODEL_FILE, AMOUNT_QUANTILE, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, HYPERPARAMETERS, JSON_INDENT, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, RAIN_AMOUNT_VARIABLE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
 from model import gbm
 from model.training import load_training_data
 from scoring.evaluate import boosted_forecasts
@@ -93,9 +93,9 @@ def fit_rain_model(window: pd.DataFrame) -> tuple[list[dict], int]:
 def fit_amount_model(window: pd.DataFrame) -> tuple[list[dict], int]:
     rows = window[(window["variable"] == RAIN_VARIABLE) & (window["observed"] >= WET_HOUR_MM)]
 
-    print(f"Training the amount model on {len(rows):,} wet rows, {rows['observed'].mean():.2f} mm an hour on average...", end=" ", flush=True)
+    print(f"Training the amount model on {len(rows):,} wet rows, {rows['observed'].median():.2f} mm in a typical one...", end=" ", flush=True)
     began = time.perf_counter()
-    trees = gbm.fit(rows[FEATURE_COLUMNS].to_numpy("float64"), rows["observed"].to_numpy("float64"))
+    trees = gbm.fit(rows[FEATURE_COLUMNS].to_numpy("float64"), rows["observed"].to_numpy("float64"), AMOUNT_QUANTILE)
     print(f"done in {time.perf_counter() - began:.0f}s", flush=True)
 
     return trees, len(rows)

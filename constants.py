@@ -104,6 +104,9 @@ WET_HOUR_MM = 0.1
 BRIER_DECIMALS = 4
 SKILL_DECIMALS = 3
 RAIN_METHODS = ["models", "climatology", "persisted", "boosted"]
+AMOUNT_METHODS = ["models", "typical", "boosted"]
+AMOUNT_QUANTILE = 0.5
+AMOUNT_DECIMALS = 3
 RELIABILITY_METHODS = ["models", "boosted"]
 RELIABILITY_BIN_COUNT = 10
 
