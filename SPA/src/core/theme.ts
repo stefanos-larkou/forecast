@@ -26,6 +26,7 @@ export interface WeatherPalette {
 
 export interface SeriesPalette {
     ours: string;
+    band: string;
     ecmwf: string;
     gfs: string;
     icon: string;
@@ -88,6 +89,7 @@ export const theme = createTheme({
                 },
                 series: {
                     ours: "#c2410c",
+                    band: "rgba(194, 65, 12, 0.18)",
                     ecmwf: "#1d4ed8",
                     gfs: "#047857",
                     icon: "#7c3aed",
@@ -124,6 +126,7 @@ export const theme = createTheme({
                 },
                 series: {
                     ours: "#e2690f",
+                    band: "rgba(226, 105, 15, 0.26)",
                     ecmwf: "#3b82f6",
                     gfs: "#0fa574",
                     icon: "#a855f7",

@@ -11,6 +11,7 @@ export function useChartStyle(): ChartStyle {
         const palette = theme.colorSchemes[scheme]?.palette ?? theme.palette;
         return {
             series: palette.series,
+            band: palette.series.band,
             text: palette.text.secondary,
             grid: palette.divider,
             font: { family: theme.typography.fontFamily ?? "", size: theme.typography.fontSize }

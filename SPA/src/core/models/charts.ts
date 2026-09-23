@@ -7,6 +7,7 @@ export interface ChartFont {
 
 export interface ChartStyle {
     series: SeriesPalette;
+    band: string;
     text: string;
     grid: string;
     font: ChartFont;

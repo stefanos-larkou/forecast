@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { Box } from "@mui/material";
-import { CategoryScale, Chart, Legend, LinearScale, LineController, LineElement, PointElement, Tooltip, type ChartConfiguration } from "chart.js";
+import { BarController, BarElement, CategoryScale, Chart, Filler, Legend, LinearScale, LineController, LineElement, PointElement, Tooltip, type ChartConfiguration, type ChartType } from "chart.js";
 
-Chart.register(CategoryScale, LinearScale, LineController, LineElement, PointElement, Legend, Tooltip);
+Chart.register(CategoryScale, LinearScale, LineController, LineElement, PointElement, BarController, BarElement, Filler, Legend, Tooltip);
 
-export function ChartCanvas({ config, label }: { config: ChartConfiguration, label: string; }) {
+export function ChartCanvas<TType extends ChartType>({ config, label }: { config: ChartConfiguration<TType>, label: string; }) {
     const ref = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Button, Collapse, Paper, Stack, Typography } from "@mui/material";
-import type { ChartConfiguration } from "chart.js";
+import type { ChartConfiguration, ChartType } from "chart.js";
 import type { ChartTable } from "../core/models/charts";
 import { ChartCanvas } from "./ChartCanvas";
 import { DataTable } from "./DataTable";
 
-export function ChartPanel({ title, label, config, table }: { title: string, label: string, config: ChartConfiguration, table: ChartTable; }) {
+export function ChartPanel<TType extends ChartType>({ title, label, config, table }: { title: string, label: string, config: ChartConfiguration<TType>, table: ChartTable; }) {
     const [tableShown, setTableShown] = useState(false);
 
     return (

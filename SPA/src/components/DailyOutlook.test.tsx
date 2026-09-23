@@ -1,4 +1,5 @@
 import { screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import type { Forecast } from "../core/models/summary";
 import { renderWithProviders } from "../test-utils";
@@ -38,5 +39,12 @@ describe("DailyOutlook", () => {
 
         expect(within(days[0] ?? document.createElement("li")).getByText("31%")).toBeInTheDocument();
         expect(within(days[1] ?? document.createElement("li")).queryByText(/%/)).not.toBeInTheDocument();
+    });
+
+    it("opens that day's hours when a day is clicked", async () => {
+        renderWithProviders(<DailyOutlook forecast={TWO_DAYS} />);
+
+        await userEvent.click(screen.getAllByRole("button")[1] ?? document.createElement("button"));
+        expect(await screen.findByRole("dialog", { name: /23\/09\/2026/ })).toBeInTheDocument();
     });
 });

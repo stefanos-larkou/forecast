@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { FORECAST } from "../../test-fixtures";
-import { currentRow, dailyRows, hourlyRows, upcomingRows } from "./forecast";
+import { currentRow, dailyRows, hourlyRows, hoursOfDay, upcomingRows } from "./forecast";
 
 const ROWS = hourlyRows(FORECAST);
 
@@ -59,5 +59,15 @@ describe("dailyRows", () => {
 
     it("has nothing to summarise when there are no hours", () => {
         expect(dailyRows([])).toEqual([]);
+    });
+});
+
+describe("hoursOfDay", () => {
+    it("gives back the hours that share a day with the one asked for", () => {
+        expect(hoursOfDay(ROWS, "2026-09-22T19:00:00+00:00")).toEqual(ROWS);
+    });
+
+    it("has nothing to give for a day the forecast does not reach", () => {
+        expect(hoursOfDay(ROWS, "2026-10-05T12:00:00+00:00")).toEqual([]);
     });
 });

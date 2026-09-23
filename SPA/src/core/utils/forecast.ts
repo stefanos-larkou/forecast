@@ -44,6 +44,11 @@ export function dailyRows(rows: HourlyRow[]): DailyRow[] {
     });
 }
 
+export function hoursOfDay(rows: HourlyRow[], at: string): HourlyRow[] {
+    const day = new Date(at).toDateString();
+    return rows.filter(row => dayOf(row) === day);
+}
+
 export function currentRow(rows: HourlyRow[], now: Date): HourlyRow | undefined {
     const passed = rows.filter(row => new Date(row.at) <= now);
     return passed.at(-1) ?? rows[0];

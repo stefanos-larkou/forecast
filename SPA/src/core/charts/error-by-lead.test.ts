@@ -5,7 +5,8 @@ import { errorByLeadConfig, errorByLeadTable } from "./error-by-lead";
 
 const [TEMPERATURE] = VARIABLES;
 const STYLE = {
-    series: { ours: "orange", ecmwf: "blue", gfs: "green", icon: "purple", reference: "grey" },
+    series: { ours: "orange", band: "rgba(255, 165, 0, 0.2)", ecmwf: "blue", gfs: "green", icon: "purple", reference: "grey" },
+    band: "rgba(255, 165, 0, 0.2)",
     text: "black",
     grid: "silver",
     font: { family: "Roboto", size: 14 }
