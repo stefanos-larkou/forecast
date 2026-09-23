@@ -13,6 +13,8 @@ const CLOUDS = [
 ];
 
 const DROPS = [8, 21, 34, 47, 60, 73, 86, 95];
+const SUNSHINE_SIZE = 50;
+const SUNSHINE_THROUGH_CLOUD = 0.3;
 
 const drift = keyframes({
     from: { transform: "translateX(0)" },
@@ -26,20 +28,26 @@ const fall = keyframes({
 });
 
 function skyKey(state: WeatherState, night: boolean): keyof SkyPalette {
+    if (!night) return state;
     const dull = state === "overcast" || state === "showers" || state === "rain";
-    if (dull) {
-        return night ? "dullNight" : "dull";
-    }
-
-    return night ? "night" : "day";
+    return dull ? "dullNight" : "night";
 }
 
-export function Sky({ state, night, children }: { state: WeatherState, night: boolean, children: ReactNode }) {
+export function Sky({ state, night, children }: { state: WeatherState, night: boolean, children: ReactNode; }) {
     const clouds = state === "clear" ? [] : CLOUDS.slice(0, state === "partly" ? 2 : 3);
     const raining = state === "rain" || state === "showers";
+    const tone = skyKey(state, night);
 
     return (
-        <Box sx={{ position: "relative", overflow: "hidden", borderRadius: 1, background: theme => theme.vars.palette.sky[skyKey(state, night)], color: "#f8fafc" }}>
+        <Box
+            sx={{
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: 1,
+                background: theme => theme.vars.palette.sky[tone].background,
+                color: theme => theme.vars.palette.sky[tone].ink
+            }}
+        >
             {state !== "overcast" && !raining && (
                 <Box
                     sx={{
@@ -47,12 +55,34 @@ export function Sky({ state, night, children }: { state: WeatherState, night: bo
                         top: night ? "18%" : "12%",
                         right: "12%",
                         width: theme => theme.spacing(night ? 7 : 10),
-                        height: theme => theme.spacing(night ? 7 : 10),
-                        borderRadius: "50%",
-                        backgroundColor: theme => night ? "#e2e8f0" : theme.vars.palette.weather.sun,
-                        boxShadow: theme => night ? "none" : `0 0 ${theme.spacing(8)} ${theme.spacing(3)} rgba(250, 204, 21, 0.45)`
+                        height: theme => theme.spacing(night ? 7 : 10)
                     }}
-                />
+                >
+                    {!night && (
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                width: theme => theme.spacing(SUNSHINE_SIZE),
+                                height: theme => theme.spacing(SUNSHINE_SIZE),
+                                borderRadius: "50%",
+                                background: theme => theme.vars.palette.weather.sunshine,
+                                opacity: state === "partly" ? SUNSHINE_THROUGH_CLOUD : 1,
+                                pointerEvents: "none"
+                            }}
+                        />
+                    )}
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            inset: 0,
+                            borderRadius: "50%",
+                            backgroundColor: theme => night ? theme.vars.palette.weather.moon : theme.vars.palette.weather.sun
+                        }}
+                    />
+                </Box>
             )}
             {clouds.map(cloud => (
                 <Box
@@ -94,13 +124,6 @@ export function Sky({ state, night, children }: { state: WeatherState, night: bo
                     }}
                 />
             ))}
-            <Box
-                sx={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "linear-gradient(100deg, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.2) 45%, transparent 75%)"
-                }}
-            />
             <Box sx={{ position: "relative" }}>{children}</Box>
         </Box>
     );

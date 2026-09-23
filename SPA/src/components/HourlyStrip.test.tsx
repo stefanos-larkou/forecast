@@ -1,8 +1,33 @@
-import { screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FORECAST } from "../test-fixtures";
 import { renderWithProviders } from "../test-utils";
 import { HourlyStrip } from "./HourlyStrip";
+import userEvent from "@testing-library/user-event";
+
+let scrollLeft = 0;
+
+function measurements(scrollWidth: number) {
+    scrollLeft = 0;
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(400);
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(scrollWidth);
+    Object.defineProperty(HTMLElement.prototype, "scrollLeft", {
+        get: () => scrollLeft,
+        set: value => {
+            scrollLeft = value;
+        },
+        configurable: true
+    });
+    Element.prototype.setPointerCapture = vi.fn();
+    Element.prototype.releasePointerCapture = vi.fn();
+}
+
+function scrolled(to: number) {
+    scrollLeft = to;
+    act(() => {
+        fireEvent.scroll(screen.getByRole("list"));
+    });
+}
 
 beforeEach(() => {
     vi.useFakeTimers();
@@ -36,5 +61,52 @@ describe("HourlyStrip", () => {
 
         expect(within(hours[0] ?? document.createElement("li")).getByText("6%")).toBeInTheDocument();
         expect(within(hours[1] ?? document.createElement("li")).queryByText(/%/)).not.toBeInTheDocument();
+    });
+
+    it("pages through the hours with its buttons", async () => {
+        const scrollBy = vi.fn();
+        measurements(1200);
+        Object.defineProperty(HTMLElement.prototype, "scrollBy", { value: scrollBy, configurable: true });
+        vi.useRealTimers();
+
+        const user = userEvent.setup();
+        renderWithProviders(<HourlyStrip forecast={FORECAST} />);
+
+        await user.click(screen.getByRole("button", { name: "Later hours" }));
+        expect(scrollBy).toHaveBeenCalledWith({ left: 320, behavior: "smooth" });
+
+        scrolled(800);
+        await user.click(screen.getByRole("button", { name: "Earlier hours" }));
+        expect(scrollBy).toHaveBeenLastCalledWith({ left: -320, behavior: "smooth" });
+    });
+
+    it("scrolls when the strip is dragged with a mouse", async () => {
+        measurements(1200);
+        vi.useRealTimers();
+
+        const user = userEvent.setup();
+        renderWithProviders(<HourlyStrip forecast={FORECAST} />);
+        const strip = screen.getByRole("list");
+
+        await user.pointer([
+            { keys: "[MouseLeft>]", target: strip, coords: { clientX: 300, clientY: 0 } },
+            { target: strip, coords: { clientX: 220, clientY: 0 } },
+            { keys: "[/MouseLeft]", target: strip }
+        ]);
+
+        expect(strip.scrollLeft).toBe(80);
+    });
+
+    it("hides the button for a direction the strip cannot go", () => {
+        measurements(1200);
+        renderWithProviders(<HourlyStrip forecast={FORECAST} />);
+
+        expect(screen.getByRole("button", { name: "Earlier hours" })).toBeDisabled();
+        expect(screen.getByRole("button", { name: "Later hours" })).toBeEnabled();
+
+        scrolled(800);
+
+        expect(screen.getByRole("button", { name: "Earlier hours" })).toBeEnabled();
+        expect(screen.getByRole("button", { name: "Later hours" })).toBeDisabled();
     });
 });
