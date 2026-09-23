@@ -1,8 +1,8 @@
 {
     "version": "2026-09-23",
     "format": 2,
-    "trained_at": "2026-09-23T12:02:19.291531+00:00",
-    "commit": "eaf2d333130ffeb995df9fe7ae23ce377b4396ff",
+    "trained_at": "2026-09-23T21:23:11.901572+00:00",
+    "commit": "ea9401fcdbdd5d944f72c3fcea98c4655c0f917e",
     "training_window": {
         "from": "2025-09-18T00:00:00+00:00",
         "to": "2026-09-17T23:00:00+00:00"
