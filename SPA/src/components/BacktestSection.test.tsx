@@ -18,7 +18,7 @@ describe("BacktestSection", () => {
     it("states the window and the number of forecasts the backtest covers", () => {
         renderWithProviders(<BacktestSection backtest={SUMMARY.backtest} />);
 
-        expect(screen.getByText(/322,096 forecasts, March 2025 to September 2026/)).toBeInTheDocument();
+        expect(screen.getByText(/322,096 forecasts, March 2025 - September 2026/)).toBeInTheDocument();
     });
 
     it("says what the error is measured against, and that it is not the live record", () => {

@@ -9,7 +9,7 @@ export default function BacktestSection({ backtest }: { backtest: Backtest; }) {
     return (
         <Box component="section" sx={{ mt: 4 }}>
             <Typography variant="overline" component="p" color="text.secondary">
-                {`Backtest \u00b7 ${formatCount(backtest.forecasts)} forecasts, ${formatMonth(backtest.from)} to ${formatMonth(backtest.to)}`}
+                {`Backtest \u00b7 ${formatCount(backtest.forecasts)} forecasts, ${formatMonth(backtest.from)} - ${formatMonth(backtest.to)}`}
             </Typography>
             <Typography variant="h2" sx={{ mb: 2 }}>{BACKTEST_HEADING}</Typography>
             <ChartGrid>

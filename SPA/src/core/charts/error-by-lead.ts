@@ -4,7 +4,7 @@ import type { ChartStyle, ChartTable } from "../models/charts";
 import type { Backtest, Variable } from "../models/summary";
 import { formatError } from "../utils/format";
 
-const ROW_HEADER = "Hours Ahead";
+const LEAD_HEADER = "Hours Ahead";
 
 export function errorByLeadConfig(backtest: Backtest, variable: Variable, style: ChartStyle): ChartConfiguration<"line"> {
     const errors = backtest.metrics.mae[variable.key];
@@ -48,7 +48,7 @@ export function errorByLeadConfig(backtest: Backtest, variable: Variable, style:
             scales: {
                 x: {
                     ticks: { font },
-                    title: { display: true, text: ROW_HEADER, font },
+                    title: { display: true, text: LEAD_HEADER, font },
                     grid: { display: false }
                 },
                 y: {
@@ -65,7 +65,7 @@ export function errorByLeadConfig(backtest: Backtest, variable: Variable, style:
 export function errorByLeadTable(backtest: Backtest, variable: Variable): ChartTable {
     const errors = backtest.metrics.mae[variable.key];
     return {
-        rowHeader: ROW_HEADER,
+        rowHeader: LEAD_HEADER,
         columns: BACKTEST_SERIES.map(series => series.label),
         rows: backtest.leads.map((lead, index) => ({
             header: String(lead),

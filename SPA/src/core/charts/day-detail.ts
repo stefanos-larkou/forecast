@@ -7,7 +7,7 @@ import { chanceLabel, weatherState } from "../utils/weather";
 
 const BAND_LABEL = "90% band";
 const RAIN_AXIS_MAX = 100;
-const ROW_HEADER = "Hour";
+const HOUR_HEADER = "Hour";
 const RAIN_UNIT = "%";
 
 function chanceOf(hours: HourlyRow[]): string {
@@ -91,7 +91,7 @@ export function dayDetailConfig(hours: HourlyRow[], style: ChartStyle): ChartCon
 
 export function dayDetailTable(hours: HourlyRow[]): ChartTable {
     return {
-        rowHeader: ROW_HEADER,
+        rowHeader: HOUR_HEADER,
         columns: [variableLabel("temperature_2m"), BAND_LABEL, chanceOf(hours)],
         rows: hours.map(hour => ({
             header: formatTime(hour.at),
