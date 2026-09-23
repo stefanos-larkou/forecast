@@ -141,6 +141,7 @@ def main() -> None:
     summary = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "location": LOCATION.slug,
+        "coordinates": {"latitude": LOCATION.latitude, "longitude": LOCATION.longitude},
         "model": current_model(),
         "live": build_live(predictions, intervals),
         "forecast": build_forecast(predictions, intervals),
