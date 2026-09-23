@@ -1,18 +1,24 @@
 import type { ChartConfiguration } from "chart.js";
-import { LOCALE } from "../constants";
+import { LOCALE, SNOW_STATES, variableLabel, variableUnit } from "../constants";
 import type { ChartStyle, ChartTable } from "../models/charts";
 import type { HourlyRow } from "../models/summary";
 import { formatMeasurement, formatTime } from "../utils/format";
+import { chanceLabel, weatherState } from "../utils/weather";
 
 const BAND_LABEL = "90% band";
-const RAIN_LABEL = "Chance of rain";
-const TEMPERATURE_LABEL = "Temperature";
 const RAIN_AXIS_MAX = 100;
 const ROW_HEADER = "Hour";
+const RAIN_UNIT = "%";
+
+function chanceOf(hours: HourlyRow[]): string {
+    return chanceLabel(hours.map(weatherState).find(state => SNOW_STATES.includes(state)) ?? "rain");
+}
 
 export function dayDetailConfig(hours: HourlyRow[], style: ChartStyle): ChartConfiguration<"bar" | "line"> {
     const font = style.font;
     const labels = hours.map(hour => formatTime(hour.at));
+    const temperature = variableLabel("temperature_2m");
+    const chance = chanceOf(hours);
 
     return {
         type: "line",
@@ -37,7 +43,7 @@ export function dayDetailConfig(hours: HourlyRow[], style: ChartStyle): ChartCon
                     order: 2
                 },
                 {
-                    label: TEMPERATURE_LABEL,
+                    label: temperature,
                     data: hours.map(hour => hour.temperature),
                     borderColor: style.series.ours,
                     backgroundColor: style.series.ours,
@@ -46,7 +52,7 @@ export function dayDetailConfig(hours: HourlyRow[], style: ChartStyle): ChartCon
                 },
                 {
                     type: "bar" as const,
-                    label: RAIN_LABEL,
+                    label: chance,
                     data: hours.map(hour => hour.rain * RAIN_AXIS_MAX),
                     backgroundColor: style.series.ecmwf,
                     yAxisID: "rain",
@@ -67,7 +73,7 @@ export function dayDetailConfig(hours: HourlyRow[], style: ChartStyle): ChartCon
                 x: { ticks: { font }, grid: { display: false } },
                 y: {
                     ticks: { font },
-                    title: { display: true, text: `${TEMPERATURE_LABEL} (\u00b0C)`, font },
+                    title: { display: true, text: `${temperature} (${variableUnit("temperature_2m")})`, font },
                     grid: { color: style.grid }
                 },
                 rain: {
@@ -75,7 +81,7 @@ export function dayDetailConfig(hours: HourlyRow[], style: ChartStyle): ChartCon
                     min: 0,
                     max: RAIN_AXIS_MAX,
                     ticks: { font },
-                    title: { display: true, text: `${RAIN_LABEL} (%)`, font },
+                    title: { display: true, text: `${chance} (${RAIN_UNIT})`, font },
                     grid: { display: false }
                 }
             }
@@ -86,7 +92,7 @@ export function dayDetailConfig(hours: HourlyRow[], style: ChartStyle): ChartCon
 export function dayDetailTable(hours: HourlyRow[]): ChartTable {
     return {
         rowHeader: ROW_HEADER,
-        columns: [TEMPERATURE_LABEL, BAND_LABEL, RAIN_LABEL],
+        columns: [variableLabel("temperature_2m"), BAND_LABEL, chanceOf(hours)],
         rows: hours.map(hour => ({
             header: formatTime(hour.at),
             values: [

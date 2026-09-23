@@ -26,6 +26,16 @@ describe("dayDetailConfig", () => {
         expect(datasets[2]).toMatchObject({ label: "Temperature", data: [26.28, 25.41, 23.9], borderColor: "orange" });
         expect(datasets[3]).toMatchObject({ type: "bar", label: "Chance of rain", data: [2, 5, 11], yAxisID: "rain" });
     });
+
+    it("names the chance after snow when an hour of the day is freezing", () => {
+        const freezing = hourlyRows({
+            ...FORECAST,
+            variables: { ...FORECAST.variables, temperature_2m: [18, 0, 19], rain_probability: [0.6, 0.6, 0.6] }
+        });
+
+        expect(dayDetailConfig(freezing, STYLE).data.datasets[3]).toMatchObject({ label: "Chance of snow" });
+        expect(dayDetailTable(freezing).columns).toContain("Chance of snow");
+    });
 });
 
 describe("dayDetailTable", () => {

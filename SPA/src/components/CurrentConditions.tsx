@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Box, Stack, Typography } from "@mui/material";
-import { MUTED_ON_SKY, WEATHER_LABELS } from "../core/constants";
+import { MUTED_ON_SKY, variableLabel, WEATHER_LABELS } from "../core/constants";
 import type { Coordinates, Forecast } from "../core/models/summary";
 import { currentRow, hourlyRows } from "../core/utils/forecast";
 import { formatDateTime, formatMeasurement } from "../core/utils/format";
@@ -19,9 +19,9 @@ export function CurrentConditions({ forecast, where }: { forecast: Forecast, whe
     const state = weatherState(now);
     const alongside = [
         { label: chanceLabel(state), value: formatMeasurement("rain_probability", now.rain) },
-        { label: "Cloud Cover", value: formatMeasurement("cloud_cover", now.cloud) },
-        { label: "Wind Speed", value: formatMeasurement("wind_speed_10m", now.wind) },
-        { label: "Humidity", value: formatMeasurement("relative_humidity_2m", now.humidity) }
+        { label: variableLabel("cloud_cover"), value: formatMeasurement("cloud_cover", now.cloud) },
+        { label: variableLabel("wind_speed_10m"), value: formatMeasurement("wind_speed_10m", now.wind) },
+        { label: variableLabel("relative_humidity_2m"), value: formatMeasurement("relative_humidity_2m", now.humidity) }
     ];
 
     return (

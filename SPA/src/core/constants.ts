@@ -1,3 +1,4 @@
+import type { VariableKey } from "./models/summary";
 import type { WeatherState } from "./models/weather";
 
 export const PLACE = "Larnaca";
@@ -53,4 +54,12 @@ export const BACKTEST_SERIES = [
 ] as const;
 
 export const SERIES_LINE_WIDTHS = { ours: 3, model: 1.5, baseline: 1.5 } as const;
+
+export function variableLabel(key: VariableKey): string {
+    return VARIABLES.filter(variable => variable.key === key)[0]?.label ?? key;
+}
+
+export function variableUnit(key: VariableKey): string {
+    return VARIABLES.filter(variable => variable.key === key)[0]?.unit ?? "";
+}
 
