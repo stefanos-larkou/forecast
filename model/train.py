@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from constants import BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, HYPERPARAMETERS, JSON_INDENT, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
+from constants import AMOUNT_MODEL_FILE, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, HYPERPARAMETERS, JSON_INDENT, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, RAIN_AMOUNT_VARIABLE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
 from model import gbm
 from model.training import load_training_data
 from scoring.evaluate import boosted_forecasts
@@ -90,6 +90,17 @@ def fit_rain_model(window: pd.DataFrame) -> tuple[list[dict], int]:
     return trees, len(rows)
 
 
+def fit_amount_model(window: pd.DataFrame) -> tuple[list[dict], int]:
+    rows = window[(window["variable"] == RAIN_VARIABLE) & (window["observed"] >= WET_HOUR_MM)]
+
+    print(f"Training the amount model on {len(rows):,} wet rows, {rows['observed'].mean():.2f} mm an hour on average...", end=" ", flush=True)
+    began = time.perf_counter()
+    trees = gbm.fit(rows[FEATURE_COLUMNS].to_numpy("float64"), rows["observed"].to_numpy("float64"))
+    print(f"done in {time.perf_counter() - began:.0f}s", flush=True)
+
+    return trees, len(rows)
+
+
 def conformal_margin(scores: pd.Series) -> float:
     coverage = UPPER_QUANTILE - LOWER_QUANTILE
     level = min(1.0, np.ceil((len(scores) + 1) * coverage) / len(scores))
@@ -165,6 +176,7 @@ def main() -> None:
     window = training_window(trained, end)
     models, rows = fit_models(window)
     rain_model, rows[RAIN_VARIABLE] = fit_rain_model(window)
+    amount_model, rows[RAIN_AMOUNT_VARIABLE] = fit_amount_model(window)
 
     calibration_start = end - pd.DateOffset(months=CALIBRATION_MONTHS)
     quantile_window = training_window(trained, calibration_start)
@@ -176,6 +188,7 @@ def main() -> None:
     save(directory, {
         MODEL_FILE: models,
         RAIN_MODEL_FILE: rain_model,
+        AMOUNT_MODEL_FILE: amount_model,
         LOWER_MODEL_FILE: lower_models,
         UPPER_MODEL_FILE: upper_models,
         METADATA_FILE: build_metadata(version, window, rows, quantile_window, calibration, margins, backtested, promoted)

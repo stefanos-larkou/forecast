@@ -33,13 +33,15 @@ MODELS = ["gfs_seamless", REFERENCE_MODEL, "icon_seamless"]
 
 RAIN_VARIABLE = "precipitation"
 RAIN_PROBABILITY_VARIABLE = "rain_probability"
+RAIN_AMOUNT_VARIABLE = "rain_amount"
 VARIABLES = [
     Variable("temperature_2m"),
     Variable("relative_humidity_2m", limits=(0, 100)),
     Variable(RAIN_VARIABLE, scored=False),
     Variable("wind_speed_10m", limits=(0, None)),
     Variable("cloud_cover", limits=(0, 100)),
-    Variable(RAIN_PROBABILITY_VARIABLE, fetched=False, scored=False, limits=(0, 1))
+    Variable(RAIN_PROBABILITY_VARIABLE, fetched=False, scored=False, limits=(0, 1)),
+    Variable(RAIN_AMOUNT_VARIABLE, fetched=False, scored=False, limits=(0, None))
 ]
 FETCHED_VARIABLES = [variable.name for variable in VARIABLES if variable.fetched]
 MAE_VARIABLES = [variable.name for variable in VARIABLES if variable.scored]
@@ -141,6 +143,7 @@ TUNING_WORKERS = max(1, (os.cpu_count() or 1) // TUNING_THREAD_SHARE)
 MODELS_DIR = Path("models")
 MODEL_FILE = "model.json"
 RAIN_MODEL_FILE = "rain.json"
+AMOUNT_MODEL_FILE = "amount.json"
 LOWER_MODEL_FILE = "lower.json"
 UPPER_MODEL_FILE = "upper.json"
 METADATA_FILE = "metadata.json"
