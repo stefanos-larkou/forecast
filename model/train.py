@@ -1,5 +1,6 @@
 import json
 import subprocess
+import sys
 import time
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -8,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from constants import AMOUNT_MODEL_FILE, AMOUNT_QUANTILE, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, HYPERPARAMETERS, JSON_INDENT, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODEL_VERSION_FORMAT, MODELS_DIR, PROMOTION_TOLERANCE, RAIN_AMOUNT_VARIABLE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
+from constants import AMOUNT_MODEL_FILE, AMOUNT_QUANTILE, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, HYPERPARAMETERS, JSON_INDENT, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODEL_VERSION_FORMAT, MODELS_DIR, OVERWRITE, PROMOTION_TOLERANCE, RAIN_AMOUNT_VARIABLE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
 from model import gbm
 from model.training import load_training_data
 from scoring.evaluate import boosted_forecasts
@@ -150,7 +151,7 @@ def build_metadata(version: str, window: pd.DataFrame, rows: dict[str, int], qua
 
 
 def save(directory: Path, files: dict[str, dict]) -> None:
-    directory.mkdir(parents=True)
+    directory.mkdir(parents=True, exist_ok=True)
     for name, content in files.items():
         (directory / name).write_text(json.dumps(content, indent=JSON_INDENT if name == METADATA_FILE else None))
     print(f"Saved {directory} ({sum((directory / name).stat().st_size for name in files) / BYTES_PER_KB:.0f} KB)")
@@ -164,9 +165,8 @@ def promote(version: str) -> None:
 def main() -> None:
     version = datetime.now(timezone.utc).strftime(MODEL_VERSION_FORMAT)
     directory = MODELS_DIR / version
-    if directory.exists():
-        print(f"{directory} already exists. The model will not be overwritten.")
-        return
+    if directory.exists() and OVERWRITE not in sys.argv[1:]:
+        raise SystemExit(f"{directory} already exists. Pass '{OVERWRITE}' to train over it.")
 
     _, _, trained = load_training_data()
     backtested = backtest(trained)

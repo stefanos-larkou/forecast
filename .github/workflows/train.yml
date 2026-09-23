@@ -4,6 +4,11 @@ on:
     schedule:
         - cron: "20 15 * * 1"
     workflow_dispatch:
+        inputs:
+            overwrite:
+                description: "Train over today's model if one already exists"
+                type: boolean
+                default: false
 
 concurrency:
     group: collect
@@ -26,7 +31,7 @@ jobs:
 
             - run: pip install -r requirements.txt
 
-            - run: python -u -m model.train
+            - run: python -u -m model.train ${{ inputs.overwrite && 'overwrite' || '' }}
 
             - run: python -u -m scoring.summary backtest
 
