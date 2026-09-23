@@ -62,7 +62,7 @@ export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
     const wet = (hour: HourlyRow) => hour.rain >= RAIN_WORTH_SHOWING;
     const anyRain = hours.some(wet);
 
-    const drag = useRef<{ x: number, from: number; } | null>(null);
+    const drag = useRef<{ x: number, from: number, to: number, frame: number | null; } | null>(null);
 
     function beginDrag(event: PointerEvent<HTMLOListElement>) {
         if (event.pointerType !== "mouse" || event.button !== PRIMARY_BUTTON) {
@@ -70,16 +70,25 @@ export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
         }
 
         const strip = event.currentTarget;
-        drag.current = { x: event.clientX, from: strip.scrollLeft };
+        drag.current = { x: event.clientX, from: strip.scrollLeft, to: strip.scrollLeft, frame: null };
         strip.setPointerCapture(event.pointerId);
         event.preventDefault();
     }
 
+    // Pointer moves arrive faster than the screen redraws, so the position is
+    // kept and written once a frame.
     function continueDrag(event: PointerEvent<HTMLOListElement>) {
         const started = drag.current;
-        if (started) {
-            event.currentTarget.scrollLeft = started.from - (event.clientX - started.x);
+        if (!started) {
+            return;
         }
+
+        const strip = event.currentTarget;
+        started.to = started.from - (event.clientX - started.x);
+        started.frame ??= requestAnimationFrame(() => {
+            strip.scrollLeft = started.to;
+            started.frame = null;
+        });
     }
 
     function endDrag(event: PointerEvent<HTMLOListElement>) {
@@ -87,14 +96,19 @@ export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
             return;
         }
 
+        if (drag.current.frame !== null) {
+            cancelAnimationFrame(drag.current.frame);
+            event.currentTarget.scrollLeft = drag.current.to;
+        }
+
         drag.current = null;
         event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
     const measure = useCallback(() => {
-        if (strip.current) {
-            setReach(reachOf(strip.current));
-        }
+        if (!strip.current) return;
+        const next = reachOf(strip.current);
+        setReach(current => current.start === next.start && current.end === next.end ? current : next);
     }, []);
 
     useEffect(() => {
@@ -117,7 +131,7 @@ export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
     }
 
     return (
-        <Box sx={{ position: "relative", mt: 3 }}>
+        <Box sx={{ position: "relative", mt: 3, px: EDGE_SPACE }}>
             <Stack
                 component="ol"
                 ref={strip}
@@ -129,8 +143,7 @@ export function HourlyStrip({ forecast }: { forecast: Forecast; }) {
                 onPointerCancel={endDrag}
                 sx={{
                     listStyle: "none",
-                    py: 0,
-                    px: EDGE_SPACE,
+                    p: 0,
                     m: 0,
                     overflowX: "auto",
                     scrollbarWidth: "none",
