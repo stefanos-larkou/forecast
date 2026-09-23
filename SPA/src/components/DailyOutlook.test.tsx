@@ -38,8 +38,8 @@ describe("DailyOutlook", () => {
         renderWithProviders(<DailyOutlook forecast={TWO_DAYS} />);
         const days = screen.getAllByRole("listitem");
 
-        expect(within(days[0] ?? document.createElement("li")).getByText("31%")).toBeInTheDocument();
-        expect(within(days[1] ?? document.createElement("li")).queryByText(/%/)).not.toBeInTheDocument();
+        expect(within(days[0] ?? document.createElement("li")).getByText("31% rain")).toBeVisible();
+        expect(within(days[1] ?? document.createElement("li")).getByText(/%/)).not.toBeVisible();
     });
 
     it("opens that day's hours when a day is clicked", async () => {

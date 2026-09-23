@@ -1,4 +1,5 @@
 import type { BACKTEST_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
+import type { WeatherState } from "./weather";
 
 export type Variable = (typeof VARIABLES)[number];
 export type VariableKey = Variable["key"];
@@ -70,8 +71,7 @@ export interface DailyRow {
     high: number;
     low: number;
     rain: number;
-    amount: number;
-    cloud: number;
+    state: WeatherState;
 }
 
 export interface Summary {

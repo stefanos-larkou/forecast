@@ -1,5 +1,6 @@
 import { HOURS_AHEAD_SHOWN } from "../constants";
 import type { DailyRow, Forecast, HourlyRow } from "../models/summary";
+import { weatherState } from "./weather";
 
 export function hourlyRows(forecast: Forecast): HourlyRow[] {
     return forecast.hours.flatMap((at, index) => {
@@ -27,6 +28,10 @@ export function upcomingRows(rows: HourlyRow[], now: Date): HourlyRow[] {
     return rows.slice(from, from + HOURS_AHEAD_SHOWN);
 }
 
+function mean(values: number[]): number {
+    return values.reduce((total, value) => total + value, 0) / values.length;
+}
+
 function dayOf(row: HourlyRow): string {
     return new Date(row.at).toDateString();
 }
@@ -40,8 +45,12 @@ export function dailyRows(rows: HourlyRow[]): DailyRow[] {
             high: Math.max(...temperatures),
             low: Math.min(...temperatures),
             rain: Math.max(...hours.map(hour => hour.rain)),
-            amount: Math.max(...hours.map(hour => hour.amount)),
-            cloud: hours.reduce((total, hour) => total + hour.cloud, 0) / hours.length
+            state: weatherState({
+                rain: mean(hours.map(hour => hour.rain)),
+                amount: mean(hours.map(hour => hour.amount)),
+                cloud: mean(hours.map(hour => hour.cloud)),
+                temperature: mean(temperatures)
+            })
         };
     });
 }
