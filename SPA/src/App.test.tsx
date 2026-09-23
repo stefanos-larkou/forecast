@@ -3,7 +3,7 @@ import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { App } from "./App";
-import { PLACE, SUMMARY_URL } from "./core/constants";
+import { BACKTEST_HEADING, PLACE, SUMMARY_URL } from "./core/constants";
 import { SUMMARY } from "./test-fixtures";
 import { renderWithProviders } from "./test-utils";
 
@@ -24,7 +24,7 @@ describe("App", () => {
 
         expect(await screen.findByRole("heading", { level: 1, name: PLACE })).toBeInTheDocument();
         expect(await screen.findByText("Snapshots")).toBeInTheDocument();
-        expect(await screen.findByRole("heading", { level: 3, name: "Temperature" })).toBeInTheDocument();
+        expect(await screen.findByRole("heading", { level: 2, name: BACKTEST_HEADING })).toBeInTheDocument();
     });
 
     it("tells the reader when the latest figures could not be loaded", async () => {

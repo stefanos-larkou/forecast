@@ -8,6 +8,10 @@ export const BACKTEST_HEADING = "Error by how far ahead the forecast looks";
 export const AMOUNT_HEADING = "How much falls in a wet hour";
 export const AMOUNT_CAPTION = "Mean absolute error in millimetres over wet hours only, against ERA5. The amount model answers how much falls given that it does.";
 export const LEAD_HEADER = "Hours Ahead";
+export const CROSSOVER_HEADING = "When forecasting stops beating the long-term average";
+export const CROSSOVER_CAPTION = "Climatology is what 30 years of ERA5 say about that day and hour. A bar that runs the whole way never loses to it within six days.";
+export const CROSSOVER_BEYOND = "Beyond";
+export const CROSSOVER_LIMIT = 168;
 export const PAGE_MAX_WIDTH = 1100;
 export const CHART_HEIGHT = 40;
 export const HOURS_AHEAD_SHOWN = 24;
@@ -54,14 +58,24 @@ export const BACKTEST_SERIES = [
     { key: "ecmwf_ifs025 raw", label: "ECMWF", colour: "ecmwf", role: "model", dash: [] },
     { key: "gfs_seamless raw", label: "GFS", colour: "gfs", role: "model", dash: [] },
     { key: "icon_seamless raw", label: "ICON", colour: "icon", role: "model", dash: [] },
-    { key: "climatology", label: "climatology", colour: "reference", role: "baseline", dash: [6, 4] },
-    { key: "persisted", label: "persistence", colour: "reference", role: "baseline", dash: [2, 3] }
+    { key: "climatology", label: "Climatology", colour: "reference", role: "baseline", dash: [6, 4] },
+    { key: "persisted", label: "Persistence", colour: "reference", role: "baseline", dash: [2, 3] }
 ] as const;
 
 export const AMOUNT_SERIES = [
     { key: "boosted", label: "gbm_blend", colour: "ours", role: "ours", dash: [] },
-    { key: "typical", label: "a typical wet hour", colour: "reference", role: "baseline", dash: [6, 4] },
-    { key: "models", label: "the three models", colour: "ecmwf", role: "model", dash: [] }
+    { key: "typical", label: "Typical Wet Hour", colour: "reference", role: "baseline", dash: [6, 4] },
+    { key: "models", label: "The Three Models", colour: "ecmwf", role: "model", dash: [] }
+] as const;
+
+export const CROSSOVER_SERIES = [
+    { key: "boosted", label: "gbm_blend", colour: "ours" },
+    { key: "ecmwf_ifs025 corrected", label: "ECMWF corrected", colour: "ecmwf" },
+    { key: "ecmwf_ifs025 raw", label: "ECMWF", colour: "ecmwf" },
+    { key: "gfs_seamless corrected", label: "GFS corrected", colour: "gfs" },
+    { key: "gfs_seamless raw", label: "GFS", colour: "gfs" },
+    { key: "icon_seamless corrected", label: "ICON corrected", colour: "icon" },
+    { key: "icon_seamless raw", label: "ICON", colour: "icon" }
 ] as const;
 
 export const SERIES_LINE_WIDTHS = { ours: 3, model: 1.5, baseline: 1.5 } as const;

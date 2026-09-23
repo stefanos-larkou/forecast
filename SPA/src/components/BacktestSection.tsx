@@ -5,6 +5,7 @@ import { formatCount, formatMonth } from "../core/utils/format";
 import { ChartGrid } from "./ChartGrid";
 import { ErrorByLeadChart } from "./ErrorByLeadChart";
 import { RainAmountChart } from "./RainAmountChart";
+import { SkillHorizon } from "./SkillHorizon";
 
 export default function BacktestSection({ backtest }: { backtest: Backtest; }) {
     return (
@@ -21,6 +22,7 @@ export default function BacktestSection({ backtest }: { backtest: Backtest; }) {
                 <RainAmountChart amount={backtest.rain.amount} />
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>{AMOUNT_CAPTION}</Typography>
             </Box>
+            <SkillHorizon backtest={backtest} />
         </Box>
     );
 }

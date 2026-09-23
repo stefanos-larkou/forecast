@@ -16,7 +16,7 @@ const DATASETS = CONFIG.data.datasets;
 
 describe("errorByLeadConfig", () => {
     it("draws one line per series, in legend order, each in its palette colour", () => {
-        expect(DATASETS.map(dataset => dataset.label)).toEqual(["gbm_blend", "ECMWF", "GFS", "ICON", "climatology", "persistence"]);
+        expect(DATASETS.map(dataset => dataset.label)).toEqual(["gbm_blend", "ECMWF", "GFS", "ICON", "Climatology", "Persistence"]);
         expect(DATASETS.map(dataset => dataset.borderColor)).toEqual(["orange", "blue", "green", "purple", "grey", "grey"]);
     });
 
@@ -41,7 +41,7 @@ describe("errorByLeadTable", () => {
         const table = errorByLeadTable(SUMMARY.backtest, TEMPERATURE);
 
         expect(table.rowHeader).toBe("Hours Ahead");
-        expect(table.columns).toEqual(["gbm_blend", "ECMWF", "GFS", "ICON", "climatology", "persistence"]);
+        expect(table.columns).toEqual(["gbm_blend", "ECMWF", "GFS", "ICON", "Climatology", "Persistence"]);
         expect(table.rows).toEqual([
             { header: "24", values: ["0.72", "1.22", "0.90", "0.94", "1.49", "1.09"] },
             { header: "48", values: ["0.75", "1.35", "0.94", "0.96", "1.49", "1.49"] }

@@ -1,4 +1,4 @@
-import type { AMOUNT_SERIES, BACKTEST_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
+import type { AMOUNT_SERIES, BACKTEST_SERIES, CROSSOVER_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
 import type { WeatherState } from "./weather";
 
 export type Variable = (typeof VARIABLES)[number];
@@ -8,6 +8,8 @@ export type SeriesKey = (typeof BACKTEST_SERIES)[number]["key"];
 export type SeriesErrors = Record<SeriesKey, number[]>;
 export type AmountKey = (typeof AMOUNT_SERIES)[number]["key"];
 export type AmountErrors = Record<AmountKey, number[]>;
+export type CrossoverKey = (typeof CROSSOVER_SERIES)[number]["key"];
+export type Crossover = Record<CrossoverKey, number | null>;
 
 export interface Coordinates {
     latitude: number;
@@ -49,6 +51,7 @@ export interface Backtest {
     forecasts: number;
     leads: number[];
     metrics: BacktestMetrics;
+    crossover: Record<VariableKey, Crossover>;
     rain: { amount: RainAmount; };
 }
 

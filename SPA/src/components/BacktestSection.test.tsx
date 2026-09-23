@@ -11,7 +11,7 @@ describe("BacktestSection", () => {
 
         const titles = screen.getAllByRole("heading", { level: 3 }).map(heading => heading.textContent);
         expect(screen.getByRole("heading", { level: 2, name: BACKTEST_HEADING })).toBeInTheDocument();
-        expect(titles).toEqual(["Temperature", "Humidity", "Wind Speed", "Cloud Cover", AMOUNT_HEADING]);
+        expect(titles.slice(0, 5)).toEqual(["Temperature", "Humidity", "Wind Speed", "Cloud Cover", AMOUNT_HEADING]);
         expect(screen.getAllByRole("img")).toHaveLength(5);
     });
 

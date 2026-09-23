@@ -1,5 +1,5 @@
-import { AMOUNT_SERIES, BACKTEST_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
-import type { AmountErrors, Backtest, Coordinates, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, RainAmount, SeriesErrors, Summary, VariableKey } from "../models/summary";
+import { AMOUNT_SERIES, BACKTEST_SERIES, CROSSOVER_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
+import type { AmountErrors, Backtest, Coordinates, Crossover, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, RainAmount, SeriesErrors, Summary, VariableKey } from "../models/summary";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -60,6 +60,15 @@ function isRainAmount(value: unknown): value is RainAmount {
         && isAmountErrors(value.skill, value.leads.length);
 }
 
+function isCrossover(value: unknown): value is Crossover {
+    return isRecord(value)
+        && CROSSOVER_SERIES.every(({ key }) => value[key] === null || (Number.isInteger(value[key]) && Number(value[key]) > 0));
+}
+
+function isCrossovers(value: unknown): value is Record<VariableKey, Crossover> {
+    return isRecord(value) && VARIABLES.every(({ key }) => isCrossover(value[key]));
+}
+
 function isHours(value: unknown): value is string[] {
     return Array.isArray(value) && value.length > 0 && value.every(hour => typeof hour === "string");
 }
@@ -92,6 +101,7 @@ function isBacktest(value: unknown): value is Backtest {
         && isLeads(value.leads)
         && isRecord(value.metrics)
         && isErrors(value.metrics.mae, value.leads.length)
+        && isCrossovers(value.crossover)
         && isRecord(value.rain)
         && isRainAmount(value.rain.amount);
 }

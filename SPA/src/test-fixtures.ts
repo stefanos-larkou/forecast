@@ -39,6 +39,12 @@ export const SUMMARY: Summary = {
         to: "2026-09",
         forecasts: 322096,
         leads: [24, 48],
+        crossover: {
+            temperature_2m: { "boosted": null, "ecmwf_ifs025 corrected": null, "ecmwf_ifs025 raw": 144, "gfs_seamless corrected": null, "gfs_seamless raw": null, "icon_seamless corrected": null, "icon_seamless raw": null },
+            relative_humidity_2m: { "boosted": null, "ecmwf_ifs025 corrected": 120, "ecmwf_ifs025 raw": 24, "gfs_seamless corrected": 144, "gfs_seamless raw": 24, "icon_seamless corrected": 72, "icon_seamless raw": 24 },
+            wind_speed_10m: { "boosted": null, "ecmwf_ifs025 corrected": 96, "ecmwf_ifs025 raw": 96, "gfs_seamless corrected": 24, "gfs_seamless raw": 24, "icon_seamless corrected": 120, "icon_seamless raw": 24 },
+            cloud_cover: { "boosted": null, "ecmwf_ifs025 corrected": null, "ecmwf_ifs025 raw": null, "gfs_seamless corrected": 96, "gfs_seamless raw": 144, "icon_seamless corrected": 48, "icon_seamless raw": 96 }
+        },
         rain: {
             amount: {
                 leads: [24, 48],
