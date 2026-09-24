@@ -6,10 +6,10 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from constants import AMOUNT_DECIMALS, BACKFILL_DIR, BAND_VARIABLE, BLEND_MODEL, BYTES_PER_KB, CLIMATE_DIR, CURRENT_MODEL_FILE, FORECASTS_DIR, INTERVALS_DIR, JSON_INDENT, LOCATION, METADATA_FILE, MODELS_DIR, OBSERVATIONS_DIR, PREDICTIONS_DIR, RELIABILITY_METHODS, SCORING_KEY, SUMMARY_DECIMALS, SUMMARY_FILE
+from constants import AMOUNT_DECIMALS, BACKFILL_DIR, BAND_LEVEL, BAND_VARIABLE, BLEND_MODEL, BYTES_PER_KB, CLIMATE_DIR, CURRENT_MODEL_FILE, FORECASTS_DIR, INTERVALS_DIR, JSON_INDENT, LOCATION, METADATA_FILE, MODELS_DIR, OBSERVATIONS_DIR, PREDICTIONS_DIR, RELIABILITY_METHODS, SCORING_KEY, SUMMARY_DECIMALS, SUMMARY_FILE
 from model.training import load_training_data
 from model.tune import validation_months
-from scoring import precipitation
+from scoring import intervals, precipitation
 from scoring.baselines import climatology
 from scoring.evaluate import boosted_forecasts, fold_starts, score
 
@@ -43,6 +43,22 @@ def build_amount(prepared: pd.DataFrame) -> dict:
         "typical_mm": round(float(scored["typical"].median()), AMOUNT_DECIMALS),
         "mae": {method: rounded(errors[method]) for method in errors.columns},
         "skill": {method: rounded(skill[method]) for method in skill.columns}
+    }
+
+
+def build_coverage(trained: pd.DataFrame) -> dict:
+    starts = intervals.coverage_starts(trained)
+    print(f"Scoring the band on {len(starts)} folds from {starts[0]}:", flush=True)
+    checked = intervals.held_out_bands(trained)
+    inside = intervals.coverage(checked)
+
+    return {
+        "from": str(starts[0]),
+        "to": str(starts[-1]),
+        "forecasts": len(checked),
+        "level": round(BAND_LEVEL, SUMMARY_DECIMALS),
+        "leads": [int(lead) for lead in inside.columns],
+        "inside": {variable: rounded(inside.loc[variable]) for variable in inside.index}
     }
 
 
@@ -81,6 +97,7 @@ def build_backtest() -> dict:
 
     print("Scoring precipitation:", flush=True)
     rain = build_rain(forecasts, observations, history)
+    coverage = build_coverage(trained)
 
     print(f"Backtest built in {time.perf_counter() - began:.0f}s", flush=True)
 
@@ -95,7 +112,8 @@ def build_backtest() -> dict:
             for metric in table.index.get_level_values("metric").unique()
         },
         "crossover": {variable: crossover(table, variable) for variable in variables},
-        "rain": rain
+        "rain": rain,
+        "coverage": coverage
     }
 
 

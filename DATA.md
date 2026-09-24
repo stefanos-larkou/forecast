@@ -59,6 +59,10 @@ A band pairs with its prediction on `location`, `run_time`, `valid_time`, `lead_
 - **Written in the same run as the prediction, or not at all.** A prediction without an interval
   file was made by a model that had no interval models yet, no band is ever added later.
 - **Edges stay within what is physically possible**, like the predictions.
+- **The band holds about as often as it promises.** Backtested on held-out data - calibrated on one
+  stretch, checked on the next - the share of outcomes inside it runs 87 to 88% for temperature and
+  89 to 91% for the other three, at every lead from 24 to 144 hours. `data/summary.json` carries the
+  figures under `backtest.coverage`.
 
 ## Variables
 

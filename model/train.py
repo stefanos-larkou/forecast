@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from constants import AMOUNT_MODEL_FILE, AMOUNT_QUANTILE, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, HYPERPARAMETERS, JSON_INDENT, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODEL_VERSION_FORMAT, MODELS_DIR, OVERWRITE, PROMOTION_TOLERANCE, RAIN_AMOUNT_VARIABLE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
+from constants import AMOUNT_MODEL_FILE, AMOUNT_QUANTILE, BAND_LEVEL, BYTES_PER_KB, CALIBRATION_MONTHS, CURRENT_MODEL_FILE, FEATURE_COLUMNS, HYPERPARAMETERS, JSON_INDENT, LOWER_MODEL_FILE, LOWER_QUANTILE, MAE_VARIABLES, METADATA_FILE, MODEL_FILE, MODEL_FORMAT, MODEL_VERSION_FORMAT, MODELS_DIR, OVERWRITE, PROMOTION_TOLERANCE, RAIN_AMOUNT_VARIABLE, RAIN_MODEL_FILE, RAIN_VARIABLE, SCORING_KEY, TRAINING_WINDOW_MONTHS, UPPER_MODEL_FILE, UPPER_QUANTILE, WET_HOUR_MM
 from model import gbm
 from model.training import load_training_data
 from scoring.evaluate import boosted_forecasts
@@ -102,9 +102,12 @@ def fit_amount_model(window: pd.DataFrame) -> tuple[list[dict], int]:
     return trees, len(rows)
 
 
+def conformal_scores(target: pd.Series, lower: np.ndarray, upper: np.ndarray) -> pd.Series:
+    return pd.Series(np.maximum(lower - target, target - upper), index=target.index)
+
+
 def conformal_margin(scores: pd.Series) -> float:
-    coverage = UPPER_QUANTILE - LOWER_QUANTILE
-    level = min(1.0, np.ceil((len(scores) + 1) * coverage) / len(scores))
+    level = min(1.0, np.ceil((len(scores) + 1) * BAND_LEVEL) / len(scores))
     return float(np.quantile(scores, level, method="higher"))
 
 
@@ -118,7 +121,7 @@ def calibrate(calibration: pd.DataFrame, lower_models: dict[str, list[dict]], up
         lower = gbm.predict(lower_models[variable], features)
         upper = gbm.predict(upper_models[variable], features)
 
-        scores = pd.Series(np.maximum(lower - rows["target"], rows["target"] - upper), index=rows.index)
+        scores = conformal_scores(rows["target"], lower, upper)
         margins[variable] = {str(lead): conformal_margin(group) for lead, group in scores.groupby(rows["lead_hours"])}
         print(f"  {variable}: {(scores <= 0).mean():.1%} inside the uncalibrated band, margins {margins[variable]}", flush=True)
 
