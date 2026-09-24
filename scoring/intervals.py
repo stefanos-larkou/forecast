@@ -80,7 +80,7 @@ def main() -> None:
     print(f"\nShare of outcomes inside the {LOWER_QUANTILE:.0%} to {UPPER_QUANTILE:.0%} band, calibrated on the {CALIBRATION_MONTHS} months before each fold and checked on the fold itself")
     print(coverage(checked).round(COVERAGE_DECIMALS).to_string())
 
-    print(f"\nMean band width, in each variable's own units")
+    print("\nMean band width, in each variable's own units")
     widths = checked["width"].groupby([checked["variable"], checked["lead_hours"]], observed=True).mean().unstack()
     print(widths.round(COVERAGE_DECIMALS).to_string())
 

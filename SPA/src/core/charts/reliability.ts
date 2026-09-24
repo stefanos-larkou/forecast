@@ -1,11 +1,14 @@
-import { Chart, type ChartConfiguration } from "chart.js";
+import { type ChartConfiguration } from "chart.js";
 import { LOCALE, RAIN_VARIABLE, RELIABILITY_DOT_DIVISOR, RELIABILITY_DOT_MAX, RELIABILITY_DOT_MIN, RELIABILITY_FORECAST_AXIS, RELIABILITY_HONEST, RELIABILITY_HOURS, RELIABILITY_HOURS_COLUMN, RELIABILITY_OBSERVED_AXIS, RELIABILITY_ROW_HEADER, RELIABILITY_SERIES, SERIES_LINE_WIDTHS } from "../constants";
 import type { ChartStyle, ChartTable } from "../models/charts";
 import type { Rain, ReliabilityBin } from "../models/summary";
 import { formatCount, formatMeasurement } from "../utils/format";
+import { seriesLegend } from "./lead-chart";
 
 const HONEST_DASH = [4, 3];
-const HONEST_LINE: { x: number, y: number; }[] = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
+const NONE = 0;
+const ALL = 1;
+const HONEST_LINE = [{ x: NONE, y: NONE }, { x: ALL, y: ALL }];
 
 function dotRadius(hours: number): number {
     return Math.max(RELIABILITY_DOT_MIN, Math.min(RELIABILITY_DOT_MAX, Math.sqrt(hours) / RELIABILITY_DOT_DIVISOR));
@@ -50,15 +53,7 @@ export function reliabilityConfig(rain: Rain, style: ChartStyle): ChartConfigura
             locale: LOCALE,
             color: style.text,
             plugins: {
-                legend: {
-                    labels: {
-                        font,
-                        usePointStyle: true,
-                        pointStyle: "line",
-                        generateLabels: chart => Chart.defaults.plugins.legend.labels.generateLabels(chart)
-                            .map((item, index) => ({ ...item, lineDash: index < RELIABILITY_SERIES.length ? [...(RELIABILITY_SERIES[index]?.dash ?? [])] : HONEST_DASH }))
-                    }
-                },
+                legend: { labels: seriesLegend(font, [...RELIABILITY_SERIES.map(series => series.dash), HONEST_DASH]) },
                 tooltip: {
                     titleFont: font,
                     bodyFont: font,
@@ -75,15 +70,15 @@ export function reliabilityConfig(rain: Rain, style: ChartStyle): ChartConfigura
             scales: {
                 x: {
                     type: "linear",
-                    min: 0,
-                    max: 1,
+                    min: NONE,
+                    max: ALL,
                     ticks: { font, callback: value => chance(Number(value)) },
                     title: { display: true, text: RELIABILITY_FORECAST_AXIS, font },
                     grid: { display: false }
                 },
                 y: {
-                    min: 0,
-                    max: 1,
+                    min: NONE,
+                    max: ALL,
                     ticks: { font, callback: value => chance(Number(value)) },
                     title: { display: true, text: RELIABILITY_OBSERVED_AXIS, font },
                     grid: { color: style.grid }

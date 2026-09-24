@@ -8,6 +8,11 @@ export const BACKTEST_HEADING = "Error by how far ahead the forecast looks";
 export const AMOUNT_HEADING = "How much falls in a wet hour";
 export const AMOUNT_CAPTION = "Mean absolute error in millimetres over wet hours only, against ERA5. The amount model answers how much falls given that it does.";
 export const LEAD_HEADER = "Hours Ahead";
+export const LEAD_TOOLTIP = "hours ahead";
+export const ERROR_AXIS = "Mean Absolute Error";
+export const AMOUNT_AXIS = "Mean Absolute Error (mm)";
+export const REFERENCE_DASH = [6, 4] as const;
+export const PERSISTENCE_DASH = [2, 3] as const;
 export const CROSSOVER_HEADING = "When forecasting stops beating the long-term average";
 export const CROSSOVER_CAPTION = "Climatology is what 30 years of ERA5 say about that day and hour. A bar that runs the whole way never loses to it within six days.";
 export const CROSSOVER_BEYOND = "Beyond";
@@ -80,21 +85,21 @@ export const BACKTEST_SERIES = [
     { key: "ecmwf_ifs025 raw", label: "ECMWF", colour: "ecmwf", role: "model", dash: [] },
     { key: "gfs_seamless raw", label: "GFS", colour: "gfs", role: "model", dash: [] },
     { key: "icon_seamless raw", label: "ICON", colour: "icon", role: "model", dash: [] },
-    { key: "climatology", label: "Climatology", colour: "reference", role: "baseline", dash: [6, 4] },
-    { key: "persisted", label: "Persistence", colour: "reference", role: "baseline", dash: [2, 3] }
+    { key: "climatology", label: "Climatology", colour: "reference", role: "baseline", dash: REFERENCE_DASH },
+    { key: "persisted", label: "Persistence", colour: "reference", role: "baseline", dash: PERSISTENCE_DASH }
 ] as const;
 
 export const AMOUNT_SERIES = [
     { key: "boosted", label: "gbm_blend", colour: "ours", role: "ours", dash: [] },
-    { key: "typical", label: "Typical Wet Hour", colour: "reference", role: "baseline", dash: [6, 4] },
+    { key: "typical", label: "Typical Wet Hour", colour: "reference", role: "baseline", dash: REFERENCE_DASH },
     { key: "models", label: "The Three Models", colour: "ecmwf", role: "model", dash: [] }
 ] as const;
 
 export const RAIN_SKILL_SERIES = [
     { key: "boosted", label: "gbm_blend", colour: "ours", role: "ours", dash: [] },
     { key: "models", label: "The Three Models", colour: "ecmwf", role: "model", dash: [] },
-    { key: "climatology", label: "Climatology", colour: "reference", role: "baseline", dash: [6, 4] },
-    { key: "persisted", label: "Persistence", colour: "reference", role: "baseline", dash: [2, 3] }
+    { key: "climatology", label: "Climatology", colour: "reference", role: "baseline", dash: REFERENCE_DASH },
+    { key: "persisted", label: "Persistence", colour: "reference", role: "baseline", dash: PERSISTENCE_DASH }
 ] as const;
 
 export const RELIABILITY_SERIES = [
