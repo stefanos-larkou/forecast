@@ -36,6 +36,10 @@ export const TABLE_COVERS: Record<string, string> = {
     "data/observations": "ERA5 truth, one file a day",
     "data/climate": "ERA5 1994-2023, the climatology baseline"
 };
+export const CREDIT_LEAD = "Weather data by";
+export const CREDIT_SOURCE = "Open-Meteo.com";
+export const CREDIT_SOURCE_URL = "https://open-meteo.com";
+export const CREDIT_LICENCE = ", CC BY 4.0. Truth is ERA5 reanalysis.";
 export const RAIN_SECTION = "Rain";
 export const RAIN_HEADING = "Chance of rain, can it be trusted?";
 export const RAIN_WET_SHARE = "of hours were wet";
