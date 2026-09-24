@@ -5,8 +5,9 @@ import time
 from datetime import datetime, timezone
 
 import pandas as pd
+from pyarrow import parquet
 
-from constants import AMOUNT_DECIMALS, BACKFILL_DIR, BAND_LEVEL, BAND_VARIABLE, BLEND_MODEL, BYTES_PER_KB, CLIMATE_DIR, CURRENT_MODEL_FILE, FORECASTS_DIR, INTERVALS_DIR, JSON_INDENT, LOCATION, METADATA_FILE, MODELS_DIR, OBSERVATIONS_DIR, PREDICTIONS_DIR, RELIABILITY_METHODS, SCORING_KEY, SUMMARY_DECIMALS, SUMMARY_FILE
+from constants import AMOUNT_DECIMALS, BACKFILL_DIR, BAND_LEVEL, BAND_VARIABLE, BLEND_MODEL, BYTES_PER_KB, CLIMATE_DIR, CURRENT_MODEL_FILE, FORECASTS_DIR, INTERVALS_DIR, JSON_INDENT, LOCATION, METADATA_FILE, MODELS_DIR, OBSERVATIONS_DIR, PARQUET_GLOB, PREDICTIONS_DIR, RELIABILITY_METHODS, SCORING_KEY, STORED_TABLES, SUMMARY_DECIMALS, SUMMARY_FILE
 from model.training import load_training_data
 from model.tune import validation_months
 from scoring import intervals, precipitation
@@ -155,7 +156,20 @@ def build_live(predictions: pd.DataFrame, intervals: pd.DataFrame) -> dict:
 
 
 def read_table(directory: Path) -> pd.DataFrame:
-    return pd.read_parquet(directory) if any(directory.rglob("*.parquet")) else pd.DataFrame()
+    return pd.read_parquet(directory) if any(directory.rglob(PARQUET_GLOB)) else pd.DataFrame()
+
+
+def count_table(directory: Path) -> dict:
+    files = sorted(directory.rglob(PARQUET_GLOB))
+    return {
+        "name": directory.as_posix(),
+        "rows": sum(parquet.read_metadata(path).num_rows for path in files),
+        "files": len(files)
+    }
+
+
+def build_tables() -> list[dict]:
+    return [count_table(directory) for directory in STORED_TABLES]
 
 
 def main() -> None:
@@ -178,6 +192,7 @@ def main() -> None:
         "model": current_model(),
         "live": build_live(predictions, intervals),
         "forecast": build_forecast(predictions, intervals),
+        "tables": build_tables(),
         "backtest": backtest
     }
 

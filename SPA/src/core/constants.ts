@@ -20,6 +20,22 @@ export const CROSSOVER_LIMIT = 168;
 export const COVERAGE_HEADING = "Does the 90% band hold 90% of the time?";
 export const COVERAGE_CAPTION = "Measured on held-out data: the band is calibrated on one stretch and checked on the next, so nothing here helped set its own width. A band needs fifteen months behind it where an error score needs twelve, so this starts one fold later than the backtest above. The dashed line is the level it aims for.";
 export const COVERAGE_SECTION = "Intervals";
+export const EXPLORE_ROWS = "rows";
+export const EXPLORE_FILES = "files";
+export const EXPLORE_HEADING = "Every forecast ever saved";
+export const EXPLORE_LEAD = "Every table below is committed to the repository as Parquet, one file per snapshot or per day, and these counts are read from those files.";
+export const TABLE_COLUMN = "Table";
+export const ROWS_COLUMN = "Rows";
+export const FILES_COLUMN = "Files";
+export const COVERS_COLUMN = "Covers";
+export const TABLE_COVERS: Record<string, string> = {
+    "data/forecasts": "live snapshots of all three models, four a day",
+    "data/predictions": "gbm_blend, one file per snapshot",
+    "data/intervals": "the 90% band, since the model gained one",
+    "data/backfill": "archived forecasts, 1 to 7 days ahead",
+    "data/observations": "ERA5 truth, one file a day",
+    "data/climate": "ERA5 1994-2023, the climatology baseline"
+};
 export const RAIN_SECTION = "Rain";
 export const RAIN_HEADING = "Chance of rain, can it be trusted?";
 export const RAIN_WET_SHARE = "of hours were wet";

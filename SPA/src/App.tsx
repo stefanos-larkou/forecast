@@ -2,6 +2,7 @@ import { Suspense, lazy, useState } from "react";
 import { Alert, Box, Skeleton } from "@mui/material";
 import { BacktestLoading } from "./components/BacktestLoading";
 import { CurrentConditions } from "./components/CurrentConditions";
+import { DataInventory } from "./components/DataInventory";
 import { PreviewBar } from "./components/PreviewBar";
 import { StatusStrip } from "./components/StatusStrip";
 import { PAGE_MAX_WIDTH } from "./core/constants";
@@ -39,6 +40,7 @@ export function App() {
                         <Suspense fallback={<BacktestLoading />}>
                             <BacktestSection backtest={shown.backtest} />
                         </Suspense>
+                        <DataInventory tables={shown.tables} />
                     </Box>
                 </>
             )}

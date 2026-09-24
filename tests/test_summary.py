@@ -1,6 +1,8 @@
+from pathlib import Path
+
 import pandas as pd
 
-from scoring.summary import build_forecast
+from scoring.summary import build_forecast, count_table
 
 
 def predictions_frame() -> pd.DataFrame:
@@ -50,3 +52,22 @@ def test_the_band_is_the_same_run_and_variable_as_the_hero_line() -> None:
 
 def test_no_predictions_means_no_forecast() -> None:
     assert build_forecast(predictions_frame().iloc[:0], intervals_frame()) is None
+
+
+def test_a_table_is_counted_by_its_rows_and_its_files(tmp_path: Path) -> None:
+    directory = tmp_path / "things"
+    (directory / "2026" / "09").mkdir(parents=True)
+    pd.DataFrame({"value": [1, 2, 3]}).to_parquet(directory / "2026" / "09" / "first.parquet")
+    pd.DataFrame({"value": [4, 5]}).to_parquet(directory / "2026" / "09" / "second.parquet")
+
+    counted = count_table(directory)
+
+    assert counted["rows"] == 5
+    assert counted["files"] == 2
+
+
+def test_a_table_holding_nothing_counts_nothing(tmp_path: Path) -> None:
+    directory = tmp_path / "empty"
+    directory.mkdir()
+
+    assert count_table(directory) == {"name": directory.as_posix(), "rows": 0, "files": 0}

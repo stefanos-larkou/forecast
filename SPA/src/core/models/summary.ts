@@ -111,6 +111,12 @@ export interface DailyRow {
     state: WeatherState;
 }
 
+export interface StoredTable {
+    name: string;
+    rows: number;
+    files: number;
+}
+
 export interface Summary {
     generated_at: string;
     location: string;
@@ -118,5 +124,6 @@ export interface Summary {
     model: ModelVersion;
     live: LiveRecord;
     forecast: Forecast | null;
+    tables?: StoredTable[];
     backtest: Backtest;
 }

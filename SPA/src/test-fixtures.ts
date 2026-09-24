@@ -34,6 +34,10 @@ export const SUMMARY: Summary = {
         graded: 0
     },
     forecast: FORECAST,
+    tables: [
+        { name: "data/forecasts", rows: 60075, files: 26 },
+        { name: "data/backfill", rows: 2244757, files: 936 }
+    ],
     backtest: {
         from: "2025-03",
         to: "2026-09",
