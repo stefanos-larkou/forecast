@@ -59,6 +59,24 @@ export const SUMMARY: Summary = {
             }
         },
         rain: {
+            leads: [24, 48],
+            wet_share: 0.0552,
+            brier: {
+                boosted: [0.0372, 0.0377],
+                models: [0.035, 0.0369],
+                climatology: [0.0493, 0.0492],
+                persisted: [0.0825, 0.0884]
+            },
+            skill: {
+                boosted: [0.2449, 0.2329],
+                models: [0.2895, 0.2498],
+                climatology: [0, 0],
+                persisted: [-0.6744, -0.7977]
+            },
+            reliability: {
+                boosted: [[0.0153, 0.0205, 69361], [0.4423, 0.4869, 995], [0.967, 0.7857, 42]],
+                models: [[0, 0.0208, 73223], [0.3333, 0.2604, 4538], [1, 0.7178, 1017]]
+            },
             amount: {
                 leads: [24, 48],
                 wet_hours: 4443,

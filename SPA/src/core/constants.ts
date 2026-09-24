@@ -15,6 +15,23 @@ export const CROSSOVER_LIMIT = 168;
 export const COVERAGE_HEADING = "Does the 90% band hold 90% of the time?";
 export const COVERAGE_CAPTION = "Measured on held-out data: the band is calibrated on one stretch and checked on the next, so nothing here helped set its own width. A band needs fifteen months behind it where an error score needs twelve, so this starts one fold later than the backtest above. The dashed line is the level it aims for.";
 export const COVERAGE_SECTION = "Intervals";
+export const RAIN_SECTION = "Rain";
+export const RAIN_HEADING = "Chance of rain, can it be trusted?";
+export const RAIN_WET_SHARE = "of hours were wet";
+export const RAIN_SKILL_HEADING = "Brier skill against climatology";
+export const RAIN_SKILL_CAPTION = "Brier skill against climatology, over the same forecasts. Above zero beats it, below zero is worse.";
+export const RAIN_SKILL_AXIS = "Brier Skill";
+export const RELIABILITY_HEADING = "Forecast chance against what happened";
+export const RELIABILITY_CAPTION = "Of the hours given each chance, how many were actually wet. On the diagonal is honest, bigger dots are more hours.";
+export const RELIABILITY_HONEST = "Perfectly honest";
+export const RELIABILITY_FORECAST_AXIS = "Forecast Chance";
+export const RELIABILITY_OBSERVED_AXIS = "Share That Was Wet";
+export const RELIABILITY_HOURS = "hours";
+export const RELIABILITY_HOURS_COLUMN = "Hours";
+export const RELIABILITY_ROW_HEADER = "Model and Forecast Chance";
+export const RELIABILITY_DOT_MIN = 3;
+export const RELIABILITY_DOT_MAX = 9;
+export const RELIABILITY_DOT_DIVISOR = 30;
 export const COVERAGE_TARGET = "Target";
 export const COVERAGE_AXIS = "Share of Outcomes Inside the Band";
 export const PAGE_MAX_WIDTH = 1100;
@@ -71,6 +88,18 @@ export const AMOUNT_SERIES = [
     { key: "boosted", label: "gbm_blend", colour: "ours", role: "ours", dash: [] },
     { key: "typical", label: "Typical Wet Hour", colour: "reference", role: "baseline", dash: [6, 4] },
     { key: "models", label: "The Three Models", colour: "ecmwf", role: "model", dash: [] }
+] as const;
+
+export const RAIN_SKILL_SERIES = [
+    { key: "boosted", label: "gbm_blend", colour: "ours", role: "ours", dash: [] },
+    { key: "models", label: "The Three Models", colour: "ecmwf", role: "model", dash: [] },
+    { key: "climatology", label: "Climatology", colour: "reference", role: "baseline", dash: [6, 4] },
+    { key: "persisted", label: "Persistence", colour: "reference", role: "baseline", dash: [2, 3] }
+] as const;
+
+export const RELIABILITY_SERIES = [
+    { key: "boosted", label: "gbm_blend", colour: "ours", dash: [] },
+    { key: "models", label: "The Three Models", colour: "ecmwf", dash: [5, 4] }
 ] as const;
 
 export const CROSSOVER_SERIES = [

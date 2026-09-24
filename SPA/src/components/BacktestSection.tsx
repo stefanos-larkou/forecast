@@ -1,11 +1,13 @@
 import { Box, Typography } from "@mui/material";
-import { AMOUNT_CAPTION, BACKTEST_CAPTION, BACKTEST_HEADING, COVERAGE_CAPTION, COVERAGE_SECTION, VARIABLES } from "../core/constants";
+import { AMOUNT_CAPTION, BACKTEST_CAPTION, BACKTEST_HEADING, COVERAGE_CAPTION, COVERAGE_SECTION, RAIN_HEADING, RAIN_SECTION, RAIN_SKILL_CAPTION, RAIN_WET_SHARE, RELIABILITY_CAPTION, VARIABLES } from "../core/constants";
 import type { Backtest } from "../core/models/summary";
-import { formatCount, formatMonth } from "../core/utils/format";
+import { formatCount, formatMonth, formatShare } from "../core/utils/format";
 import { ChartGrid } from "./ChartGrid";
 import { CoverageChart } from "./CoverageChart";
 import { ErrorByLeadChart } from "./ErrorByLeadChart";
 import { RainAmountChart } from "./RainAmountChart";
+import { RainSkillChart } from "./RainSkillChart";
+import { ReliabilityChart } from "./ReliabilityChart";
 import { SkillHorizon } from "./SkillHorizon";
 
 export default function BacktestSection({ backtest }: { backtest: Backtest; }) {
@@ -20,8 +22,24 @@ export default function BacktestSection({ backtest }: { backtest: Backtest; }) {
             </ChartGrid>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>{BACKTEST_CAPTION}</Typography>
             <Box sx={{ mt: 4 }}>
-                <RainAmountChart amount={backtest.rain.amount} />
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>{AMOUNT_CAPTION}</Typography>
+                <Typography variant="overline" component="p" color="text.secondary">
+                    {`${RAIN_SECTION} \u00b7 ${formatShare(backtest.rain.wet_share)} ${RAIN_WET_SHARE}`}
+                </Typography>
+                <Typography variant="h2" sx={{ mb: 2 }}>{RAIN_HEADING}</Typography>
+                <Box sx={{ mb: 2 }}>
+                    <RainSkillChart rain={backtest.rain} />
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>{RAIN_SKILL_CAPTION}</Typography>
+                </Box>
+                <ChartGrid>
+                    <Box>
+                        <ReliabilityChart rain={backtest.rain} />
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>{RELIABILITY_CAPTION}</Typography>
+                    </Box>
+                    <Box>
+                        <RainAmountChart amount={backtest.rain.amount} />
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>{AMOUNT_CAPTION}</Typography>
+                    </Box>
+                </ChartGrid>
             </Box>
             <SkillHorizon backtest={backtest} />
             <Box sx={{ mt: 4 }}>
