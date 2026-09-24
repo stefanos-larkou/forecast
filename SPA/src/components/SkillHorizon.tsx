@@ -69,7 +69,7 @@ export function SkillHorizon({ backtest }: { backtest: Backtest; }) {
                     ))}
                 </Box>
             </Paper>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>{CROSSOVER_CAPTION}</Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary", mt: 2 }}>{CROSSOVER_CAPTION}</Typography>
         </Box>
     );
 }

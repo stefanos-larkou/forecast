@@ -13,12 +13,12 @@ export function DataInventory({ tables }: { tables?: StoredTable[]; }) {
 
     return (
         <Box component="section" sx={{ mt: 4 }}>
-            <Typography variant="overline" component="p" color="text.secondary">
+            <Typography variant="overline" component="p" sx={{ color: "text.secondary" }}>
                 {`${formatCount(rows)} ${EXPLORE_ROWS} \u00b7 ${formatCount(files)} ${EXPLORE_FILES}`}
             </Typography>
             <Typography variant="h2" sx={{ mb: 2 }}>{EXPLORE_HEADING}</Typography>
             <Paper variant="outlined" sx={{ p: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{EXPLORE_LEAD}</Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary", mb: 2 }}>{EXPLORE_LEAD}</Typography>
                 <TableContainer>
                     <Table size="small" aria-label={EXPLORE_HEADING}>
                         <TableHead>

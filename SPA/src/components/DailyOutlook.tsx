@@ -25,7 +25,7 @@ export function DailyOutlook({ forecast }: { forecast: Forecast; }) {
 
     return (
         <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
-            <Typography variant="overline" component="h2" color="text.secondary">The week ahead</Typography>
+            <Typography variant="overline" component="h2" sx={{ color: "text.secondary" }}>The week ahead</Typography>
             <ScrollStrip back="Earlier days" forward="Later days" spacing={0.5}>
                 {days.map((day, index) => (
                     <Box component="li" key={day.at} sx={{ flex: "0 0 auto", width: theme => theme.spacing(CARD_WIDTH) }}>

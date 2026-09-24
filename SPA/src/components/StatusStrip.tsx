@@ -33,7 +33,7 @@ export function StatusStrip({ summary }: { summary: Summary; }) {
             >
                 {items.map(({ label, value }) => (
                     <div key={label}>
-                        <Typography variant="overline" component="dt" color="text.secondary">{label}</Typography>
+                        <Typography variant="overline" component="dt" sx={{ color: "text.secondary" }}>{label}</Typography>
                         <Typography component="dd" sx={{ m: 0 }}>{value}</Typography>
                     </div>
                 ))}

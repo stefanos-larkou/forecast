@@ -5,7 +5,7 @@ import { ChartGrid } from "./ChartGrid";
 export function BacktestLoading() {
     return (
         <Box component="section" sx={{ mt: 4 }}>
-            <Typography variant="overline" component="p" color="text.secondary"><Skeleton width={280} /></Typography>
+            <Typography variant="overline" component="p" sx={{ color: "text.secondary" }}><Skeleton width={280} /></Typography>
             <Typography variant="h2" sx={{ mb: 2 }}>{BACKTEST_HEADING}</Typography>
             <ChartGrid>
                 {VARIABLES.map(variable => (
@@ -16,7 +16,7 @@ export function BacktestLoading() {
                         </Stack>
                         <Box sx={{ height: theme => theme.spacing(40), display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
                             <CircularProgress size={64} disableShrink />
-                            <Typography variant="body1" color="text.secondary">{variable.label}</Typography>
+                            <Typography variant="body1" sx={{ color: "text.secondary" }}>{variable.label}</Typography>
                         </Box>
                     </Paper>
                 ))}
