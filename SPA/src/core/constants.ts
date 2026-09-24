@@ -12,6 +12,11 @@ export const CROSSOVER_HEADING = "When forecasting stops beating the long-term a
 export const CROSSOVER_CAPTION = "Climatology is what 30 years of ERA5 say about that day and hour. A bar that runs the whole way never loses to it within six days.";
 export const CROSSOVER_BEYOND = "Beyond";
 export const CROSSOVER_LIMIT = 168;
+export const COVERAGE_HEADING = "Does the 90% band hold 90% of the time?";
+export const COVERAGE_CAPTION = "Measured on held-out data: the band is calibrated on one stretch and checked on the next, so nothing here helped set its own width. A band needs fifteen months behind it where an error score needs twelve, so this starts one fold later than the backtest above. The dashed line is the level it aims for.";
+export const COVERAGE_EYEBROW = "Intervals";
+export const COVERAGE_TARGET = "Target";
+export const COVERAGE_AXIS = "Share of Outcomes Inside the Band";
 export const PAGE_MAX_WIDTH = 1100;
 export const CHART_HEIGHT = 40;
 export const HOURS_AHEAD_SHOWN = 24;
@@ -77,6 +82,13 @@ export const CROSSOVER_SERIES = [
     { key: "icon_seamless corrected", label: "ICON corrected", colour: "icon" },
     { key: "icon_seamless raw", label: "ICON", colour: "icon" }
 ] as const;
+
+export const COVERAGE_COLOURS = {
+    temperature_2m: "ours",
+    relative_humidity_2m: "ecmwf",
+    wind_speed_10m: "gfs",
+    cloud_cover: "icon"
+} as const;
 
 export const SERIES_LINE_WIDTHS = { ours: 3, model: 1.5, baseline: 1.5 } as const;
 

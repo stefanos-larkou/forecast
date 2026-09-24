@@ -2,6 +2,7 @@ import { LOCALE } from "../constants";
 import type { ForecastVariableKey } from "../models/summary";
 
 const ERROR_DECIMALS = 2;
+const SHARE_DECIMALS = 1;
 
 const DATE = new Intl.DateTimeFormat(LOCALE, { day: "2-digit", month: "2-digit", year: "numeric" });
 const TIME = new Intl.DateTimeFormat(LOCALE, { hour: "2-digit", minute: "2-digit" });
@@ -9,6 +10,7 @@ const MONTH = new Intl.DateTimeFormat(LOCALE, { month: "long", year: "numeric", 
 const COUNT = new Intl.NumberFormat(LOCALE);
 const WEEKDAY = new Intl.DateTimeFormat(LOCALE, { weekday: "long" });
 const ERROR = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: ERROR_DECIMALS, maximumFractionDigits: ERROR_DECIMALS });
+const SHARE = new Intl.NumberFormat(LOCALE, { style: "percent", minimumFractionDigits: SHARE_DECIMALS, maximumFractionDigits: SHARE_DECIMALS });
 
 export function formatDate(timestamp: string): string {
     return DATE.format(new Date(timestamp));
@@ -50,4 +52,8 @@ export function formatMeasurement(variable: ForecastVariableKey, value: number):
 
 export function formatError(error: number): string {
     return ERROR.format(error);
+}
+
+export function formatShare(share: number): string {
+    return SHARE.format(share);
 }

@@ -45,6 +45,19 @@ export const SUMMARY: Summary = {
             wind_speed_10m: { "boosted": null, "ecmwf_ifs025 corrected": 96, "ecmwf_ifs025 raw": 96, "gfs_seamless corrected": 24, "gfs_seamless raw": 24, "icon_seamless corrected": 120, "icon_seamless raw": 24 },
             cloud_cover: { "boosted": null, "ecmwf_ifs025 corrected": null, "ecmwf_ifs025 raw": null, "gfs_seamless corrected": 96, "gfs_seamless raw": 144, "icon_seamless corrected": 48, "icon_seamless raw": 96 }
         },
+        coverage: {
+            from: "2025-06",
+            to: "2026-09",
+            forecasts: 78912,
+            level: 0.9,
+            leads: [24, 48],
+            inside: {
+                temperature_2m: [0.7917, 0.7969],
+                relative_humidity_2m: [0.8662, 0.8831],
+                wind_speed_10m: [0.9051, 0.9018],
+                cloud_cover: [0.8262, 0.8301]
+            }
+        },
         rain: {
             amount: {
                 leads: [24, 48],

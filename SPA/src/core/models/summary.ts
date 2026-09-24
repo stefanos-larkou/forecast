@@ -45,6 +45,15 @@ export interface RainAmount {
     skill: AmountErrors;
 }
 
+export interface Coverage {
+    from: string;
+    to: string;
+    forecasts: number;
+    level: number;
+    leads: number[];
+    inside: Record<VariableKey, number[]>;
+}
+
 export interface Backtest {
     from: string;
     to: string;
@@ -53,6 +62,7 @@ export interface Backtest {
     metrics: BacktestMetrics;
     crossover: Record<VariableKey, Crossover>;
     rain: { amount: RainAmount; };
+    coverage: Coverage;
 }
 
 export interface ForecastBand {
