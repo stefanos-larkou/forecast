@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { SUMMARY } from "../test-fixtures";
 import { renderWithProviders } from "../test-utils";
 import BacktestSection from "./BacktestSection";
-import { AMOUNT_CAPTION, AMOUNT_HEADING, BACKTEST_CAPTION, BACKTEST_HEADING, COVERAGE_CAPTION, COVERAGE_HEADING } from "../core/constants";
+import { AMOUNT_CAPTION, AMOUNT_HEADING, BACKTEST_CAPTION, BACKTEST_HEADING, COVERAGE_CAPTION, COVERAGE_HEADING, COVERAGE_SECTION } from "../core/constants";
 
 describe("BacktestSection", () => {
     it("gives every variable its own titled, labelled chart, in order", () => {
@@ -34,9 +34,10 @@ describe("BacktestSection", () => {
         expect(screen.getByText(AMOUNT_CAPTION)).toBeInTheDocument();
     });
 
-    it("asks whether the band holds, and says which window answered it", () => {
+    it("heads the intervals section with the question it answers and the window it covers", () => {
         renderWithProviders(<BacktestSection backtest={SUMMARY.backtest} />);
 
+        expect(screen.getByRole("heading", { level: 2, name: COVERAGE_SECTION })).toBeInTheDocument();
         expect(screen.getByRole("heading", { level: 3, name: COVERAGE_HEADING })).toBeInTheDocument();
         expect(screen.getByText(/78,912 forecasts, June 2025 - September 2026/)).toBeInTheDocument();
         expect(screen.getByText(COVERAGE_CAPTION)).toBeInTheDocument();
