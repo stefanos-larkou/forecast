@@ -1,0 +1,101 @@
+{
+    "version": "2026-09-24",
+    "format": 2,
+    "trained_at": "2026-09-24T15:01:30.546125+00:00",
+    "commit": "8a0dfc1233bc0841d7c8d1fb5da6efbd8331b8ae",
+    "training_window": {
+        "from": "2025-09-19T00:00:00+00:00",
+        "to": "2026-09-18T23:00:00+00:00"
+    },
+    "rows": {
+        "temperature_2m": 52371,
+        "relative_humidity_2m": 52431,
+        "wind_speed_10m": 52560,
+        "cloud_cover": 52126,
+        "precipitation": 52354,
+        "rain_amount": 3962
+    },
+    "features": [
+        "gfs_seamless",
+        "ecmwf_ifs025",
+        "icon_seamless",
+        "gfs_seamless_trailing_bias",
+        "ecmwf_ifs025_trailing_bias",
+        "icon_seamless_trailing_bias",
+        "spread",
+        "lead_hours",
+        "hour_sin",
+        "hour_cos",
+        "day_sin",
+        "day_cos"
+    ],
+    "hyperparameters": {
+        "tree_max_depth": 3,
+        "min_leaf_rows": 100,
+        "boosting_rounds": 200,
+        "learning_rate": 0.1,
+        "training_window_months": 12,
+        "lower_quantile": 0.05,
+        "upper_quantile": 0.95,
+        "calibration_months": 3,
+        "wet_hour_mm": 0.1
+    },
+    "quantile_training_window": {
+        "from": "2025-06-19T00:00:00+00:00",
+        "to": "2026-06-18T23:00:00+00:00"
+    },
+    "calibration_window": {
+        "from": "2026-06-19T00:00:00+00:00",
+        "to": "2026-09-18T23:00:00+00:00"
+    },
+    "conformal_margins": {
+        "temperature_2m": {
+            "24": 0.16434717324846781,
+            "48": 0.2383846075779581,
+            "72": 0.3691446208731426,
+            "96": 0.33165408009015945,
+            "120": 0.3444386954256219,
+            "144": 0.3837598081489477
+        },
+        "relative_humidity_2m": {
+            "24": 2.0019770099469447,
+            "48": 1.561705159331421,
+            "72": 2.064297295967711,
+            "96": 1.6393403254994823,
+            "120": 1.4516204230054532,
+            "144": 1.5935630984619653
+        },
+        "wind_speed_10m": {
+            "24": 0.6435107433111329,
+            "48": 0.8137833995703918,
+            "72": 0.9649009996007005,
+            "96": 0.9417599037463036,
+            "120": 1.043359835867772,
+            "144": 1.0372232387066331
+        },
+        "cloud_cover": {
+            "24": 0.737160077277758,
+            "48": 0.6594671969950472,
+            "72": 0.2807740774961367,
+            "96": 0.02036334052480749,
+            "120": 0.1431783228693364,
+            "144": 0.41120651945930575
+        }
+    },
+    "backtest": {
+        "until": "2026-09-18T23:00:00+00:00",
+        "mae": {
+            "cloud_cover": 16.5638332901197,
+            "relative_humidity_2m": 5.782719671419251,
+            "temperature_2m": 0.8378665077593411,
+            "wind_speed_10m": 3.3068209751694955
+        },
+        "forecasts": {
+            "cloud_cover": 80710,
+            "relative_humidity_2m": 81015,
+            "temperature_2m": 80955,
+            "wind_speed_10m": 81144
+        }
+    },
+    "promoted": true
+}
