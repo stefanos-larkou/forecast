@@ -3,10 +3,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from constants import ARCHIVE_API_URL, CLIMATE_DIR, CLIMATE_FIRST_YEAR, CLIMATE_LAST_YEAR, FETCHED_VARIABLES, HOURS_PER_DAY, LOCATION, SECONDS_BETWEEN_REQUESTS, TRUTH_MODEL
+from constants import ARCHIVE_API_URL, CLIMATE_DIR, CLIMATE_FIRST_YEAR, CLIMATE_LAST_YEAR, FETCHED_VARIABLES, LOCATION, SECONDS_BETWEEN_REQUESTS, TRUTH_MODEL, YEAR_FIRST_DAY, YEAR_LAST_DAY
 from schema import OBSERVATIONS
-from sources.observe import to_long
-from sources.openmeteo import fetch_hourly
+from sources.openmeteo import expected_observations, fetch_hourly, to_observations
 
 
 def year_path(year: int) -> Path:
@@ -19,10 +18,10 @@ def main() -> None:
 
     for year in missing:
         print(f"{year}: fetching...", end=" ", flush=True)
-        payload = fetch_hourly(ARCHIVE_API_URL, LOCATION, FETCHED_VARIABLES, models=TRUTH_MODEL, start_date=f"{year}-01-01", end_date=f"{year}-12-31")
-        df = to_long(payload, LOCATION)
+        payload = fetch_hourly(ARCHIVE_API_URL, LOCATION, FETCHED_VARIABLES, models=TRUTH_MODEL, start_date=f"{year}-{YEAR_FIRST_DAY}", end_date=f"{year}-{YEAR_LAST_DAY}")
+        df = to_observations(payload, LOCATION)
 
-        expected = pd.Timestamp(year=year, month=12, day=31).dayofyear * HOURS_PER_DAY * len(FETCHED_VARIABLES)
+        expected = expected_observations(pd.Timestamp(f"{year}-{YEAR_LAST_DAY}").dayofyear)
         if len(df) < expected:
             print(f"only {len(df)} of {expected} values. Not written.")
             continue

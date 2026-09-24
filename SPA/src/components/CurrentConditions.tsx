@@ -5,6 +5,7 @@ import { MUTED_ON_SKY, PAGE_MAX_WIDTH, PLACE, TWO_COLUMNS_FROM, variableLabel, W
 import type { Coordinates, Forecast } from "../core/models/summary";
 import { currentRow, hourlyRows } from "../core/utils/forecast";
 import { formatDateTime, formatMeasurement } from "../core/utils/format";
+import { evenColumns, responsiveColumns } from "../core/utils/layout";
 import { chanceLabel, isNight, weatherState } from "../core/utils/weather";
 import { HourlyStrip } from "./HourlyStrip";
 import { Sky } from "./Sky";
@@ -53,10 +54,7 @@ export function CurrentConditions({ forecast, where }: { forecast: Forecast, whe
                     <Box
                         component="dl"
                         sx={{
-                            display: "grid",
-                            gridTemplateColumns: "1fr",
-                            [`@media (min-width: ${TWO_COLUMNS_FROM}px)`]: { gridTemplateColumns: "repeat(2, 1fr)" },
-                            [`@media (min-width: ${FOUR_COLUMNS_FROM}px)`]: { gridTemplateColumns: "repeat(4, 1fr)" },
+                            ...responsiveColumns({ [TWO_COLUMNS_FROM]: evenColumns(2), [FOUR_COLUMNS_FROM]: evenColumns(4) }),
                             gap: 2,
                             mt: 2,
                             mb: 0

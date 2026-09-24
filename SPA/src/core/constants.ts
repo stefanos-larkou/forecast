@@ -54,6 +54,7 @@ export const RELIABILITY_OBSERVED_AXIS = "Share That Was Wet";
 export const RELIABILITY_HOURS = "hours";
 export const RELIABILITY_HOURS_COLUMN = "Hours";
 export const RELIABILITY_ROW_HEADER = "Model and Forecast Chance";
+export const RELIABILITY_BIN_PARTS = 3;
 export const RELIABILITY_DOT_MIN = 3;
 export const RELIABILITY_DOT_MAX = 9;
 export const RELIABILITY_DOT_DIVISOR = 30;

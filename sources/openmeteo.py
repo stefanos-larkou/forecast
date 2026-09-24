@@ -1,8 +1,11 @@
+import sys
 import time
 
+import pandas as pd
 import requests
 
-from constants import REQUEST_ATTEMPTS, REQUEST_TIMEOUT_SECONDS, RETRYABLE_STATUS_CODES, SECONDS_BETWEEN_ATTEMPTS, Location
+from constants import FETCHED_VARIABLES, HOURS_PER_DAY, REQUEST_ATTEMPTS, REQUEST_TIMEOUT_SECONDS, RETRYABLE_STATUS_CODES, SECONDS_BETWEEN_ATTEMPTS, Location
+from schema import OBSERVATIONS
 
 
 def is_retryable(error: requests.RequestException) -> bool:
@@ -32,3 +35,30 @@ def fetch_hourly(url: str, location: Location, hourly: list[str], **params) -> d
                 raise
             print(f"Attempt {attempt} of {REQUEST_ATTEMPTS} failed: {error}. Retrying in {SECONDS_BETWEEN_ATTEMPTS} seconds.")
             time.sleep(SECONDS_BETWEEN_ATTEMPTS)
+
+
+def to_observations(payload: dict, location: Location) -> pd.DataFrame:
+    hourly = payload["hourly"]
+    valid_time = pd.to_datetime(hourly["time"], utc=True)
+    frames = []
+
+    for variable in FETCHED_VARIABLES:
+        if variable not in hourly:
+            print(f"Missing: {variable}")
+            continue
+
+        frames.append(pd.DataFrame({
+            "location": location.slug,
+            "valid_time": valid_time,
+            "variable": variable,
+            "value": hourly[variable]
+        }))
+
+    if not frames:
+        sys.exit("No observations returned. Check the variable names.")
+
+    return OBSERVATIONS.finalise(pd.concat(frames, ignore_index=True))
+
+
+def expected_observations(days: int) -> int:
+    return days * HOURS_PER_DAY * len(FETCHED_VARIABLES)

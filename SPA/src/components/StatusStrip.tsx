@@ -2,6 +2,7 @@ import { Box, Paper, Typography } from "@mui/material";
 import { TWO_COLUMNS_FROM } from "../core/constants";
 import type { Summary } from "../core/models/summary";
 import { formatCount, formatDate, formatDateTime } from "../core/utils/format";
+import { evenColumns, responsiveColumns } from "../core/utils/layout";
 
 const THREE_COLUMNS_FROM = 540;
 const ALL_COLUMNS_FROM = 980;
@@ -21,11 +22,11 @@ export function StatusStrip({ summary }: { summary: Summary; }) {
             <Box
                 component="dl"
                 sx={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr",
-                    [`@media (min-width: ${TWO_COLUMNS_FROM}px)`]: { gridTemplateColumns: "repeat(2, 1fr)" },
-                    [`@media (min-width: ${THREE_COLUMNS_FROM}px)`]: { gridTemplateColumns: "repeat(3, 1fr)" },
-                    [`@media (min-width: ${ALL_COLUMNS_FROM}px)`]: { gridTemplateColumns: `repeat(${items.length}, auto)` },
+                    ...responsiveColumns({
+                        [TWO_COLUMNS_FROM]: evenColumns(2),
+                        [THREE_COLUMNS_FROM]: evenColumns(3),
+                        [ALL_COLUMNS_FROM]: `repeat(${items.length}, auto)`
+                    }),
                     justifyContent: "space-between",
                     gap: 3,
                     m: 0

@@ -1,5 +1,5 @@
-import { AMOUNT_SERIES, BACKTEST_SERIES, CROSSOVER_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_VARIABLE, VARIABLES } from "../constants";
-import type { AmountErrors, Backtest, Coordinates, Crossover, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, RainAmount, SeriesErrors, Summary, VariableKey } from "../models/summary";
+import { AMOUNT_SERIES, BACKTEST_SERIES, CROSSOVER_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_SKILL_SERIES, RAIN_VARIABLE, RELIABILITY_BIN_PARTS, RELIABILITY_SERIES, VARIABLES } from "../constants";
+import type { AmountErrors, Backtest, Coordinates, Coverage, Crossover, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, Rain, RainAmount, RainScores, ReliabilityBin, SeriesErrors, StoredTable, Summary, VariableKey } from "../models/summary";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -60,6 +60,54 @@ function isRainAmount(value: unknown): value is RainAmount {
         && isAmountErrors(value.skill, value.leads.length);
 }
 
+function isRainScores(value: unknown, length: number): value is RainScores {
+    return isRecord(value) && RAIN_SKILL_SERIES.every(({ key }) => isNumbers(value[key], length));
+}
+
+function isReliabilityBin(value: unknown): value is ReliabilityBin {
+    return Array.isArray(value)
+        && value.length === RELIABILITY_BIN_PARTS
+        && Number.isFinite(value[0])
+        && Number.isFinite(value[1])
+        && Number.isInteger(value[2]) && Number(value[2]) >= 0;
+}
+
+function isReliability(value: unknown): value is Record<string, ReliabilityBin[]> {
+    return isRecord(value) && RELIABILITY_SERIES.every(({ key }) => Array.isArray(value[key]) && (value[key] as unknown[]).every(isReliabilityBin));
+}
+
+function isRain(value: unknown): value is Rain {
+    if (!isRecord(value) || !isLeads(value.leads)) {
+        return false;
+    }
+
+    return Number.isFinite(value.wet_share)
+        && isRainScores(value.brier, value.leads.length)
+        && isRainScores(value.skill, value.leads.length)
+        && isReliability(value.reliability)
+        && isRainAmount(value.amount);
+}
+
+function isCoverage(value: unknown): value is Coverage {
+    if (!isRecord(value) || !isLeads(value.leads) || !isRecord(value.inside)) {
+        return false;
+    }
+
+    const inside = value.inside;
+    return hasStrings(value, ["from", "to"])
+        && hasCounts(value, ["forecasts"])
+        && Number.isFinite(value.level)
+        && VARIABLES.every(({ key }) => isNumbers(inside[key], (value.leads as number[]).length));
+}
+
+function isStoredTable(value: unknown): value is StoredTable {
+    return isRecord(value) && hasStrings(value, ["name"]) && hasCounts(value, ["rows", "files"]);
+}
+
+function isTables(value: unknown): value is StoredTable[] {
+    return Array.isArray(value) && value.every(isStoredTable);
+}
+
 function isCrossover(value: unknown): value is Crossover {
     return isRecord(value)
         && CROSSOVER_SERIES.every(({ key }) => value[key] === null || (Number.isInteger(value[key]) && Number(value[key]) > 0));
@@ -102,8 +150,8 @@ function isBacktest(value: unknown): value is Backtest {
         && isRecord(value.metrics)
         && isErrors(value.metrics.mae, value.leads.length)
         && isCrossovers(value.crossover)
-        && isRecord(value.rain)
-        && isRainAmount(value.rain.amount);
+        && isRain(value.rain)
+        && isCoverage(value.coverage);
 }
 
 export function isSummary(value: unknown): value is Summary {
@@ -113,5 +161,6 @@ export function isSummary(value: unknown): value is Summary {
         && isModelVersion(value.model)
         && isLiveRecord(value.live)
         && (value.forecast === null || isForecast(value.forecast))
+        && (value.tables === undefined || isTables(value.tables))
         && isBacktest(value.backtest);
 }

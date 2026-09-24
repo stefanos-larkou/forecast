@@ -2,6 +2,7 @@ import { Box, Paper, Stack, Typography } from "@mui/material";
 import { CROSSOVER_BEYOND, CROSSOVER_CAPTION, CROSSOVER_HEADING, CROSSOVER_LIMIT, CROSSOVER_SERIES, VARIABLES } from "../core/constants";
 import type { Backtest, Crossover } from "../core/models/summary";
 import { useChartStyle } from "../core/hooks/useChartStyle";
+import { evenColumns, responsiveColumns } from "../core/utils/layout";
 
 const TWO_BLOCKS_FROM = 680;
 const LABEL_WIDTH = 15;
@@ -55,9 +56,7 @@ export function SkillHorizon({ backtest }: { backtest: Backtest; }) {
             <Paper variant="outlined" sx={{ p: 2 }}>
                 <Box
                     sx={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr",
-                        [`@media (min-width: ${TWO_BLOCKS_FROM}px)`]: { gridTemplateColumns: "repeat(2, 1fr)" },
+                        ...responsiveColumns({ [TWO_BLOCKS_FROM]: evenColumns(2) }),
                         gap: 3
                     }}
                 >

@@ -48,6 +48,9 @@ MAE_VARIABLES = [variable.name for variable in VARIABLES if variable.scored]
 PHYSICAL_LIMITS = {variable.name: variable.limits for variable in VARIABLES}
 
 HOURS_PER_DAY = 24
+DAYS_PER_FILE = 1
+YEAR_FIRST_DAY = "01-01"
+YEAR_LAST_DAY = "12-31"
 DAYS_PER_YEAR = 365.25
 BYTES_PER_KB = 1024
 
