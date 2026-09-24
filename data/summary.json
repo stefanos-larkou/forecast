@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-09-24T05:01:31.674216+00:00",
+    "generated_at": "2026-09-24T08:27:44.231662+00:00",
     "location": "larnaca",
     "coordinates": {
         "latitude": 34.9221,
@@ -17,7 +17,7 @@
     "live": {
         "from": "2026-09-17T21:00:00+00:00",
         "to": "2026-09-24T05:00:00+00:00",
-        "truth_until": "2026-09-17T23:00:00+00:00",
+        "truth_until": "2026-09-18T23:00:00+00:00",
         "snapshots": 25,
         "forecasts": 57735,
         "predictions": 14256,
