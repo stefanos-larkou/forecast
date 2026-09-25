@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-09-25T05:05:24.119340+00:00",
+    "generated_at": "2026-09-25T08:49:42.093471+00:00",
     "location": "larnaca",
     "coordinates": {
         "latitude": 34.9221,
@@ -17,12 +17,12 @@
     "live": {
         "from": "2026-09-17T21:00:00+00:00",
         "to": "2026-09-25T05:00:00+00:00",
-        "truth_until": "2026-09-18T23:00:00+00:00",
+        "truth_until": "2026-09-19T23:00:00+00:00",
         "snapshots": 29,
         "forecasts": 66945,
         "predictions": 17712,
         "intervals": 10944,
-        "graded": 0,
+        "graded": 168,
         "model": "gbm_blend",
         "leaderboard": null,
         "coverage": null,
@@ -1373,8 +1373,8 @@
         },
         {
             "name": "data/observations",
-            "rows": 111840,
-            "files": 932
+            "rows": 111960,
+            "files": 933
         },
         {
             "name": "data/climate",
