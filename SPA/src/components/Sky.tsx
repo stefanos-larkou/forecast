@@ -25,7 +25,7 @@ const CLOUDS_WHEN_WET = 4;
 const CLOUD_NIGHT_FADE = 0.4;
 
 const SUN_POSITION = { top: "12%", right: "12%", size: 10 };
-const MOON_POSITION = { top: "18%", right: "12%", size: 7 };
+const MOON_POSITION = { top: "18%", right: "12%", size: 8.5 };
 const CLOUD_FROM = "-20%";
 const CLOUD_TO = "110%";
 const SUNSHINE_SIZE = 50;
