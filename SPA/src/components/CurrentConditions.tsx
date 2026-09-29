@@ -8,6 +8,7 @@ import { formatDateTime, formatMeasurement } from "../core/utils/format";
 import { evenColumns, responsiveColumns } from "../core/utils/layout";
 import { chanceLabel, isNight, weatherState } from "../core/utils/weather";
 import { HourlyStrip } from "./HourlyStrip";
+import { SiteBar } from "./SiteBar";
 import { Sky } from "./Sky";
 
 const ISSUED_PREFIX = "Forecast issued";
@@ -33,7 +34,10 @@ export function CurrentConditions({ forecast, where }: { forecast: Forecast, whe
 
     return (
         <Sky state={state} night={isNight(now.at, where)}>
-            <Box sx={{ maxWidth: PAGE_MAX_WIDTH, mx: "auto", px: 2, py: 3 }}>
+            <Box sx={{ px: 2, pt: 3 }}>
+                <SiteBar />
+            </Box>
+            <Box sx={{ maxWidth: PAGE_MAX_WIDTH, mx: "auto", px: 2, pt: 2, pb: 3 }}>
                 <Stack component="section" aria-label="Current conditions">
                     <Stack direction="row" spacing={1.5} useFlexGap sx={{ alignItems: "baseline", flexWrap: "wrap" }}>
                         <Typography variant="h4" component="h1">{PLACE}</Typography>
