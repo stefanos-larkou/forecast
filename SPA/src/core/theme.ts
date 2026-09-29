@@ -204,7 +204,7 @@ export const theme = createTheme({
             letterSpacing: "-0.02em"
         },
         h2: {
-            fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
+            fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)",
             fontWeight: 600,
             lineHeight: 1.2
         },
