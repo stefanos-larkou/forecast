@@ -235,7 +235,7 @@ Every script runs as a module from the repository root, with the virtual environ
 | `python -m model.train` | Trains, scores and possibly promotes a model |
 | `python -m model.train overwrite` | Trains over today's model directory |
 | `python -m model.predict` | Predicts the newest snapshot and writes its intervals |
-| `python -m model.tune` | Hyperparameter search, run by hand and never scheduled |
+| `python -m model.tune` | Hyperparameter search, run by hand |
 | `python -m scoring.evaluate` | Prints the rolling-origin backtest |
 | `python -m scoring.intervals` | Prints measured interval coverage |
 | `python -m scoring.precipitation` | Prints the rain scores and reliability table |

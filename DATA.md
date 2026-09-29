@@ -226,8 +226,8 @@ the project owns, because special-casing one is how a leaderboard stops being fa
   past which forecasting adds nothing for this city.
 - **Climatology is a fixed 30-year ERA5 window ending before every forecast scored** (1994 to 2023),
   averaged per variable, hour and day of year over a 31-day window that wraps the year. It is
-  recomputed from `data/climate/` on demand and never stored as a derived table, and it is never
-  extended into the years being scored, which would leak. Its own bias against the 2020s is measured
+  recomputed from `data/climate/` on demand, and never extended into the years being scored, which
+  would leak. Its own bias against the 2020s is measured
   and quoted per hour. Over the whole day it is small, at -0.11 degrees, but it runs -0.7 to -1.6 at
   midday and turns positive overnight.
 - **Bias and scatter are computed separately** and published beside MAE in
@@ -277,7 +277,7 @@ probability of precipitation and scored with the Brier score and a reliability c
 The target is the residual `observed - ECMWF`, not the observation itself. Predicting zero is
 then equivalent to trusting ECMWF, so the floor is the best operational model, and the target has no
 seasonal cycle for the model to waste capacity rediscovering. It sees all three models' output, so beating
-any one of them is ensembling and not a like-for-like win.
+any one of them is ensembling.
 
 - **One model per variable, with `lead_hours` as a feature.** One model per lead time would fragment
   data that is already thin, and trees can partition on lead time themselves.
