@@ -9,10 +9,11 @@ export const TO_LIGHT = "Switch to light theme";
 export const GLYPH_BOX = "0 0 24 24";
 export const GLYPH_SIZE = 24;
 export const SUN_GLYPH = "M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5M2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1m18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1M11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1m0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1M5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0z";
+export const INFO_GLYPH = "M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8";
 export const MOON_GLYPH = "M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z";
 export const BACK_GLYPH = "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z";
 export const LOCALE = "en-GB";
-export const BACKTEST_CAPTION = "Mean absolute error against ERA5 (lower is better). These are archived forecasts, not the live record.";
+export const BACKTEST_CAPTION = "Mean absolute error against ERA5. These are archived forecasts, not the live record.";
 export const BACKTEST_HEADING = "Error by how far ahead the forecast looks";
 export const AMOUNT_HEADING = "How much falls in a wet hour";
 export const AMOUNT_CAPTION = "Mean absolute error in millimetres over wet hours only, against ERA5. The amount model answers how much falls given that it does.";
@@ -49,6 +50,22 @@ export const CREDIT_LEAD = "Weather data by";
 export const CREDIT_SOURCE = "Open-Meteo.com";
 export const CREDIT_SOURCE_URL = "https://open-meteo.com";
 export const CREDIT_LICENCE = ", CC BY 4.0. Truth is ERA5 reanalysis.";
+export const LIVE_SECTION = "Live record";
+export const LIVE_HEADING = "Live scoreboard";
+export const LIVE_CAPTION = "Every forecast here was saved before its outcome was known, then scored against ERA5 once the truth arrived. Each point is the mean absolute error over every hour graded so far at that lead.";
+export const LIVE_WAITING = "ERA5 runs about six days behind, so the longest leads rest on the fewest hours, and every point firms up as the record grows.";
+export const LIVE_FORECASTS = "forecasts";
+export const LIVE_ABOUT = "About the live scoreboard";
+export const LIVE_RAIN_ABOUT = "About the chance of rain score";
+export const LIVE_RAIN_EXPLAINER = "The mean squared gap between the chance given and what happened, counting a wet hour as one and a dry hour as zero. Lower is better, and a stretch of dry hours forecast with a near zero chance scores near zero.";
+export const INFO_SIZE = 20;
+export const TOOLTIP_WIDTH = 420;
+export const LEAVE_TOUCH_DELAY = 10000;
+export const LIVE_RAIN_LABEL = "Chance of Rain";
+export const LIVE_WIDE_VARIABLE = "temperature_2m";
+export const LIVE_RAIN_AXIS = "Brier Score";
+export const BLEND_LABEL = "gbm_blend";
+export const LIVE_GRADED = "graded";
 export const RAIN_SECTION = "Rain";
 export const RAIN_HEADING = "Chance of rain, can it be trusted?";
 export const RAIN_WET_SHARE = "of hours were wet";
@@ -135,6 +152,13 @@ export const RAIN_SKILL_SERIES = [
 export const RELIABILITY_SERIES = [
     { key: "boosted", label: "gbm_blend", colour: "ours", dash: [] },
     { key: "models", label: "The Three Models", colour: "ecmwf", dash: [5, 4] }
+] as const;
+
+export const LIVE_SERIES = [
+    { key: "gbm_blend", label: "gbm_blend", colour: "ours", role: "ours", dash: [] },
+    { key: "ecmwf_ifs025", label: "ECMWF", colour: "ecmwf", role: "model", dash: [] },
+    { key: "gfs_seamless", label: "GFS", colour: "gfs", role: "model", dash: [] },
+    { key: "icon_seamless", label: "ICON", colour: "icon", role: "model", dash: [] }
 ] as const;
 
 export const CROSSOVER_SERIES = [

@@ -57,3 +57,15 @@ export function formatError(error: number): string {
 export function formatShare(share: number): string {
     return SHARE.format(share);
 }
+
+const SUPERSCRIPTS = "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079";
+const SCIENTIFIC_DIGITS = 3;
+
+export function formatScientific(value: number): string {
+    if (value === 0) return "0";
+
+    const [mantissa, exponent] = Number(value.toPrecision(SCIENTIFIC_DIGITS)).toExponential().split("e");
+    const sign = exponent?.startsWith("-") === true ? "\u207b" : "";
+    const digits = [...(exponent ?? "").replace(/[+-]/, "")].map(digit => SUPERSCRIPTS[Number(digit)]).join("");
+    return `${mantissa}\u00d710${sign}${digits}`;
+}

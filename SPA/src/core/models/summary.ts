@@ -1,4 +1,4 @@
-import type { AMOUNT_SERIES, BACKTEST_SERIES, CROSSOVER_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_SKILL_SERIES, RAIN_VARIABLE, RELIABILITY_SERIES, VARIABLES } from "../constants";
+import type { AMOUNT_SERIES, BACKTEST_SERIES, CROSSOVER_SERIES, LIVE_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_SKILL_SERIES, RAIN_VARIABLE, RELIABILITY_SERIES, VARIABLES } from "../constants";
 import type { WeatherState } from "./weather";
 
 export type Variable = (typeof VARIABLES)[number];
@@ -35,6 +35,35 @@ export interface LiveRecord {
     predictions: number;
     intervals: number;
     graded: number;
+    leaderboard: LiveLeaderboard | null;
+    coverage: LiveCoverage | null;
+    rain: LiveRain | null;
+}
+
+export type LiveKey = (typeof LIVE_SERIES)[number]["key"];
+export type LiveErrors = Partial<Record<LiveKey, number[]>>;
+
+export interface LiveLeaderboard {
+    leads: number[];
+    forecasts: number;
+    counts: number[];
+    mae: Partial<Record<VariableKey, LiveErrors>>;
+}
+
+export interface LiveCoverage {
+    leads: number[];
+    forecasts: number;
+    level: number;
+    counts: number[];
+    inside: Partial<Record<VariableKey, number[]>>;
+}
+
+export interface LiveRain {
+    leads: number[];
+    forecasts: number;
+    wet_share: number;
+    counts: number[];
+    brier: number[];
 }
 
 export interface BacktestMetrics {

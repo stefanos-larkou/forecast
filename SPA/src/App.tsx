@@ -4,6 +4,7 @@ import { BacktestLoading } from "./components/BacktestLoading";
 import { Credits } from "./components/Credits";
 import { CurrentConditions } from "./components/CurrentConditions";
 import { DataInventory } from "./components/DataInventory";
+import { LiveScoreboard } from "./components/LiveScoreboard";
 import { PreviewBar } from "./components/PreviewBar";
 import { StatusStrip } from "./components/StatusStrip";
 import { PAGE_MAX_WIDTH } from "./core/constants";
@@ -39,6 +40,7 @@ export function App() {
                             {import.meta.env.DEV && <PreviewBar showing={preview} onShow={setPreview} />}
                             {shown.forecast && <DailyOutlook forecast={shown.forecast} />}
                             <StatusStrip summary={shown} />
+                            <LiveScoreboard live={shown.live} />
                             <Suspense fallback={<BacktestLoading />}>
                                 <BacktestSection backtest={shown.backtest} />
                             </Suspense>

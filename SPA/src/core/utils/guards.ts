@@ -1,5 +1,5 @@
-import { AMOUNT_SERIES, BACKTEST_SERIES, CROSSOVER_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_SKILL_SERIES, RAIN_VARIABLE, RELIABILITY_BIN_PARTS, RELIABILITY_SERIES, VARIABLES } from "../constants";
-import type { AmountErrors, Backtest, Coordinates, Coverage, Crossover, Forecast, ForecastVariableKey, LiveRecord, ModelVersion, Rain, RainAmount, RainScores, ReliabilityBin, SeriesErrors, StoredTable, Summary, VariableKey } from "../models/summary";
+import { AMOUNT_SERIES, BACKTEST_SERIES, CROSSOVER_SERIES, LIVE_SERIES, RAIN_AMOUNT_VARIABLE, RAIN_SKILL_SERIES, RAIN_VARIABLE, RELIABILITY_BIN_PARTS, RELIABILITY_SERIES, VARIABLES } from "../constants";
+import type { AmountErrors, Backtest, Coordinates, Coverage, Crossover, Forecast, ForecastVariableKey, LiveCoverage, LiveErrors, LiveLeaderboard, LiveRain, LiveRecord, ModelVersion, Rain, RainAmount, RainScores, ReliabilityBin, SeriesErrors, StoredTable, Summary, VariableKey } from "../models/summary";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -26,7 +26,14 @@ function isModelVersion(value: unknown): value is ModelVersion {
 function isLiveRecord(value: unknown): value is LiveRecord {
     return isRecord(value)
         && hasStrings(value, ["from", "to", "truth_until"])
-        && hasCounts(value, ["snapshots", "forecasts", "predictions", "intervals", "graded"]);
+        && hasCounts(value, ["snapshots", "forecasts", "predictions", "intervals", "graded"])
+        && (value.leaderboard === null || isLiveLeaderboard(value.leaderboard))
+        && (value.coverage === null || isLiveCoverage(value.coverage))
+        && (value.rain === null || isLiveRain(value.rain));
+}
+
+function isCounts(value: unknown, length: number): boolean {
+    return Array.isArray(value) && value.length === length && value.every(count => Number.isInteger(count) && count >= 0);
 }
 
 function isLeads(value: unknown): value is number[] {
@@ -35,6 +42,49 @@ function isLeads(value: unknown): value is number[] {
 
 function isNumbers(value: unknown, length: number): value is number[] {
     return Array.isArray(value) && value.length === length && value.every(item => Number.isFinite(item));
+}
+
+function isLiveErrors(value: unknown, length: number): value is LiveErrors {
+    return isRecord(value)
+        && Object.keys(value).length > 0
+        && LIVE_SERIES.every(({ key }) => value[key] === undefined || isNumbers(value[key], length));
+}
+
+function isLiveLeaderboard(value: unknown): value is LiveLeaderboard {
+    if (!isRecord(value) || !isLeads(value.leads) || !isRecord(value.mae)) {
+        return false;
+    }
+
+    const mae = value.mae;
+    const leads = value.leads.length;
+    return hasCounts(value, ["forecasts"])
+        && isCounts(value.counts, leads)
+        && Object.keys(mae).length > 0
+        && VARIABLES.every(({ key }) => mae[key] === undefined || isLiveErrors(mae[key], leads));
+}
+
+function isLiveCoverage(value: unknown): value is LiveCoverage {
+    if (!isRecord(value) || !isLeads(value.leads) || !isRecord(value.inside)) {
+        return false;
+    }
+
+    const inside = value.inside;
+    const leads = value.leads.length;
+    return hasCounts(value, ["forecasts"])
+        && Number.isFinite(value.level)
+        && isCounts(value.counts, leads)
+        && VARIABLES.every(({ key }) => inside[key] === undefined || isNumbers(inside[key], leads));
+}
+
+function isLiveRain(value: unknown): value is LiveRain {
+    if (!isRecord(value) || !isLeads(value.leads)) {
+        return false;
+    }
+
+    return hasCounts(value, ["forecasts"])
+        && Number.isFinite(value.wet_share)
+        && isCounts(value.counts, value.leads.length)
+        && isNumbers(value.brier, value.leads.length);
 }
 
 function isSeriesErrors(value: unknown, length: number): value is SeriesErrors {

@@ -31,7 +31,10 @@ export const SUMMARY: Summary = {
         forecasts: 33000,
         predictions: 5400,
         intervals: 1152,
-        graded: 0
+        graded: 0,
+        leaderboard: null,
+        coverage: null,
+        rain: null
     },
     forecast: FORECAST,
     tables: [
