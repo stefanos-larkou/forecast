@@ -108,6 +108,7 @@ LEADERBOARD_METRICS = {
 WET_HOUR_MM = 0.1
 COVERAGE_DECIMALS = 3
 BRIER_DECIMALS = 4
+LIVE_BRIER_DECIMALS = 7
 SKILL_DECIMALS = 3
 RAIN_METHODS = ["models", "climatology", "persisted", "boosted"]
 AMOUNT_METHODS = ["models", "typical", "boosted"]

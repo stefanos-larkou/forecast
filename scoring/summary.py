@@ -10,7 +10,7 @@ from pyarrow import parquet
 from constants import AMOUNT_DECIMALS, BACKFILL_DIR, BAND_LEVEL, BAND_VARIABLE, BLEND_MODEL, BYTES_PER_KB, CLIMATE_DIR, CURRENT_MODEL_FILE, FORECASTS_DIR, INTERVALS_DIR, JSON_INDENT, LOCATION, METADATA_FILE, MODELS_DIR, OBSERVATIONS_DIR, PARQUET_GLOB, PREDICTIONS_DIR, RELIABILITY_METHODS, SCORING_KEY, STORED_TABLES, SUMMARY_DECIMALS, SUMMARY_FILE
 from model.training import load_training_data
 from model.tune import validation_months
-from scoring import intervals, precipitation
+from scoring import intervals, live, precipitation
 from scoring.baselines import climatology
 from scoring.evaluate import boosted_forecasts, fold_starts, score
 
@@ -134,7 +134,7 @@ def build_forecast(predictions: pd.DataFrame, intervals: pd.DataFrame) -> dict |
     }
 
 
-def build_live(predictions: pd.DataFrame, intervals: pd.DataFrame) -> dict:
+def build_live(predictions: pd.DataFrame, band: pd.DataFrame) -> dict:
     forecasts = pd.read_parquet(FORECASTS_DIR)
     observations = pd.read_parquet(OBSERVATIONS_DIR)
     truth_until = observations["valid_time"].max()
@@ -146,12 +146,12 @@ def build_live(predictions: pd.DataFrame, intervals: pd.DataFrame) -> dict:
         "snapshots": int(forecasts["run_time"].nunique()),
         "forecasts": len(forecasts),
         "predictions": len(predictions),
-        "intervals": len(intervals),
+        "intervals": len(band),
         "graded": int((predictions["valid_time"] <= truth_until).sum()),
         "model": BLEND_MODEL,
-        "leaderboard": None,
-        "coverage": None,
-        "rain": None
+        "leaderboard": live.build_leaderboard(forecasts, predictions, observations),
+        "coverage": live.build_coverage(band, observations),
+        "rain": live.build_rain(predictions, observations)
     }
 
 
