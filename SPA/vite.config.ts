@@ -5,6 +5,7 @@ import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 
 const BASE = "/forecast/";
+const PORT = 5174;
 const DATA = "data";
 const DATA_FOLDER = resolve(import.meta.dirname, "..", DATA);
 const DATA_PATH = `${BASE}${DATA}`;
@@ -52,7 +53,7 @@ function localCertificate(): { cert: Buffer, key: Buffer; } {
 export default defineConfig(({ command, mode }) => ({
     base: BASE,
     plugins: [react(), serveData()],
-    server: command === "serve" && mode !== "test" ? { https: localCertificate() } : {},
+    server: command === "serve" && mode !== "test" ? { https: localCertificate(), port: PORT, strictPort: true } : {},
     test: {
         environment: "jsdom",
         setupFiles: "./src/test-setup.ts"
