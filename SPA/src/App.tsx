@@ -1,11 +1,12 @@
-import { Suspense, lazy, useState } from "react";
+import { lazy, useState } from "react";
 import { Alert, Box, Skeleton } from "@mui/material";
 import { BacktestLoading } from "./components/BacktestLoading";
 import { Credits } from "./components/Credits";
 import { CurrentConditions } from "./components/CurrentConditions";
 import { DataInventory } from "./components/DataInventory";
-import { LiveScoreboard } from "./components/LiveScoreboard";
+import { LiveLoading } from "./components/LiveLoading";
 import { PreviewBar } from "./components/PreviewBar";
+import { Reveal } from "./components/Reveal";
 import { StatusStrip } from "./components/StatusStrip";
 import { PAGE_MAX_WIDTH } from "./core/constants";
 import { useSummary } from "./core/hooks/useSummary";
@@ -14,8 +15,8 @@ import type { WeatherState } from "./core/models/weather";
 import { isError, isLoading, isSuccess } from "./core/utils/query-state";
 import { DailyOutlook } from "./components/DailyOutlook";
 
-const backtestSection = import("./components/BacktestSection");
-const BacktestSection = lazy(() => backtestSection);
+const BacktestSection = lazy(() => import("./components/BacktestSection"));
+const LiveScoreboard = lazy(() => import("./components/LiveScoreboard"));
 
 const COLUMN = { maxWidth: PAGE_MAX_WIDTH, mx: "auto", px: 2 };
 
@@ -40,11 +41,15 @@ export function App() {
                             {import.meta.env.DEV && <PreviewBar showing={preview} onShow={setPreview} />}
                             {shown.forecast && <DailyOutlook forecast={shown.forecast} />}
                             <StatusStrip summary={shown} />
-                            <LiveScoreboard live={shown.live} />
-                            <Suspense fallback={<BacktestLoading />}>
+                            <Reveal fallback={<LiveLoading />}>
+                                <LiveScoreboard live={shown.live} />
+                            </Reveal>
+                            <Reveal fallback={<BacktestLoading />}>
                                 <BacktestSection backtest={shown.backtest} />
-                            </Suspense>
-                            <DataInventory tables={shown.tables} />
+                            </Reveal>
+                            <Reveal>
+                                <DataInventory tables={shown.tables} />
+                            </Reveal>
                         </Box>
                     </>
                 )}

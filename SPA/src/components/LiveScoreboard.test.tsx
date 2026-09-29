@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { SUMMARY } from "../test-fixtures";
 import { renderWithProviders } from "../test-utils";
-import { LiveScoreboard } from "./LiveScoreboard";
+import LiveScoreboard from "./LiveScoreboard";
 import { LIVE_ABOUT, LIVE_HEADING, LIVE_RAIN_LABEL } from "../core/constants";
 import type { LiveLeaderboard, LiveRain, LiveRecord } from "../core/models/summary";
 

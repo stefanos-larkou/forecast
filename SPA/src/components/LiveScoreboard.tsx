@@ -38,7 +38,7 @@ function RainChart({ rain }: { rain: LiveRain; }) {
     );
 }
 
-export function LiveScoreboard({ live }: { live: LiveRecord; }) {
+export default function LiveScoreboard({ live }: { live: LiveRecord; }) {
     const leaderboard = live.leaderboard;
     if (leaderboard === null) {
         return null;
