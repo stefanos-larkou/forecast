@@ -16,13 +16,13 @@ describe("coverageConfig", () => {
         const datasets = coverageConfig(COVERAGE, STYLE).data.datasets;
 
         expect(datasets.map(dataset => dataset.label)).toEqual(["Temperature", "Humidity", "Wind Speed", "Cloud Cover", "Target (90.0%)"]);
-        expect(datasets[0]).toMatchObject({ data: [0.7917, 0.7969], borderColor: "orange" });
+        expect(datasets[0]).toMatchObject({ data: [{ x: 24, y: 0.7917 }, { x: 48, y: 0.7969 }], borderColor: "orange" });
     });
 
     it("holds the target flat across every lead", () => {
         const target = coverageConfig(COVERAGE, STYLE).data.datasets[4];
 
-        expect(target).toMatchObject({ data: [0.9, 0.9], borderColor: "grey", borderDash: [6, 4] });
+        expect(target).toMatchObject({ data: [{ x: 24, y: 0.9 }, { x: 48, y: 0.9 }], borderColor: "grey", borderDash: [6, 4] });
     });
 });
 

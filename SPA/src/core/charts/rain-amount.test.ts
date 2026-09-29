@@ -16,8 +16,8 @@ describe("rainAmountConfig", () => {
         const datasets = rainAmountConfig(AMOUNT, STYLE).data.datasets;
 
         expect(datasets.map(dataset => dataset.label)).toEqual(["gbm_blend", "Typical Wet Hour", "The Three Models"]);
-        expect(datasets[0]).toMatchObject({ data: [0.3475, 0.35], borderColor: "orange" });
-        expect(datasets[1]).toMatchObject({ data: [0.3731, 0.3746], borderDash: [6, 4] });
+        expect(datasets[0]).toMatchObject({ data: [{ x: 24, y: 0.3475 }, { x: 48, y: 0.35 }], borderColor: "orange" });
+        expect(datasets[1]).toMatchObject({ data: [{ x: 24, y: 0.3731 }, { x: 48, y: 0.3746 }], borderDash: [6, 4] });
     });
 });
 

@@ -16,13 +16,13 @@ describe("rainSkillConfig", () => {
         const datasets = rainSkillConfig(RAIN, STYLE).data.datasets;
 
         expect(datasets.map(dataset => dataset.label)).toEqual(["gbm_blend", "The Three Models", "Climatology", "Persistence"]);
-        expect(datasets[0]).toMatchObject({ data: [0.2449, 0.2329], borderColor: "orange" });
+        expect(datasets[0]).toMatchObject({ data: [{ x: 24, y: 0.2449 }, { x: 48, y: 0.2329 }], borderColor: "orange" });
     });
 
     it("lays climatology flat at zero, the line the skill is measured from", () => {
         const climatology = rainSkillConfig(RAIN, STYLE).data.datasets[2];
 
-        expect(climatology).toMatchObject({ data: [0, 0], borderColor: "grey", borderDash: [6, 4] });
+        expect(climatology).toMatchObject({ data: [{ x: 24, y: 0 }, { x: 48, y: 0 }], borderColor: "grey", borderDash: [6, 4] });
     });
 });
 

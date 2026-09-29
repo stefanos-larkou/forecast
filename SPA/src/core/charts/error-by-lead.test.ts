@@ -26,9 +26,8 @@ describe("errorByLeadConfig", () => {
     });
 
     it("plots each series' errors against the leads they belong to", () => {
-        expect(CONFIG.data.labels).toEqual([24, 48]);
-        expect(DATASETS[0]?.data).toEqual([0.72, 0.75]);
-        expect(DATASETS[5]?.data).toEqual([1.09, 1.49]);
+        expect(DATASETS[0]?.data).toEqual([{ x: 24, y: 0.72 }, { x: 48, y: 0.75 }]);
+        expect(DATASETS[5]?.data).toEqual([{ x: 24, y: 1.09 }, { x: 48, y: 1.49 }]);
     });
 
     it("labels the error axis with the variable's unit and starts it at zero", () => {

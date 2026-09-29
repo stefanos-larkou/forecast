@@ -1,5 +1,5 @@
 import { Chart, type ChartConfiguration } from "chart.js";
-import { LEAD_HEADER, LEAD_TOOLTIP, LOCALE, SERIES_LINE_WIDTHS } from "../constants";
+import { LEAD_HEADER, LEAD_TOOLTIP, LOCALE, POINT_OVERFLOW, SERIES_LINE_WIDTHS } from "../constants";
 import type { ChartFont, ChartStyle, ChartTable } from "../models/charts";
 import type { SeriesPalette } from "../theme";
 
@@ -51,10 +51,11 @@ export function leadChartConfig({ leads, datasets, style, axis, value, ticks, fr
     fromZero?: boolean;
 }): ChartConfiguration<"line"> {
     const font = style.font;
+    const plotted = datasets.map(dataset => ({ ...dataset, clip: POINT_OVERFLOW, data: leads.map((lead, index) => ({ x: lead, y: dataset.data[index] ?? null })) }));
 
     return {
         type: "line",
-        data: { labels: leads, datasets },
+        data: { datasets: plotted },
         options: {
             maintainAspectRatio: false,
             locale: LOCALE,
@@ -73,7 +74,13 @@ export function leadChartConfig({ leads, datasets, style, axis, value, ticks, fr
             },
             scales: {
                 x: {
+                    type: "linear",
+                    min: leads[0],
+                    max: leads[leads.length - 1],
                     ticks: { font },
+                    afterBuildTicks: scale => {
+                        scale.ticks = leads.map(lead => ({ value: lead }));
+                    },
                     title: { display: true, text: LEAD_HEADER, font },
                     grid: { display: false }
                 },

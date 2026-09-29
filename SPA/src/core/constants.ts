@@ -155,6 +155,7 @@ export const COVERAGE_COLOURS = {
 } as const;
 
 export const SERIES_LINE_WIDTHS = { ours: 3, model: 1.5, baseline: 1.5 } as const;
+export const POINT_OVERFLOW = 6;
 
 export function variableLabel(key: VariableKey): string {
     return VARIABLES.filter(variable => variable.key === key)[0]?.label ?? key;
