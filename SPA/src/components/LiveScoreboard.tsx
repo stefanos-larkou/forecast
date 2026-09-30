@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { Box, Stack, Typography } from "@mui/material";
-import { LIVE_ABOUT, LIVE_CAPTION, LIVE_FORECASTS, LIVE_GRADED, LIVE_HEADING, LIVE_RAIN_ABOUT, LIVE_RAIN_EXPLAINER, LIVE_RAIN_LABEL, LIVE_SECTION, LIVE_WAITING, LIVE_WIDE_VARIABLE, VARIABLES, variableLabel } from "../core/constants";
+import { LIVE_ABOUT, LIVE_CAPTION, LIVE_FORECASTS, LIVE_HEADING, LIVE_RAIN_ABOUT, LIVE_RAIN_EXPLAINER, LIVE_RAIN_LABEL, LIVE_SECTION, LIVE_THROUGH, LIVE_WAITING, LIVE_WIDE_VARIABLE, VARIABLES, variableLabel } from "../core/constants";
 import { liveMaeConfig, liveMaeTable } from "../core/charts/live-mae";
 import { liveRainConfig, liveRainTable } from "../core/charts/live-rain";
 import { useChartStyle } from "../core/hooks/useChartStyle";
 import type { LiveErrors, LiveRain, LiveRecord, VariableKey } from "../core/models/summary";
-import { formatCount } from "../core/utils/format";
+import { formatUtcDate } from "../core/utils/format";
 import { ChartGrid } from "./ChartGrid";
 import { ChartPanel } from "./ChartPanel";
 import { InfoTip } from "./InfoTip";
@@ -47,7 +47,7 @@ export default function LiveScoreboard({ live }: { live: LiveRecord; }) {
     return (
         <Box component="section" sx={{ mt: 4 }}>
             <Typography variant="overline" component="p" sx={{ color: "text.secondary" }}>
-                {`${LIVE_SECTION} \u00b7 ${formatCount(leaderboard.forecasts)} ${LIVE_GRADED}`}
+                {`${LIVE_SECTION} \u00b7 ${LIVE_THROUGH} ${formatUtcDate(live.truth_until)}`}
             </Typography>
             <Stack direction="row" sx={{ alignItems: "center", gap: 0.5, mb: 2 }}>
                 <Typography variant="h2">{LIVE_HEADING}</Typography>

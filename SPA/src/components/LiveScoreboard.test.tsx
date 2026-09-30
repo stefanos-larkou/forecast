@@ -5,6 +5,7 @@ import { SUMMARY } from "../test-fixtures";
 import { renderWithProviders } from "../test-utils";
 import LiveScoreboard from "./LiveScoreboard";
 import { LIVE_ABOUT, LIVE_HEADING, LIVE_RAIN_LABEL } from "../core/constants";
+import { formatUtcDate } from "../core/utils/format";
 import type { LiveLeaderboard, LiveRain, LiveRecord } from "../core/models/summary";
 
 const LEADERBOARD: LiveLeaderboard = {
@@ -46,10 +47,10 @@ describe("LiveScoreboard", () => {
         expect(screen.getAllByRole("img")).toHaveLength(2);
     });
 
-    it("states how much has been graded without being asked", () => {
+    it("states how far the truth reaches without being asked", () => {
         renderWithProviders(<LiveScoreboard live={record({})} />);
 
-        expect(screen.getByText(/1,476 graded/)).toBeInTheDocument();
+        expect(screen.getByText(new RegExp(`graded through ${formatUtcDate(SUMMARY.live.truth_until)}`))).toBeInTheDocument();
     });
 
     it("keeps the explanation out of the way until it is asked for", () => {

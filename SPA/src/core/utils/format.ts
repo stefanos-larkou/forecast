@@ -5,6 +5,7 @@ const ERROR_DECIMALS = 2;
 const SHARE_DECIMALS = 1;
 
 const DATE = new Intl.DateTimeFormat(LOCALE, { day: "2-digit", month: "2-digit", year: "numeric" });
+const UTC_DATE = new Intl.DateTimeFormat(LOCALE, { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" });
 const TIME = new Intl.DateTimeFormat(LOCALE, { hour: "2-digit", minute: "2-digit" });
 const MONTH = new Intl.DateTimeFormat(LOCALE, { month: "long", year: "numeric", timeZone: "UTC" });
 const COUNT = new Intl.NumberFormat(LOCALE);
@@ -14,6 +15,10 @@ const SHARE = new Intl.NumberFormat(LOCALE, { style: "percent", minimumFractionD
 
 export function formatDate(timestamp: string): string {
     return DATE.format(new Date(timestamp));
+}
+
+export function formatUtcDate(timestamp: string): string {
+    return UTC_DATE.format(new Date(timestamp));
 }
 
 export function formatDateTime(timestamp: string): string {
