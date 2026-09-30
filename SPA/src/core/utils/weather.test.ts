@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { chanceLabel, isNight, weatherState } from "./weather";
+import { chanceLabel, dayState, isNight, weatherState } from "./weather";
 import { SUMMARY } from "../../test-fixtures";
+import type { Conditions } from "./weather";
 
 const WARM = 20;
 
@@ -62,5 +63,50 @@ describe("isNight", () => {
     it("follows the seasons: half past seven is light in June and dark in December", () => {
         expect(isNight("2026-06-21T16:30:00Z", larnaca)).toBe(false);
         expect(isNight("2026-12-21T15:00:00Z", larnaca)).toBe(true);
+    });
+});
+
+describe("dayState", () => {
+    const hour = (rain: number, over: Partial<Conditions> = {}): Conditions =>
+        ({ rain, amount: 0.2, cloud: 30, temperature: 20, ...over });
+
+    const day = (wet: number, rain: number, over: Partial<Conditions> = {}): Conditions[] =>
+        [...Array(24)].map((_, index) => hour(index < wet ? rain : 0, over));
+
+    it("calls a day dry when no hour is wet, and says how cloudy it was", () => {
+        expect(dayState(day(0, 0, { cloud: 10 }))).toBe("clear");
+        expect(dayState(day(0, 0, { cloud: 40 }))).toBe("partly");
+        expect(dayState(day(0, 0, { cloud: 90 }))).toBe("overcast");
+    });
+
+    it("calls it rain once a quarter of the day is wet, however light each hour is", () => {
+        expect(dayState(day(7, 0.61))).toBe("rain");
+        expect(dayState(day(6, 0.51))).toBe("rain");
+    });
+
+    it("keeps a brief spell a shower, however sure that hour is", () => {
+        expect(dayState(day(1, 0.9))).toBe("showers");
+    });
+
+    it("reads an afternoon of rain as rain, where its average hour looks dry", () => {
+        const afternoon = [...Array(24)].map((_, index) => hour(index >= 12 && index < 19 ? 0.61 : 0.02));
+
+        expect(dayState(afternoon)).toBe("rain");
+    });
+
+    it("keeps one uncertain hour from turning the day into a washout", () => {
+        const spell = [...Array(24)].map((_, index) => hour(index === 14 ? 0.38 : 0.01));
+
+        expect(dayState(spell)).toBe("drizzle");
+    });
+
+    it("promotes a wet day to a downpour on the heaviest hour it holds", () => {
+        expect(dayState(day(7, 0.61, { amount: 6 }))).toBe("downpour");
+    });
+
+    it("turns to snow when the day is cold enough, wet for long or not", () => {
+        expect(dayState(day(7, 0.61, { temperature: 0 }))).toBe("snow");
+        expect(dayState(day(1, 0.61, { temperature: 0 }))).toBe("snow");
+        expect(dayState(day(7, 0.61, { temperature: 0, amount: 6 }))).toBe("heavySnow");
     });
 });

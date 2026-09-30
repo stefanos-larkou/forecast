@@ -101,6 +101,7 @@ export const RAIN_DRIZZLE_UNDER = 0.5;
 export const RAIN_DOWNPOUR_FROM = 4;
 export const SNOW_MAX_C = 1;
 export const RAIN_WORTH_SHOWING = 0.005;
+export const RAIN_SPELL_SHARE = 0.25;
 export const MUTED_ON_SKY = 0.85;
 export const TWO_COLUMNS_FROM = 360;
 export const CHANCE_OF_RAIN = "Chance of rain";
