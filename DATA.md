@@ -1,8 +1,7 @@
 # Data and pipeline
 
 How the data is shaped, where it is stored, what guarantees it carries, and how every published
-number is produced. For what the project is and how to run it, see [README.md](README.md). For how
-code is written here, see [CONVENTIONS.md](CONVENTIONS.md).
+number is produced. For what the project is and how to run it, see [README.md](README.md).
 
 - [Columns](#columns)
 - [Models](#models)
