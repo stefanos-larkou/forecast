@@ -1,0 +1,28 @@
+{
+    "name": "Larnaca Forecast",
+    "short_name": "Forecast",
+    "description": "A weather forecast for Larnaca that keeps score of itself. Three global models are saved four times a day, corrected by a hand-written gradient-boosted model, and graded against ERA5 reanalysis once the truth catches up.",
+    "start_url": "/forecast/",
+    "scope": "/forecast/",
+    "display": "standalone",
+    "background_color": "#12456e",
+    "theme_color": "#12456e",
+    "icons": [
+        {
+            "src": "/forecast/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/forecast/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/forecast/icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
