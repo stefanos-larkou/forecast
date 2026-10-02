@@ -13,7 +13,7 @@ const CONDITIONS: Record<WeatherState, Condition> = {
     partly: { rain: 0, amount: 0, cloud: 45, temperature: 27 },
     overcast: { rain: 0.1, amount: 0, cloud: 90, temperature: 24 },
     drizzle: { rain: 0.6, amount: 0.3, cloud: 85, temperature: 20 },
-    showers: { rain: 0.4, amount: 1.5, cloud: 85, temperature: 19 },
+    showers: { rain: 0.52, amount: 1.5, cloud: 85, temperature: 19 },
     rain: { rain: 0.8, amount: 2, cloud: 92, temperature: 17 },
     downpour: { rain: 0.9, amount: 6, cloud: 97, temperature: 16 },
     snow: { rain: 0.6, amount: 1, cloud: 92, temperature: 0 },

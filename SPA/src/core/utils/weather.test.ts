@@ -11,7 +11,7 @@ function state(rain: number, amount: number, cloud = 90, temperature = WARM): st
 
 describe("weatherState", () => {
     it("falls back to how much cloud there is when rain is unlikely", () => {
-        expect(state(0.29, 8, 70)).toBe("overcast");
+        expect(state(0.49, 8, 70)).toBe("overcast");
         expect(state(0, 0, 40)).toBe("partly");
         expect(state(0, 0, 24)).toBe("clear");
     });
@@ -24,18 +24,18 @@ describe("weatherState", () => {
     });
 
     it("promises no more than showers while rain is merely possible", () => {
-        expect(state(0.3, 0.5)).toBe("showers");
+        expect(state(0.5, 0.5)).toBe("showers");
         expect(state(0.54, 9)).toBe("showers");
     });
 
     it("calls the same millimetres drizzle at every chance of rain", () => {
-        expect(state(0.3, 0.2)).toBe("drizzle");
+        expect(state(0.5, 0.2)).toBe("drizzle");
         expect(state(0.54, 0.2)).toBe("drizzle");
         expect(state(0.99, 0.2)).toBe("drizzle");
     });
 
     it("turns to snow at freezing, and calls it heavy only where rain would have been a downpour", () => {
-        expect(state(0.3, 0.2, 90, 1)).toBe("snow");
+        expect(state(0.5, 0.2, 90, 1)).toBe("snow");
         expect(state(0.9, 3.9, 90, 0)).toBe("snow");
         expect(state(0.54, 9, 90, 0)).toBe("snow");
         expect(state(0.9, 4, 90, 0)).toBe("heavySnow");
@@ -95,7 +95,7 @@ describe("dayState", () => {
     });
 
     it("keeps one uncertain hour from turning the day into a washout", () => {
-        const spell = [...Array(24)].map((_, index) => hour(index === 14 ? 0.38 : 0.01));
+        const spell = [...Array(24)].map((_, index) => hour(index === 14 ? 0.52 : 0.01));
 
         expect(dayState(spell)).toBe("drizzle");
     });
